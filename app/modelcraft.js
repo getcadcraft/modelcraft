@@ -1717,8 +1717,11 @@ function init(root) {
           row(t('app.info.volume'), formatVolume(s.volume * k * k * k, u));
         }
         const bb = model.bbox(d);
+        // the size as placed: the definition's own size times this placement's scale along each of its axes
+        const sc = [0, 1, 2].map((q) => Math.hypot(inst.m[q * 4], inst.m[q * 4 + 1], inst.m[q * 4 + 2]));
         if (bb) [t('app.info.width'), t('app.info.depth'), t('app.info.height')].forEach((lb, q) => {
-          if (bb.max[q] - bb.min[q] > 1e-6) lenBox(lb, 'mc-size' + q, bb.max[q] - bb.min[q], (L) => model.change(t(d.kind === 'component' ? 'app.undo.resize_component' : 'app.undo.resize_group'), (m) => m.setDefSize(d.id, q, L), [d.id]));
+          const own = bb.max[q] - bb.min[q], placed = own * sc[q];
+          if (placed > 1e-6) lenBox(lb, 'mc-size' + q, placed, (L) => model.change(t(d.kind === 'component' ? 'app.undo.resize_component' : 'app.undo.resize_group'), (m) => m.setDefSize(d.id, q, L / sc[q]), [d.id]));
           else row(lb, formatLength(0, u));
         });
         if (!(s.closed && !d.insts.size)) solidCheck(d, sel[0].id, notes);
