@@ -49,7 +49,10 @@ import { Autosave } from "./app-autosave.js";
 import { handoffParam, takeHandoff } from './handoff.js';
 import { MATERIALS, CATEGORIES, material as libMat, planarUV } from './render/materials.js';   // 0.5 RC.7: the material library
 import { libMaterial, swatchPixels, imageTexture, imageMaterial as imgMaterial } from './render/three-mats.js';
-import { action3d, wheelFactor } from './input-mouse.js';   // 0.5 IP.3: the menu style's buttons and wheel (input-modelcraft.js)
+import { mountTimeline } from './timeline.js';   // 0.6 LC.10: the animation timeline (render/anim.js)
+import { mountXrMc } from './xr-mc.js';   // 0.6 LC.19: review in a headset (xr/), the Issues list
+import { action3d, wheelFactor } from './input-mouse.js';
+import { GUIDE_STEPS, guideStep } from './firstmodel.js';   // 0.6 LC.21: the guided first model   // 0.5 IP.3: the menu style's buttons and wheel (input-modelcraft.js)
 const { t } = i18n;
 /** The display unit in words, lower case ("feet and inches", "millimeters"). */
 const unitWords = (u) => t('app.unit.' + String(u).replace('-', '_'));
@@ -84,6 +87,7 @@ function init(root) {
   let renderSettings = null;   // 0.5 RC.11: the Render dialog's settings (render/looks.js cleanSettings shape), kept in the file's view
   let presentation = false;   // 0.4 M28: only the model on screen (no axes, guides, marks or selection)
   let sceneIndex = -1;
+  let timeline = null, videoSettings = null, xrmc = null;   // 0.6 LC.10: the animation timeline (mounted below) and the Render video dialog's choices
   let playing = null;
   // a new model's unit comes from the browser's locale (feet and inches in the US, Liberia and
   // Myanmar, millimeters elsewhere); the picker changes it for this model and the file keeps it
@@ -144,12 +148,12 @@ function init(root) {
   const axisIcon = mountAxisIcon(ui.stage, { getView: cubeOpts.getView, i18n: { t: i18n.t, has: i18n.has } });
   { const draw0 = view.draw.bind(view); view.draw = () => { draw0(); viewCube.update(); axisIcon.update(); }; }
   window.modelcraft = { model, cam, tools, view, host, ui, viewCube, axisIcon, cubeView: cubeOpts.getView, presenting: () => presentation,
-    afterHistory: () => afterHistory(), print: (m) => print(m) };   // Studio Live (0.5 LV.22, live.js): redraw after others' edits, its messages
+    afterHistory: () => afterHistory(), print: (m) => print(m), get timeline() { return timeline; }, get xrmc() { return xrmc; } };   // Studio Live (0.5 LV.22, live.js): redraw after others' edits, its messages
   // ---- AI assistants and scripts (0.4 part 2 X.7, session agents; agents.js on host.js's control channel): off until Settings › Assistants ----
   installAgents({ model, changed: () => host.changed(), canvas: () => view.renderer?.domElement || null, draw: () => view.draw() });
 
   // ---- settings (Settings › ModelCraft; per viewer conveniences only) ----
-  const SET_DEFAULTS = { keys: 'sketchup', scroll: 'auto', touch2: 'pan', snap: true, collide: true, corner: 'cube' };
+  const SET_DEFAULTS = { keys: 'sketchup', scroll: 'auto', touch2: 'pan', snap: true, collide: true, corner: 'cube', bed: '' };
   const settings = (() => {
     const out = { ...SET_DEFAULTS };
     try {
@@ -160,6 +164,7 @@ function init(root) {
       if (typeof v.snap === 'boolean') out.snap = v.snap;
       if (typeof v.collide === 'boolean') out.collide = v.collide;
       if (['cube', 'axes', 'none'].includes(v.corner)) out.corner = v.corner;
+      if (['', '180', '220', '256', '300'].includes(v.bed)) out.bed = v.bed;   // 0.6 LC.21: printprep.js BEDS
     } catch { /* private window: defaults */ }
     return out;
   })();
@@ -184,6 +189,7 @@ function init(root) {
       if (sn) sn.checked = settings.snap;
       if (co) co.checked = settings.collide;
       settingsDlg.querySelectorAll('input[name="mcCorner"]').forEach((r) => { r.checked = r.value === settings.corner; });
+      settingsDlg.querySelectorAll('input[name="mcBed"]').forEach((r) => { r.checked = r.value === settings.bed; });
       const kh = settingsDlg.querySelector('[data-mc-keys-hint]');
       if (kh) kh.textContent = blender()
         ? t('app.keys.hint.blender')
@@ -206,6 +212,7 @@ function init(root) {
       else if (t.name === 'mcSnap') setSetting('snap', t.checked);
       else if (t.name === 'mcCollide') setSetting('collide', t.checked);
       else if (t.name === 'mcCorner') setSetting('corner', t.value);
+      else if (t.name === 'mcBed') setSetting('bed', t.value);
     });
     settingsDlg.addEventListener('cc-settings-reset', () => { Object.assign(settings, SET_DEFAULTS); persist(); applySettings();
       // the push-pull keys again: a Modeler style goes back to ModelCraft's own (IP.3: the style and the keys stay one)
@@ -964,6 +971,7 @@ function init(root) {
       case 'keys-blender': setKeys('blender'); break;
       default: break;
     }
+    scheduleInfo();
   }
   function afterHistory() {
     if (!model.context(host.path)) host.path = [];
@@ -1351,6 +1359,47 @@ function init(root) {
       }
     }
   }
+  // ---- the animation timeline (0.6 LC.10, session lc-model): timeline.js under the view (Views › Timeline); Render video in
+  // Export and on the timeline. With no keys and two scenes or more, Render video uses the scenes as the camera path (WALK).
+  const tlToggle = $('[data-timeline-toggle]');
+  timeline = mountTimeline({
+    root, model, cam, view, host, t, print,
+    selected: () => host.sel.filter((x) => x.t === 'i').map((x) => {
+      const path = [...host.path, x.id], pl = model.placementAt(path);
+      return pl ? { path, name: pl.inst.name || model.defs.get(pl.inst.def)?.name || '' } : null;
+    }).filter(Boolean),
+    perspChanged: () => perspBtn.setAttribute('aria-checked', String(cam.persp !== false)),
+    busy: () => !!(tools.tool && tools.tool.busy) || !!recording,
+    changed: () => model.bumpSafe(),   // the autosave copy follows timeline edits too
+    openVideo: () => openVideo(),
+    onToggle: (on) => tlToggle.setAttribute('aria-checked', String(on)),
+  });
+  tlToggle.addEventListener('click', () => { closeMenus(); timeline.toggle(); });
+  // ---- review in a headset (0.6 LC.19, session lc-model): xr-mc.js (Views › Review in VR, the Issues list) on xr/xr-session.js ----
+  xrmc = mountXrMc({ root, model, cam, view, host, t, print, settings: () => renderSettings, download: (blob, name, type) => download(blob, name, type), base: () => base(),
+    perspChanged: () => perspBtn.setAttribute('aria-checked', String(cam.persp !== false)), closeMenus });
+  async function openVideo() {
+    if (!model.root.faces.size && !model.root.insts.size) { print(t('app.export.empty')); return; }
+    if (!timeline.has()) {
+      if (model.scenes.length < 2) { timeline.open(); print(t('app.tl.video.none')); return; }
+      timeline.fromScenes();   // WALK: the scenes, in order, as the camera's path
+    }
+    timeline.stop();
+    const [{ openVideoDialog }, { mcScene }] = await Promise.all([import('./render/video-ui.js'), import('./render-mc.js')]);
+    openVideoDialog({
+      scene: (s) => mcScene(model, cam, view.style, s, { anim: timeline.anim }),
+      length: () => timeline.anim.length,
+      fps: timeline.anim.fps,
+      viewSize: () => ({ w: ui.gl.clientWidth, h: ui.gl.clientHeight }),
+      settings: renderSettings,
+      video: videoSettings,
+      saveVideo: (v) => { videoSettings = v; },
+      download: (blob, name) => download(blob, name, blob.type),
+      fileBase: base,
+      onClose: () => { view.invalidate(); ui.over.focus({ preventScroll: true }); },
+      parent: root,
+    });
+  }
   function renderScenes() {
     ui.scenes.replaceChildren();
     model.scenes.forEach((s, i) => {
@@ -1358,6 +1407,7 @@ function init(root) {
         el('button', { type: 'button', className: 'mc-scene-go', title: t('app.scene.go.title'), onclick: () => goScene(i) }, s.name),
         el('span', { className: 'mc-scene-acts' },
           el('button', { type: 'button', className: 'mc-icon', title: t('app.scene.update.title', { name: s.name }), 'aria-label': t('app.scene.update.aria', { name: s.name }), onclick: () => updateScene(i) }, el('i', { className: 'bi bi-arrow-repeat', 'aria-hidden': 'true' })),
+          el('button', { type: 'button', className: 'mc-icon', 'data-scene-lock': '', 'aria-pressed': String(!!s.lock), title: t(s.lock ? 'app.scene.unlock.title' : 'app.scene.lock.title'), 'aria-label': t('app.scene.lock.aria', { name: s.name }), onclick: () => lockScene(i, !s.lock) }, el('i', { className: s.lock ? 'bi bi-lock-fill' : 'bi bi-unlock', 'aria-hidden': 'true' })),
           el('button', { type: 'button', className: 'mc-icon', title: t('app.scene.rename'), 'aria-label': t('app.scene.rename.aria', { name: s.name }), onclick: () => renameScene(i) }, el('i', { className: 'bi bi-pencil', 'aria-hidden': 'true' })),
           el('button', { type: 'button', className: 'mc-icon', title: t('app.scene.delete'), 'aria-label': t('app.scene.delete.aria', { name: s.name }), onclick: () => deleteScene(i) }, el('i', { className: 'bi bi-trash', 'aria-hidden': 'true' }))));
       ui.scenes.append(li);
@@ -1365,14 +1415,22 @@ function init(root) {
     ui.scenesEmpty.hidden = model.scenes.length > 0;
     ui.sceneNav.hidden = model.scenes.length === 0;
     ui.scenebar.hidden = model.scenes.length === 0;
-    ui.scenebar.replaceChildren(...model.scenes.map((s, i) => el('button', { type: 'button', 'aria-current': String(i === sceneIndex), onclick: () => goScene(i) }, s.name)));
+    ui.scenebar.replaceChildren(...model.scenes.map((s, i) => el('button', { type: 'button', 'aria-current': String(i === sceneIndex), title: s.lock ? t('app.scene.locked.tab') : null, onclick: () => goScene(i) }, s.name, s.lock ? el('i', { className: 'bi bi-lock-fill mc-scene-lockmark', 'aria-hidden': 'true' }) : null)));
   }
   function updateScene(i) {
-    const s = cleanScene({ name: model.scenes[i].name, cam: cam.toJSON(), style: view.style, vis: model.captureVis() });
+    // a locked scene (0.6 DC.64) keeps its camera: the style and what is hidden still update
+    const old = model.scenes[i];
+    const s = cleanScene({ name: old.name, lock: old.lock, cam: old.lock ? old.cam : cam.toJSON(), style: view.style, vis: model.captureVis() });
     model.change(t('app.undo.scene_update'), (m) => { m.scenes = m.scenes.map((x, k) => (k === i ? s : x)); }, []);
     sceneIndex = i;
     renderScenes();
-    print(t('app.scene.updated', { name: s.name }));
+    print(t(s.lock ? 'app.scene.updated.locked' : 'app.scene.updated', { name: s.name }));
+  }
+  function lockScene(i, lock) {
+    const nm = model.scenes[i].name;
+    model.change(t(lock ? 'app.undo.scene_lock' : 'app.undo.scene_unlock'), (m) => { m.scenes = m.scenes.map((x, k) => (k === i ? cleanScene({ ...x, lock }) : x)); }, []);
+    renderScenes();
+    print(t(lock ? 'app.scene.locked' : 'app.scene.unlocked', { name: nm }));
   }
   async function renameScene(i) {
     const name = await askText(t('app.scene.rename.h'), t('app.scene.rename.label'), model.scenes[i].name);
@@ -1390,10 +1448,30 @@ function init(root) {
 
   // ---- panels: outliner, components, entity info ----
   let infoTimer = 0;
+  // Toolbar and menu availability: a button that cannot do anything right now is greyed out
+  const NEEDS_SEL = new Set(['copy', 'cut', 'duplicate', 'delete', 'hide', 'isolate', 'group', 'component', 'select-none', 'intersect-sel', 'terrain-contours',
+    'flip-x', 'flip-y', 'flip-z', 'flipcopy-x', 'flipcopy-y', 'flipcopy-z', 'solid-union', 'solid-subtract', 'solid-intersect']);
+  function renderToolbar() {
+    const def = model.root, empty = !(def.edges.size || def.faces.size || def.insts.size || model.dims.size || model.guides.size);
+    const sel = host.sel, has = (...ts) => sel.some((x) => ts.includes(x.t));
+    for (const b of root.querySelectorAll('[data-act]')) {
+      const a = b.dataset.act;
+      if (a === 'new') b.disabled = empty && !model.dirty;
+      else if (a === 'save') b.disabled = empty && !model.dirty;
+      else if (a === 'undo') b.disabled = !model.canUndo();
+      else if (a === 'redo') b.disabled = !model.canRedo();
+      else if (a === 'paste' || a === 'paste-in-place') b.disabled = !window.modelcraft.clip();
+      else if (a === 'extents' || a === 'select-all' || a === 'intersect-model' || a === 'storeys') b.disabled = empty;
+      else if (a === 'explode') b.disabled = !has('i');
+      else if (a === 'axes-face') b.disabled = !(sel.length === 1 && sel[0].t === 'f');
+      else if (NEEDS_SEL.has(a)) b.disabled = !sel.length;
+    }
+  }
+  window.addEventListener('storage', (e) => { if (e.key === 'modelcraft.clipboard') scheduleInfo(); });
   // the panels wait while a tool previews (a drag): they show the model once it is put down, not on every frame
-  function scheduleInfo() { if (!infoTimer) infoTimer = requestAnimationFrame(() => { infoTimer = 0; if (model.previewing) return; renderInfo(); renderTree(); renderComps(); renderTags(); renderScenesIfChanged(); renderLights(); }); }
+  function scheduleInfo() { if (!infoTimer) infoTimer = requestAnimationFrame(() => { infoTimer = 0; if (model.previewing) return; renderToolbar(); renderInfo(); renderTree(); renderComps(); renderTags(); renderScenesIfChanged(); renderLights(); }); }
   let scenesSeen = '';
-  function renderScenesIfChanged() { const k = JSON.stringify(model.scenes.map((s) => s.name)) + sceneIndex; if (k !== scenesSeen) { scenesSeen = k; renderScenes(); } }
+  function renderScenesIfChanged() { const k = JSON.stringify(model.scenes.map((s) => [s.name, !!s.lock])) + sceneIndex; if (k !== scenesSeen) { scenesSeen = k; renderScenes(); } }
 
   // Outliner (0.4 M22): search by name, an eye per row (hide/show, M17), F2 renames in place, drag a row onto a group to
   // move it inside (onto the Outliner heading: to the top level), keeping where it is in the world
@@ -1847,6 +1925,9 @@ function init(root) {
     sceneIndex = -1;
     view.style = { ...view.style, mode: 'shaded', edges: true, shadows: false };
     renderSettings = null;
+    videoSettings = null;
+    timeline.reset();
+    xrmc.reset();
     model.images.clear();
     styleToUi();
     cam.eye = [9, -12, 8]; cam.target = [0, 0, 1];
@@ -1869,6 +1950,11 @@ function init(root) {
     const imgs = model.imagesJSON();
     if (imgs.length) j.images = imgs;   // 0.5 RC.11 (b): imported textures, beside the model (outside undo)
     if (renderSettings) j.view.render = renderSettings;   // 0.5 RC.11: the Render dialog's settings and looks
+    if (videoSettings) j.view.video = videoSettings;   // 0.6 LC.10: the Render video dialog's choices
+    const an = timeline && timeline.toJSON();
+    if (an) j.anim = an;   // 0.6 LC.10: the animation (render/anim.js; checked again on open)
+    const iss = xrmc && xrmc.toJSON();
+    if (iss) j.issues = iss;   // 0.6 LC.19: issues (placed in VR), pictures as base64 PNG; checked again on open
     return JSON.stringify(j);
   };
   async function saveModel() {
@@ -1890,6 +1976,7 @@ function init(root) {
     const kind = b.dataset.export;
     try {
       if (kind === 'print3d') { await print3d(); return; }
+      if (kind === 'video') { await openVideo(); return; }   // 0.6 LC.10
       if (kind === 'render') {
         // a rendered picture of the view (0.5 RC.11): the shared renderer in render/, ModelCraft's adapter render-mc.js
         if (!model.root.faces.size && !model.root.insts.size) { print(t('app.export.empty')); return; }
@@ -1968,38 +2055,128 @@ function init(root) {
   /**
    * Check for 3D printing (0.5 SG.4, #531): the selection, or everything shown, as a printer mesh (mm, Z up) through
    * print3d.js — closed, faces the right way, not passing through itself; size, volume, base, overhangs — then STL or
-   * 3MF of exactly that mesh. Both modules load on first use.
+   * 3MF of exactly that mesh. 0.6 LC.21 (printprep.js): each problem in plain words (what is wrong · why it matters · what
+   * to do), the parts it is in with Show, one Fix what can be fixed (one undo step, then the check runs again), and the
+   * printer bed from Settings. The modules load on first use.
    */
+  let printReady = -1;   // model.version of the last check that said ready (the guided first model's last step)
   async function print3d() {
-    const [P, { printTriangles }] = await Promise.all([import('./print3d.js'), import('./print-mc.js')]);
-    const { tris, what } = printTriangles(model, { path: host.path, sel: host.sel });
+    const [P, { printTriangles }, PP] = await Promise.all([import('./print3d.js'), import('./print-mc.js'), import('./printprep.js')]);
+    const choice = { path: host.path, sel: host.sel };
+    const { tris, what } = printTriangles(model, choice);
     print(t('app.print3d.checking'));
     await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
-    const rep = P.printCheck(P.meshFromTriangles(tris));
+    const bed = PP.bedSize(settings.bed);
+    const rep = P.printCheck(P.meshFromTriangles(tris), { bed });
+    const plain = PP.plainReport(rep);
+    const parts = plain.fix ? PP.partsToFix(model, choice, rep) : [];
+    if (rep.ok) printReady = model.version;
+    syncGuide(true);   // a check changes no geometry, so the guide's version watch alone would not see it
     const mm = (v) => (Math.round(v * 10) / 10).toLocaleString(i18n.locale() === 'en-XA' ? 'en' : i18n.locale());
     const facts = el('ul', { className: 'mc-print-facts' },
       el('li', {}, t(what === 'selection' ? 'app.print3d.what.sel' : 'app.print3d.what.all')),
       rep.size ? el('li', {}, t('app.print3d.size', { w: mm(rep.size[0]), d: mm(rep.size[1]), h: mm(rep.size[2]) })) : null,
       rep.volume != null ? el('li', {}, t('app.print3d.volume', { v: mm(rep.volume / 1000) })) : null,
-      el('li', {}, t('app.print3d.tris', { n: rep.triangles })));
-    const line = (k, x) => el('li', {}, t(k, x));
-    const problems = rep.problems.map((p) => line('app.print3d.p.' + p.kind, { n: p.n }));
-    const warnings = rep.warnings.map((w) => line('app.print3d.w.' + w.kind, { n: w.n || 0, share: Math.max(1, Math.round((w.share || 0) * 100)), angle: w.angle || 45 }));
+      el('li', {}, t('app.print3d.tris', { n: rep.triangles })),
+      el('li', {}, bed ? t('app.prep.bed', { x: bed[0], y: bed[1], z: bed[2] }) : t('app.prep.bed.none')));
+    const row = (r) => el('li', { className: 'mc-prep-row', dataset: { prepKind: r.kind } },
+      el('span', { className: 'mc-prep-what' }, t((r.level === 'fix' ? 'app.print3d.p.' : 'app.print3d.w.') + r.kind, { n: r.n, share: Math.max(1, Math.round((r.share || 0) * 100)), angle: r.angle || 45 })),
+      el('span', { className: 'mc-prep-why' }, t('app.prep.why.' + r.kind)),
+      el('span', { className: 'mc-prep-todo' }, t('app.prep.todo.' + r.kind)));
+    const fixRows = plain.rows.filter((r) => r.level === 'fix'), lookRows = plain.rows.filter((r) => r.level === 'look');
+    const partName = (p) => (p.name ? p.name : t(p.defId === 'root' ? 'app.prep.part.loose' : 'app.prep.part.unnamed'));
+    const partList = (p) => problemList({ holes: { length: p.holes }, extra: { length: p.extra }, inner: { length: p.inner }, stray: { length: p.stray }, flipped: { length: p.flipped } });
+    const fixable = parts.some((p) => p.fixable);
     const body = el('div', { className: 'mc-print' },
-      el('p', { className: 'mc-print-verdict', dataset: { printOk: rep.ok ? '1' : '0' } }, t(rep.ok ? 'app.print3d.ready' : 'app.print3d.notready')),
-      problems.length ? el('ul', { className: 'mc-print-problems', dataset: { printProblems: '' } }, ...problems) : null,
-      warnings.length ? el('ul', { className: 'mc-print-warnings', dataset: { printWarnings: '' } }, ...warnings) : null,
+      el('p', { className: 'mc-print-verdict', dataset: { printOk: rep.ok ? '1' : '0', prepVerdict: plain.verdict } },
+        plain.verdict === 'empty' ? t('app.print3d.p.empty') : plain.verdict === 'fix' ? t('app.prep.verdict.fix', { n: plain.fix })
+          : plain.verdict === 'look' ? t('app.prep.verdict.look', { n: plain.look }) : t('app.prep.verdict.ready')),
+      plain.verdict === 'empty' ? el('p', { className: 'mc-note' }, t('app.prep.todo.empty')) : null,
+      fixRows.length && plain.verdict !== 'empty' ? el('h3', { className: 'mc-prep-h' }, t('app.prep.h.fix')) : null,
+      fixRows.length && plain.verdict !== 'empty' ? el('ul', { className: 'mc-print-problems', dataset: { printProblems: '' } }, ...fixRows.map(row)) : null,
+      parts.length ? el('h3', { className: 'mc-prep-h' }, t('app.prep.parts.h')) : null,
+      parts.length ? el('ul', { className: 'mc-prep-parts', dataset: { prepParts: '' } }, ...parts.map((p, k) => el('li', {},
+        el('span', {}, t('app.prep.part', { name: partName(p), list: partList(p) })), ' ',
+        el('button', { type: 'button', className: 'mc-linkbtn', dataset: { key: 'show:' + k } }, t('app.prep.show'))))) : null,
+      lookRows.length ? el('h3', { className: 'mc-prep-h' }, t('app.prep.h.look')) : null,
+      lookRows.length ? el('ul', { className: 'mc-print-warnings', dataset: { printWarnings: '' } }, ...lookRows.map(row)) : null,
       facts,
-      problems.length && rep.problems[0].kind !== 'empty' ? el('p', { className: 'mc-note' }, t('app.print3d.fixhint')) : null);
-    print(t(rep.ok ? 'app.print3d.ready' : 'app.print3d.notready'));
-    if (!rep.triangles) { await ask({ title: t('app.print3d.title'), body, buttons: [['cancel', t('app.btn.close'), 'btn-plot']] }); return; }
-    const key = await ask({ title: t('app.print3d.title'), body, buttons: [['cancel', t('app.btn.cancel'), 'btn-line'], ['stl', t('app.print3d.stl'), 'btn-line'], ['3mf', t('app.print3d.3mf'), 'btn-plot']] });
+      plain.fix && !parts.length && plain.verdict !== 'empty' ? el('p', { className: 'mc-note' }, t('app.print3d.fixhint')) : null);
+    print(plain.verdict === 'fix' ? t('app.prep.verdict.fix', { n: plain.fix }) : t(rep.ok ? 'app.print3d.ready' : 'app.print3d.notready'));
+    const buttons = !rep.triangles ? [['cancel', t('app.btn.close'), 'btn-plot']]
+      : [['cancel', t('app.btn.cancel'), 'btn-line'], ...(fixable ? [['fix', t('app.prep.fixall'), 'btn-line']] : []), ['stl', t('app.print3d.stl'), 'btn-line'], ['3mf', t('app.print3d.3mf'), rep.ok ? 'btn-plot' : 'btn-line']];
+    const key = await ask({ title: t('app.print3d.title'), body, buttons });
+    if (key.startsWith('show:')) {
+      // open the part and select what is wrong in it, as Entity info's Show problems does
+      const p = parts[Number(key.slice(5))];
+      if (!p || !model.def(p.defId)) return;
+      const sp = solidProblems(model.def(p.defId));
+      host.openContext(p.path);
+      host.setSel([...[...sp.holes, ...sp.extra, ...sp.stray].map((id) => ({ t: 'e', id })), ...[...sp.inner, ...(p.flipped ? sp.flipped : [])].map((id) => ({ t: 'f', id }))]);
+      print(t('app.check.showing', { list: partList(p) }));
+      return;
+    }
+    if (key === 'fix') {
+      const r = PP.fixParts(model, parts.filter((p) => p.fixable), t('app.undo.prep_fix'));
+      afterHistory();
+      const done = [r.stray && t('app.check.fixed.stray', { n: r.stray }), r.inner && t('app.check.fixed.inner', { n: r.inner }), r.flipped && t('app.check.fixed.flipped', { n: r.flipped }), r.holes && t('app.check.fixed.holes', { n: r.holes })].filter(Boolean).join(' · ');
+      print(done ? t('app.check.fixed', { done }) : t('app.prep.nothing'));
+      await print3d();   // check again, so the dialog shows what is left
+      return;
+    }
     if (key !== 'stl' && key !== '3mf') return;
     const file = base() + '.' + key;
     if (key === 'stl') download(P.stlBinary(rep.mesh, 'ModelCraft ' + base()), file, 'model/stl');   // i18n-ignore: the STL header
     else download(P.threeMF(rep.mesh, { name: base(), app: 'ModelCraft' }), file, 'model/3mf');   // i18n-ignore: an app name in the file
     print(t('app.print3d.done', { file, n: rep.mesh.indices.length / 3 }));
   }
+
+  // ---- the guided first model (0.6 LC.21, firstmodel.js): a card over the view; each step is read from the model, so any
+  // way of doing it counts and Undo steps back. Opened from the Start modeling card or Views › Guided first model. ----
+  const guideBox = root.querySelector('[data-guide]');
+  let guideOn = false, guideAt = -1, guideVer = -1;
+  function syncGuide(force) {
+    if (!guideOn || !guideBox) return;
+    if (!force && guideVer === model.version && guideAt >= 0) return;
+    guideVer = model.version;
+    const step = guideStep(model, { ready: printReady === model.version });
+    if (step === guideAt && !force) return;
+    guideAt = step;
+    const name = GUIDE_STEPS[step] || 'done';
+    const K = blender() ? { face: 'B', solid: 'E', group: 'Ctrl+G' } : { face: 'R', solid: 'P', group: 'Shift+G' };
+    const act = (label, fn) => el('button', { type: 'button', className: 'btn-line btn-sm-cc', dataset: { guideAct: name }, onclick: fn }, label);
+    const actions = {
+      face: () => act(t('app.guide.tool'), () => { setTool('rect'); ui.over.focus({ preventScroll: true }); }),
+      solid: () => act(t('app.guide.tool'), () => { setTool('push'); ui.over.focus({ preventScroll: true }); }),
+      group: () => act(t('app.guide.select'), () => {
+        host.openContext([]);
+        const d = model.root, f = [...d.faces.keys()][0];
+        host.setSel(f === undefined ? [] : connected(d, [{ t: 'f', id: f }]));
+        ui.over.focus({ preventScroll: true });
+      }),
+      print: () => act(t('app.guide.check'), () => print3d()),
+      done: () => act(t('app.guide.done'), () => closeGuide()),
+    };
+    guideBox.replaceChildren(
+      el('div', { className: 'mc-guide-top' },
+        el('p', { className: 'mc-guide-step', dataset: { guideStep: String(step) } }, step < GUIDE_STEPS.length ? t('app.guide.step', { n: step + 1, total: GUIDE_STEPS.length }) : t('app.guide.title')),
+        el('button', { type: 'button', className: 'mc-linkbtn', dataset: { guideClose: '' }, title: t('app.guide.close'), 'aria-label': t('app.guide.close'), onclick: () => closeGuide() }, el('i', { className: 'bi bi-x-lg', 'aria-hidden': 'true' }))),
+      el('h2', { className: 'mc-guide-h', id: 'mc-guide-h' }, t('app.guide.' + name + '.h')),
+      el('p', {}, ...lx('app.guide.' + name + '.body', { key: kb(K[name] || ''), eg: kb(name === 'face' ? '40mm,30mm' : '20mm'), enter: kb('Enter') })),
+      el('ol', { className: 'mc-guide-list' }, ...GUIDE_STEPS.map((k, i) => el('li', { className: i < step ? 'is-done' : i === step ? 'is-now' : '' }, t('app.guide.' + k + '.short')))),
+      el('div', { className: 'mc-actions' }, actions[name]()));
+    if (step > 0 && step < GUIDE_STEPS.length) print(t('app.guide.next', { step: t('app.guide.' + name + '.short') }));
+  }
+  function openGuide() {
+    closeMenus(); hideHint();
+    guideOn = true; guideAt = -1; guideBox.hidden = false;
+    syncGuide(true);
+    guideBox.querySelector('[data-guide-act]')?.focus({ preventScroll: true });
+  }
+  function closeGuide() { guideOn = false; guideBox.hidden = true; focusView(); }
+  root.querySelectorAll('[data-guide-open]').forEach((b) => b.addEventListener('click', openGuide));
+  setInterval(() => syncGuide(false), 400);
+  window.modelcraft.guide = { open: openGuide, close: closeGuide, step: () => (guideOn ? guideAt : null) };
 
   // the hidden inputs stay for browsers without the host picker's handles (and for tests: setInputFiles)
   ui.fileOpen.addEventListener('change', () => { const f = ui.fileOpen.files[0]; ui.fileOpen.value = ''; if (f) openFile(f); });
@@ -2031,6 +2208,9 @@ function init(root) {
       const v = j.view && cleanScene({ name: 'v', cam: j.view.cam, style: j.view.style });
       if (v) { cam.set(v.cam); view.style = v.style; perspBtn.setAttribute('aria-checked', String(cam.persp)); } else zoomExtents();
       renderSettings = j.view && j.view.render && typeof j.view.render === 'object' ? j.view.render : null;   // cleaned when the dialog opens
+      videoSettings = j.view && j.view.video && typeof j.view.video === 'object' ? j.view.video : null;   // 0.6 LC.10, cleaned when the dialog opens
+      timeline.load(j.anim);   // 0.6 LC.10 (untrusted: checked)
+      xrmc.load(j.issues);   // 0.6 LC.19 (untrusted: checked)
       ui.units.value = model.units;
       styleToUi(); renderScenes(); setTool('select'); hideHint();
       scheduleInfo(); view.invalidate();

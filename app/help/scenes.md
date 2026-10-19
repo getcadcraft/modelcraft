@@ -32,6 +32,15 @@ Each scene in the list has three small buttons after its name:
 
 Adding, updating, renaming and deleting scenes are steps in undo, like changes to the model.
 
+## Lock a scene's camera
+
+When you render the same view again and again as the design changes, lock that scene's camera so the view never moves by accident.
+
+1. In the {{ui:Scenes}} list, click the **lock** button (the open padlock) after the scene's name. It closes, and the scene's tab over the 3D view shows a small padlock. The status bar says "Scene 2: camera locked."
+2. Go to the scene whenever you want to render: the camera goes back to exactly the saved view, so pictures made from it line up with the earlier ones.
+
+While the camera is locked, **Update** still saves the style and what is hidden into the scene, but the camera stays where it was, even if you have orbited away. Click the padlock again to unlock it; Update then saves the current view again. Locking and unlocking are steps in undo, and the lock is saved in the `.modelcraft` file.
+
 ## Present
 
 1. Add two or more scenes.
@@ -51,6 +60,8 @@ Hidden loose faces and edges are not part of scenes. Going to a scene does not m
 ## Export an animation
 
 {{ui:Export animation}}, under the list, plays the scenes from the first to the last, moving the camera smoothly between them, and saves the film as a **WebM** video (two seconds' move and a short pause per scene). It records the view as you see it, at its size on screen, in [presentation view](topic:styles-shadows#presentation-view) (no axes, guides or selection). Press {{key:Esc}} or click the button again to stop without saving. WebM plays in browsers and VLC, and video editors convert it.
+
+For a rendered walkthrough (sky, sun, shadows, materials) at a size you choose, use {{ui:Render video…}} instead: with no animation keys it takes the scenes, in order, as the camera's path. See [Animate the camera and objects](topic:animation).
 
 ## Things to know
 

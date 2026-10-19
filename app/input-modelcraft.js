@@ -48,6 +48,7 @@ export const COMMANDS = [
   C('export.pdf', 'export', 'bi-file-earmark-pdf', X('pdf')),
   C('export.print', 'export', 'bi-printer', X('print')),
   C('export.render', 'export', 'bi-camera', X('render')),
+  C('export.video', 'export', 'bi-camera-reels', X('video')),   // 0.6 LC.10 (session lc-model)
 
   C('draw.line', 'draw', 'bi-slash-lg', TL('line'), { defKeys: ['L'] }),
   C('draw.rect', 'draw', 'bi-square', TL('rect'), { defKeys: ['R'] }),
@@ -124,6 +125,9 @@ export const COMMANDS = [
   C('camera.present', 'camera', 'bi-easel', '.mc-tools [data-present]', { defKeys: ['Shift+P'] }),
   C('camera.sec-planes', 'camera', 'bi-slash-square', '.mc-tools [data-sec-planes]'),
   C('camera.sec-cuts', 'camera', 'bi-scissors', '.mc-tools [data-sec-cuts]'),
+  C('camera.timeline', 'camera', 'bi-film', '.mc-tools [data-timeline-toggle]'),   // 0.6 LC.10
+  C('camera.vr', 'camera', 'bi-headset-vr', '.mc-tools [data-xr-enter]'),   // 0.6 LC.19
+  C('camera.guide', 'camera', 'bi-signpost-2', '.mc-tools [data-guide-open]'),   // 0.6 LC.21
 
   C('aids.snap', 'aids', 'bi-magnet', '[data-mc-toggle="snap"]'),
   C('aids.collide', 'aids', 'bi-bricks', '[data-mc-toggle="collide"]'),
@@ -162,7 +166,7 @@ export const KEYSETS = {
 
 const m = (label, items) => ({ label: 'input.m.' + label, items });
 const EXPORTS = ['export.glb', 'export.dae', 'export.obj', 'export.stl', 'export.ifc', 'export.storeys', 'export.dwg', 'export.dxf'];
-const IMAGES = ['export.png', 'export.png2', 'export.pdf', 'export.print', 'export.print3d', 'export.render'];
+const IMAGES = ['export.png', 'export.png2', 'export.pdf', 'export.print', 'export.print3d', 'export.render', 'export.video'];
 const FLIPS = ['edit.flip-x', 'edit.flip-y', 'edit.flip-z', 'edit.flipcopy-x', 'edit.flipcopy-y', 'edit.flipcopy-z'];
 const VIEWS = ['camera.iso', 'camera.top', 'camera.front', 'camera.right', 'camera.back', 'camera.left', 'camera.bottom'];
 const APP = ['app.settings', 'app.palette', 'app.help'];
@@ -178,7 +182,7 @@ export const STYLES = {
     menus: [
       m('file', ['file.new', 'file.open', 'file.save', '-', 'file.import', '-', ...EXPORTS, '-', ...IMAGES, '-', ...APP]),
       m('edit', ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.paste-in-place', 'edit.duplicate', 'edit.delete', '-', 'edit.select-all', 'edit.select-none', '-', 'edit.hide', 'edit.isolate', 'edit.unhide-all', '-', 'organize.component', 'organize.group', 'organize.explode', '-', 'edit.intersect-model', 'edit.intersect-sel']),
-      m('view', ['camera.present', '-', 'camera.sec-planes', 'camera.sec-cuts']),
+      m('view', ['camera.present', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.guide']),
       m('camera', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp']),
       m('draw', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.curve', '-', 'draw.rect', 'draw.circle', 'draw.polygon']),
       m('tools', ['modify.select', 'modify.erase', 'modify.paint', '-', 'modify.move', 'modify.push', 'modify.rotate', 'modify.follow', 'modify.scale', 'modify.offset', '-', 'organize.union', 'organize.subtract', 'organize.intersect', '-', ...FLIPS, '-', 'modify.tape', 'modify.dim', 'modify.protractor', 'draw.text3d', 'edit.axes-place', 'edit.axes-face', 'edit.axes-reset', '-', 'camera.section', '-', 'edit.terrain-contours', 'edit.terrain-grid', 'edit.sculpt']),
@@ -193,13 +197,13 @@ export const STYLES = {
     menus: [
       m('file', ['file.new', 'file.open', 'file.save', '-', 'file.import', '-', ...EXPORTS, '-', ...IMAGES, '-', ...APP]),
       m('edit', ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.paste-in-place', '-', 'aids.snap', 'aids.collide', '-', 'edit.keys-pushpull', 'edit.keys-modeler']),
-      m('view', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp', 'camera.present', '-', 'camera.sec-planes', 'camera.sec-cuts']),
+      m('view', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp', 'camera.present', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.guide']),
       m('select', ['modify.select', 'edit.select-all', 'edit.select-none', '-', 'edit.hide', 'edit.isolate', 'edit.unhide-all']),
       m('add', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.curve', 'draw.rect', 'draw.circle', 'draw.polygon', 'draw.text3d', '-', 'modify.tape', 'modify.protractor', 'modify.dim', 'camera.section']),
       m('object', ['modify.move', 'modify.rotate', 'modify.scale', '-', 'edit.duplicate', 'edit.delete', '-', ...FLIPS, '-', 'organize.group', 'organize.component', 'organize.explode', '-', 'organize.union', 'organize.subtract', 'organize.intersect', '-', 'edit.axes-place', 'edit.axes-face', 'edit.axes-reset']),
       m('mesh', ['modify.push', 'modify.follow', 'modify.offset', 'modify.erase', 'modify.paint', '-', 'edit.intersect-model', 'edit.intersect-sel', '-', 'edit.terrain-contours', 'edit.terrain-grid', 'edit.sculpt']),
     ],
-    bar: ['modify.select', 'modify.move', 'modify.rotate', 'modify.scale', '-', 'modify.push', 'draw.line', 'draw.rect', 'draw.circle', '-', 'camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', 'edit.undo', 'edit.redo'],
+    bar: ['modify.select', 'modify.move', 'modify.rotate', 'modify.scale', '-', 'modify.push', 'draw.line', 'draw.rect', 'draw.circle', '-', 'modify.tape', 'modify.dim', '-', 'camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', 'edit.undo', 'edit.redo'],
     labels: { 'modify.move': 'input.lbl.modeler.move', 'modify.push': 'input.lbl.modeler.push' },
     keys: MODELER_KEYS,
     // the middle button orbits (Shift + middle pans, Ctrl + middle zooms); the right button belongs to the tool (it cancels)

@@ -1038,6 +1038,33 @@ section('snapping to a closed group (0.4 M29, user report)');
     }
   }
   ok(visibleOk.length >= 40 && visibleOk.every(Boolean), `Line snaps to every visible corner of a closed group, from the top level and from inside another group, from 4 views (${visibleOk.filter(Boolean).length}/${visibleOk.length})`);
+  // 0.6 DC.21 (the same report): every drawing/editing tool, and the edges' midpoints too (an end closer than the midpoint wins)
+  const toolsOk = {};
+  for (const ctx of [[], [gB]]) {
+    host.path = ctx;
+    for (const eye of [[6, -6, 5], [-4, -5, 3]]) {
+      cam.eye = eye; cam.target = [2, 0.5, 0.7]; cam.clip(30);
+      const sc = host.scene();
+      for (const e of sc.edges) {
+        if (e.path?.[0] !== gA) continue;
+        for (const [kind, p] of [['end', e.a], ['mid', V.mul(V.add(e.a, e.b), 0.5)]]) {
+          const s2 = cam.project(p), ray = cam.ray(s2[0], s2[1]), tp = V.dist(ray.o, p);
+          let hidden = false;
+          for (const f of sc.faces) for (const [a2, b2, c2] of f.tris) { const tt = V.rayTri(ray.o, ray.d, a2, b2, c2); if (tt !== null && tt < tp - 1e-6) hidden = true; }
+          if (hidden) continue;
+          for (const tool of ['rect', 'circle', 'move', 'tape']) {
+            T.set(tool); T.move({ x: s2[0] + 1, y: s2[1] - 1 });
+            const c = T.tool.cur, k = tool + ' ' + kind;
+            toolsOk[k] ||= [0, 0];
+            toolsOk[k][1]++;
+            if (c && V.dist(c.p, p) < 1e-9 && (c.kind === kind || (kind === 'mid' && c.kind === 'end'))) toolsOk[k][0]++;
+          }
+        }
+      }
+    }
+  }
+  ok(Object.keys(toolsOk).length === 8 && Object.values(toolsOk).every(([g, n]) => n >= 8 && g === n), `Rectangle, Circle, Move and Tape snap to closed group A's corners and edge midpoints too (${Object.entries(toolsOk).map(([k, [g, n]]) => k + ' ' + g + '/' + n).join(', ')})`);
+  host.path = [];
   // draw from a corner of the closed group while editing inside the other one: the line lands in that group, starting exactly there
   host.path = [gB];
   cam.eye = [6, -6, 5]; cam.target = [2, 0.5, 0.7]; cam.clip(30);
@@ -2379,6 +2406,121 @@ section('3D printing from a model: print-mc.js (0.5 SG.4)');
   const stl = P.stlBinary(r.mesh), mf = P.threeMF(r.mesh, { name: 'cubes', app: 'ModelCraft' });
   ok(new DataView(stl.buffer).getUint32(80, true) === r.mesh.indices.length / 3 && mf[0] === 0x50 && mf[1] === 0x4b, 'STL and 3MF of the checked mesh');
 }
+section('beginner 3D and print prep: firstmodel.js + printprep.js (0.6 LC.21)');
+{
+  const F = await import(path.join(APP, 'firstmodel.js'));
+  const PP = await import(path.join(APP, 'printprep.js'));
+  const P = await import(path.join(APP, 'print3d.js'));
+  const { printTriangles } = await import(path.join(APP, 'print-mc.js'));
+  const check = (m, choice = {}, bed = null) => P.printCheck(P.meshFromTriangles(printTriangles(m, choice).tris), { bed });
+  const box = (mm, x, w, d, h) => {
+    const had = new Set(mm.root.faces.keys());
+    addPolygon(mm.root, rectPts([x, 0, 0], [1, 0, 0], [0, 1, 0], w, d));
+    const f = [...mm.root.faces.keys()].find((k) => !had.has(k));
+    pushPull(mm.root, f, h);
+    return f;
+  };
+  const group = (mm, f, kind = 'group', name) => mm.makeGroup(mm.root, M.connected(mm.root, [{ t: 'f', id: f }]), kind, name);
+
+  // the guided first model: each step read from the model, Undo steps back
+  const g = new Model();
+  ok(F.guideStep(g) === 0, 'guide: an empty model is at step 1 (draw a rectangle)');
+  g.change('r', (mm) => addPolygon(mm.root, rectPts([0, 0, 0], [1, 0, 0], [0, 1, 0], 0.04, 0.03)));
+  ok(F.guideStep(g) === 1, 'guide: a rectangle on the ground → step 2 (pull it up)');
+  g.change('p', (mm) => pushPull(mm.root, [...mm.root.faces.keys()][0], 0.02));
+  const sh = F.shells(g.root);
+  ok(sh.length === 1 && sh[0].closed && close(sh[0].volume, 0.04 * 0.03 * 0.02, 1e-12), 'guide: pulled up 20 mm → one closed piece of 40 × 30 × 20 mm = ' + sh[0].volume + ' m³');
+  ok(F.guideStep(g) === 2, 'guide: a loose box → step 3 (make it one object)');
+  g.change('g', (mm) => group(mm, [...mm.root.faces.keys()][0], 'group', 'Box'));
+  ok(F.guideStep(g) === 3 && F.guideStep(g, { ready: false }) === 3, 'guide: grouped → step 4 (check it for 3D printing)');
+  ok(F.guideStep(g, { ready: true }) === 4, 'guide: grouped and checked ready → done');
+  g.undo();
+  ok(F.guideStep(g) === 2, 'guide: Undo the group → back to step 3');
+  g.redo();
+  ok(F.guideStep(g) === 3, 'guide: Redo → step 4 again');
+  // other ways count too: a face grouped before it is pulled up is not a solid yet; the starter library's chair is
+  const g2 = new Model();
+  g2.change('r', (mm) => { addPolygon(mm.root, rectPts([0, 0, 0], [1, 0, 0], [0, 1, 0], 1, 1)); group(mm, [...mm.root.faces.keys()][0]); });
+  ok(F.guideStep(g2) === 1, 'guide: a flat face in a group → still step 2 (no solid yet)');
+  const { buildStarter } = await import(path.join(APP, 'starter.js'));
+  const g3 = new Model();
+  g3.change('chair', (mm) => { const d = buildStarter(mm, 'chair', 'Chair'); mm.place(mm.root, d.id, V.ident()); });
+  ok(F.guideStep(g3) === 3, 'guide: a placed starter chair (solid parts in a component) → step 4');
+  const g4 = new Model();
+  g4.change('h', (mm) => { const f = box(mm, 0, 0.02, 0.02, 0.02); group(mm, f); });
+  g4.change('hide', (mm) => { for (const i of mm.root.insts.values()) i.hidden = true; });
+  ok(F.guideStep(g4) === 0, 'guide: a hidden group does not count (what shows is what counts)');
+  const two = new Model();
+  two.change('2', (mm) => { box(mm, 0, 0.01, 0.01, 0.01); box(mm, 0.05, 0.02, 0.01, 0.01); });
+  const s2 = F.shells(two.root);
+  ok(s2.length === 2 && s2.every((s) => s.closed) && close(s2[0].volume + s2[1].volume, 1e-6 + 2e-6, 1e-12), 'shells: two separate boxes → two closed pieces, 1 + 2 cm³');
+
+  // plain words: most serious first, the verdict counts
+  const rep0 = { problems: [{ kind: 'flipped', n: 2 }, { kind: 'open', n: 4 }], warnings: [{ kind: 'overhang', share: 0.2, angle: 45 }, { kind: 'tiny' }] };
+  const pr0 = PP.plainReport(rep0);
+  ok(pr0.verdict === 'fix' && pr0.fix === 2 && pr0.look === 2 && pr0.rows.map((r) => r.kind).join() === 'open,flipped,tiny,overhang', 'plain: holes before turned faces, wrong units before overhangs — ' + pr0.rows.map((r) => r.kind));
+  ok(PP.plainReport({ problems: [], warnings: [{ kind: 'nobase' }] }).verdict === 'look' && PP.plainReport({ problems: [], warnings: [] }).verdict === 'ready', 'plain: warnings only → "look"; nothing → "ready"');
+  const pe = PP.plainReport({ problems: [{ kind: 'empty', n: 0, at: [] }], warnings: [] });
+  ok(pe.verdict === 'empty' && pe.fix === 0, 'plain: nothing shown → "empty", no count of things to fix');
+
+  // the bed: sizes only, from Settings
+  ok(JSON.stringify(PP.bedSize('220')) === '[220,220,250]' && PP.bedSize('') === null && PP.bedSize('999') === null && PP.bedSize('__proto__') === null && PP.bedSize('constructor') === null, 'bed: 220 → 220 × 220 × 250 mm; not set / unknown / prototype names → none');
+  const big = new Model();
+  big.change('b', (mm) => group(mm, box(mm, 0, 0.2, 0.05, 0.05), 'group', 'Long'));
+  const rb = check(big, {}, PP.bedSize('180'));
+  ok(rb.ok && PP.plainReport(rb).rows.some((r) => r.kind === 'bed') && !PP.plainReport(check(big, {}, PP.bedSize('220'))).rows.some((r) => r.kind === 'bed'), 'bed: a 200 mm bar is too long for 180 mm, fits 220 mm');
+
+  // the parts with problems, and one Fix for all of them
+  const holed = new Model();
+  const ids = holed.change('c', (mm) => {
+    const a = group(mm, box(mm, 0, 0.02, 0.02, 0.02), 'component', 'Cube');
+    const b = mm.place(mm.root, mm.root.insts.get(a).def, V.translation([0.05, 0, 0]));
+    const ok2 = group(mm, box(mm, 0.1, 0.02, 0.02, 0.02), 'group', 'Good');
+    return { a, b, ok2 };
+  });
+  const cube = holed.defs.get(holed.root.insts.get(ids.a).def);
+  const topF = [...cube.faces].find(([, f]) => faceNormal(cube, f)[2] > 0.99)[0];
+  holed.change('hole', (mm) => { mm.def(cube.id).faces.delete(topF); });
+  const rh = check(holed);
+  const parts = PP.partsToFix(holed, {}, rh);
+  ok(!rh.ok && parts.length === 1 && parts[0].name === 'Cube' && parts[0].holes === 4 && parts[0].fixable && parts[0].path.join() === String(ids.a), 'parts: a component with its top gone, placed twice → one row "Cube", 4 hole edges, at its first placement; the good group is not listed');
+  const undoBefore = holed.undoStack.length;
+  const fx = PP.fixParts(holed, parts, 'fix');
+  ok(fx.holes === 1 && holed.undoStack.length === undoBefore + 1, 'fix: one flat hole closed, as one undo step');
+  const rh2 = check(holed);
+  ok(rh2.ok && rh2.shells === 3 && PP.partsToFix(holed, {}, rh2).length === 0, 'fix: then ready, both copies closed (3 cubes) and no parts left');
+  holed.undo();
+  ok(!check(holed).ok, 'fix: Undo brings the hole back');
+  // a face turned the wrong way, loose in the model (no group)
+  const turned = new Model();
+  turned.change('t', (mm) => { const f = box(mm, 0, 0.02, 0.02, 0.02); M.reverseFaces(mm.root, [f]); });
+  const rt = check(turned), pt = PP.partsToFix(turned, {}, rt);
+  ok(!rt.ok && pt.length === 1 && pt[0].defId === 'root' && pt[0].name === null && pt[0].flipped === 1, 'parts: one turned face on loose faces → the "Faces not in a group" row, 1 turned');
+  PP.fixParts(turned, pt, 'fix');
+  ok(check(turned).ok, 'fix: the turned face turned back → ready');
+  // a hollow part (a 40 mm box with a 20 mm group inside it, turned to face in) is ready and lists nothing
+  const hollow = new Model();
+  hollow.change('h', (mm) => {
+    group(mm, box(mm, 0, 0.04, 0.04, 0.04), 'group', 'Outer');
+    const inner = group(mm, box(mm, 0.1, 0.02, 0.02, 0.02), 'group', 'Hollow');
+    const d = mm.def(mm.root.insts.get(inner).def);
+    M.reverseFaces(d, [...d.faces.keys()]);
+    mm.root.insts.get(inner).m = V.translation([0.01, 0.01, 0.01]);   // a group's origin is its own lowest corner
+  });
+  const rhw = check(hollow);
+  ok(rhw.ok && close(rhw.volume, 64000 - 8000, 1e-6) && PP.partsToFix(hollow, {}, rhw).length === 0, 'parts: a hollow box is ready (56 cm³) and nothing is listed to fix');
+  // only what is selected: the broken cube unselected → nothing to fix in the selection
+  holed.redo();
+  ok(PP.partsToFix(holed, { sel: [{ t: 'i', id: ids.ok2 }] }, check(holed, { sel: [{ t: 'i', id: ids.ok2 }] })).length === 0, 'parts: follow the selection (the good group alone has nothing to fix)');
+
+  // every word the dialog and the card use exists
+  const EN = JSON.parse(fs.readFileSync(path.join(APP, 'lang/en.json'), 'utf8'));
+  const kinds = ['empty', 'open', 'nonmanifold', 'flipped', 'inverted', 'selfintersect', 'overlap', 'touch', 'tiny', 'bed', 'nobase', 'overhang', 'degenerate', 'unchecked'];
+  const missing = [...kinds.filter((k) => k !== 'empty').map((k) => 'app.prep.why.' + k), ...kinds.map((k) => 'app.prep.todo.' + k),
+    ...[...F.GUIDE_STEPS, 'done'].flatMap((k) => ['app.guide.' + k + '.h', 'app.guide.' + k + '.body']), ...F.GUIDE_STEPS.map((k) => 'app.guide.' + k + '.short'),
+    ...Object.keys(PP.BEDS).map((k) => 'set.printbed.' + k), 'set.printbed.none', 'ui.hint.guide', 'ui.views.guide'].filter((k) => !(k in EN));
+  ok(!missing.length, 'every print prep, guide and bed string is in en.json' + (missing.length ? ': missing ' + missing : ''));
+}
 section('push/pull to a face\'s level (0.5 DR.4, Discord)');
 {
   // tangentsoft's model (2026-10-14): a box, a circle on top pulled up into a post, its top offset inward, the inner face
@@ -2447,6 +2589,149 @@ section('push/pull to a face\'s level (0.5 DR.4, Discord)');
   T.set('push'); clickAt([1, 1, 3]); moveTo([0.25, 0.25, 2]); T.value('0.5');
   ok(upAt(2.5).length === 1, 'typed 0.5 while pointing at the box\'s top: pushed 0.5, not to the box');
 }
+section('a circle from a pushed rectangle\'s face (0.6 DC.26, Discord)');
+{
+  // tangentsoft (2026-10-13, then on 0.3): "draw a rectangle and Push it out into a long shape. Grab the circle tool and try to
+  // draw one out from the midpoint of one of the faces" (a USB-A grip, 16 × 8 mm, the circle on its narrow end). 0.3 gave a
+  // midpoint no face, so the circle lay flat on the ground; 0.4 U.2 fixed it. Pinned here with the reporter's own steps, in
+  // millimetres, loose, as a closed group and inside the opened group, from every face's centre and every edge midpoint.
+  const { Camera } = await import(path.join(APP, 'camera.js'));
+  const { sceneOf, faceCenter, onFace } = await import(path.join(APP, 'infer.js'));
+  const { Tools } = await import(path.join(APP, 'tools.js'));
+  for (const grp of ['loose', 'a closed group', 'inside the group']) {
+    const model = new Model(); model.units = 'mm';
+    const cam = new Camera(); cam.setSize(1200, 800);
+    let cache = null, tt = 0;
+    const host = { model, cam, path: [], sel: [], units: 'mm', scene() { if (!cache || cache.version !== model.version) cache = sceneOf(model); return cache; },
+      setSel(x) { host.sel = x; }, overlay() {}, tip() {}, vcb() {}, print() {}, changed() {}, openContext(p) { host.path = p; }, closeContext() { host.path = []; } };
+    const T = new Tools(host);
+    const at = (p) => cam.project(p);
+    const clickAt = (p) => { const q = at(p); T.move({ x: q[0], y: q[1] }); T.click(q[0], q[1], { time: (tt += 1000) }); };
+    cam.eye = [0.08, -0.06, 0.07]; cam.target = [0.008, 0.004, 0.02]; cam.clip(0.3);
+    T.set('rect'); clickAt([0, 0, 0]); { const q = at([0.016, 0.008, 0]); T.move({ x: q[0], y: q[1] }); } T.value('16,8');
+    T.set('push'); clickAt([0.008, 0.004, 0]); { const q = at([0.008, 0.004, 0.04]); T.move({ x: q[0], y: q[1] }); } T.value('40');
+    ok(close(solidInfo(model.root).volume, 0.016 * 0.008 * 0.04, 1e-12), `the grip: 16 × 8 mm pushed 40 mm (${grp})`);
+    if (grp !== 'loose') model.change('g', (m) => m.makeGroup(m.root, M.connected(m.root, [{ t: 'f', id: [...m.root.faces.keys()][0] }]), 'group'));
+    if (grp === 'inside the group') host.path = [[...model.root.insts.keys()][0]];
+    const sc = host.scene();
+    let tried = 0, good = 0, cut = 0, cutTried = 0;
+    const bad = [];
+    for (const f of sc.faces) {
+      const c = faceCenter(f);
+      if (V.dot(f.n, V.sub(cam.eye, c)) <= 0) continue;   // faces turned away from the eye
+      const targets = [['center', c], ...sc.edges.map((e) => V.mul(V.add(e.a, e.b), 0.5)).filter((p) => onFace(f, p)).map((p) => ['mid', p])];
+      for (const [kind, p] of targets) {
+        // the pointer 2 px inside the face from the point (an edge's midpoint is on two faces: the one under the pointer decides)
+        const q = at(p), k = at(c), kd = Math.hypot(k[0] - q[0], k[1] - q[1]) || 1;
+        const x = q[0] + (k[0] - q[0]) / kd * 2, y = q[1] + (k[1] - q[1]) / kd * 2;
+        T.set('circle'); T.move({ x, y });
+        const r = T.tool.cur;
+        tried++;
+        const snapped = r.kind === kind && V.dist(r.p, p) < 1e-9 && r.face && V.dot(r.face.n, f.n) > 1 - 1e-9;
+        if (!snapped) { bad.push(kind + ' ' + f.n.map((v) => +v.toFixed(2)) + ' → ' + r.kind); continue; }
+        // draw it: a 2 mm circle, in that face's plane
+        const D = () => (host.path.length ? model.def(model.root.insts.get(host.path[0]).def) : model.root);
+        const vb = new Set(D().verts.keys()), fb = D().faces.size;
+        T.click(x, y, { time: (tt += 1000) });
+        T.value('2');
+        const mw = host.path.length ? model.root.insts.get(host.path[0]).m : [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        const pts = [...D().verts].filter(([id]) => !vb.has(id)).map(([, v]) => V.apply(mw, v));
+        if (pts.length >= 24 && pts.every((v) => Math.abs(V.dot(f.n, v) - f.plane.d) < 1e-9)) good++;
+        else bad.push(kind + ' ' + f.n.map((v) => +v.toFixed(2)) + ' drawn off the face');
+        if (grp !== 'a closed group') { cutTried++; if (D().faces.size > fb) cut++; }
+        model.undo(); cache = null;
+      }
+    }
+    ok(tried >= 12 && good === tried, `${grp}: the circle snaps to every visible face's centre and edge midpoints and lies in that face (${good}/${tried})${bad.length ? ' ' + bad.join('; ') : ''}`);
+    if (cutTried) ok(cut === cutTried, `${grp}: …and cuts the face it starts on (${cut}/${cutTried})`);
+  }
+}
+
+section('a scene\'s camera can be locked (0.6 DC.64, Discord)');
+{
+  // tangentsoft (2026-10-16): "save a given view as a named camera … lock the camera, so I can get a consistent render as a
+  // drawing evolves". The file gains one optional scene key, `lock: true`; nothing else changes.
+  const cam = { eye: [1, -5, 3], target: [0, 0, 0] };
+  const locked = M.cleanScene({ name: 'Front', cam, lock: true });
+  ok(locked.lock === true && locked.cam.eye.join() === '1,-5,3', 'cleanScene keeps lock: true with the camera');
+  for (const bad of [false, 'true', 1, null, {}, []]) ok(!('lock' in M.cleanScene({ name: 'x', cam, lock: bad })), `an untrusted lock of ${JSON.stringify(bad)} is not a lock (no key written)`);
+  const plain = M.cleanScene({ name: 'Plain', cam });
+  ok(!('lock' in plain), 'an unlocked scene carries no lock key, so it saves exactly as before');
+  const model = new Model();
+  model.change('scenes', (m) => { m.scenes = [plain, locked]; });
+  const j = JSON.parse(JSON.stringify(model.toJSON()));
+  ok(j.scenes[1].lock === true && !('lock' in j.scenes[0]), 'saved in the file: lock on the locked scene only');
+  const back = new Model(); back.load(j);
+  ok(back.scenes[1].lock === true && !back.scenes[0].lock && back.scenes[1].cam.eye.join() === '1,-5,3', 'and read back');
+  // an older file (no lock key anywhere) opens unchanged and saves its scenes byte for byte the same
+  const oldFile = { ...j, scenes: j.scenes.map(({ lock, ...s }) => s) };
+  const o = new Model(); o.load(JSON.parse(JSON.stringify(oldFile)));
+  ok(o.scenes.every((s) => !s.lock) && JSON.stringify(o.toJSON().scenes) === JSON.stringify(oldFile.scenes), 'an older file opens unlocked and its scenes save byte for byte as they were');
+  // locking is an undo step
+  const n0 = model.undoStack.length;
+  model.change('Unlock scene camera', (m) => { m.scenes = m.scenes.map((s, k) => (k === 1 ? M.cleanScene({ ...s, lock: false }) : s)); });
+  ok(!model.scenes[1].lock && model.undoStack.length === n0 + 1, 'unlocking is one undo step');
+  model.undo();
+  ok(model.scenes[1].lock === true, 'undo locks it again');
+}
+
+section('push/pull flush keeps the outline (0.6 DR.4, the owner\'s choice)');
+{
+  // Decision (2026-10-17): when an inner face lands flush with the face around it, KEEP its outline (two faces in one plane,
+  // the outline's edges stay) rather than merging back into one face. Pinned three ways: a recess pushed back out by a typed
+  // distance, a bump pushed back down, and the Push/pull tool snapping to the level of the face around it.
+  const mkBox = () => {
+    const m = new Model(); m.units = 'm';
+    m.change('box', (mm) => { addPolygon(mm.root, rectPts([0, 0, 0], [1, 0, 0], [0, 1, 0], 4, 3)); pushPull(mm.root, [...mm.root.faces.keys()][0], 2); });
+    m.change('rect on top', (mm) => addPolygon(mm.root, rectPts([1, 1, 2], [1, 0, 0], [0, 1, 0], 2, 1), [0, 0, 1]));
+    return m;
+  };
+  const tops = (d) => [...d.faces].filter(([, f]) => close(faceNormal(d, f)[2], 1, 1e-9) && close(d.verts.get(f.loops[0][0])[2], 2, 1e-9));
+  const outline = (d) => [...d.edges.values()].filter((e) => { const a = d.verts.get(e.a), b = d.verts.get(e.b); return close(a[2], 2, 1e-9) && close(b[2], 2, 1e-9) && [a, b].every((p) => p[0] > 0.5 && p[0] < 3.5 && p[1] > 0.5 && p[1] < 2.5); }).length;
+  const zeroFaces = (d) => [...d.faces.values()].filter((f) => faceArea(d, f) < 1e-9).length;
+  const check = (m, label) => {
+    const d = m.root, s = solidInfo(d), tp = tops(d);
+    ok(s.closed && close(s.volume, 24, 1e-9), `${label}: a closed box of 24 m³ again (${s.volume?.toFixed(6)})`);
+    ok(tp.length === 2 && tp.some(([, f]) => f.loops.length === 2) && tp.some(([, f]) => close(faceArea(d, f), 2, 1e-9)), `${label}: the outline is kept: the inner 2 m² face and the top around it, both at z = 2 (${tp.length} faces on top)`);
+    ok(outline(d) === 4 && zeroFaces(d) === 0 && d.faces.size === 7, `${label}: its four edges stay, no zero-height sides (${outline(d)} edges, ${d.faces.size} faces)`);
+  };
+  for (const [dir, label] of [[-0.5, 'pushed in 0.5, then out 0.5'], [0.5, 'pulled out 0.5, then back 0.5']]) {
+    const m = mkBox();
+    const f0 = tops(m.root).find(([, f]) => f.loops.length === 1)[0];
+    const r1 = m.change('one way', (mm) => pushPull(mm.root, f0, dir));
+    ok(r1.ok && !close(solidInfo(m.root).volume, 24, 1e-6), `${label}: the first push changes the box (${solidInfo(m.root).volume.toFixed(3)} m³)`);
+    m.change('back', (mm) => pushPull(mm.root, r1.face ?? f0, -dir));
+    check(m, label);
+    if (dir < 0) {
+      // the help's way back to one face: erase the outline's edges, the two faces heal into one
+      const ids = [...m.root.edges].filter(([, e]) => { const a = m.root.verts.get(e.a), b = m.root.verts.get(e.b); return close(a[2], 2, 1e-9) && close(b[2], 2, 1e-9) && [a, b].every((p) => p[0] > 0.5 && p[0] < 3.5 && p[1] > 0.5 && p[1] < 2.5); }).map(([id]) => id);
+      m.change('erase outline', (mm) => eraseEdges(mm.root, ids));
+      const tp = tops(m.root);
+      ok(tp.length === 1 && tp[0][1].loops.length === 1 && close(faceArea(m.root, tp[0][1]), 12, 1e-9) && solidInfo(m.root).closed, `erasing the kept outline merges the top back into one 12 m² face (${tp.length} face)`);
+    }
+  }
+  {
+    // with the tool: the recess pulled back, the cursor on the top around it ("On face" sets the level)
+    const { Camera } = await import(path.join(APP, 'camera.js'));
+    const { sceneOf } = await import(path.join(APP, 'infer.js'));
+    const { Tools } = await import(path.join(APP, 'tools.js'));
+    const m = mkBox();
+    const f0 = tops(m.root).find(([, f]) => f.loops.length === 1)[0];
+    m.change('recess', (mm) => pushPull(mm.root, f0, -0.5));
+    const cam = new Camera(); cam.setSize(1000, 800);
+    let cache = null, tt = 0;
+    const host = { model: m, cam, path: [], sel: [], units: 'm', scene() { if (!cache || cache.version !== m.version) cache = sceneOf(m); return cache; }, setSel() {}, overlay() {}, tip() {}, vcb() {}, print() {}, changed() {}, openContext() {}, closeContext() {} };
+    const T = new Tools(host);
+    cam.eye = [2.1, 1.4, 12]; cam.target = [2, 1.5, 1.5]; cam.clip(20);
+    const at = (p) => cam.project(p);
+    const clickAt = (p) => { const q = at(p); T.move({ x: q[0], y: q[1] }); T.click(q[0], q[1], { time: (tt += 1000) }); };
+    T.set('push'); clickAt([2, 1.5, 1.5]); { const q = at([0.5, 0.5, 2]); T.move({ x: q[0], y: q[1] }); }
+    ok(close(T.tool.d, 0.5, 1e-9), `the tool: pointing at the top around the recess sets the level (${T.tool.d})`);
+    clickAt([0.5, 0.5, 2]);
+    check(m, 'the tool, pulled up to the top around it');
+  }
+}
+
 section('language files (0.4 G)');
 {
   // error paths that once called t() under a local variable named t (they threw "t is not a function")

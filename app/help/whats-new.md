@@ -1,59 +1,59 @@
 ---
-title: What's new in 0.5
-summary: Import .skp models with their textures, check a model for 3D printing, render pictures with sky, sun, materials and lamps, entourage, push/pull to a face's level, menu styles, live sessions in CadCraft Studio, and phones.
+title: What's new in 0.6
+summary: An animation timeline, rendered videos and walkthroughs from scenes, review in a VR headset with issues, a guided first model, print prep in the 3D printing check, and scenes with a locked camera.
 section: start
 order: 5
-keywords: whats new, what's new, release notes, changelog, changes, 0.5, version, new features, skp, import, textures, 3d printing, stl, 3mf, render, picture, path tracing, materials, lamps, lights, entourage, trees, people, cars, push pull, on face, menu styles, keys, mouse, live, studio, phone, fold phone, tablet, settings
+keywords: whats new, what's new, release notes, changelog, changes, 0.6, version, new features, animation, timeline, keyframe, video, render video, webm, walkthrough, scenes, vr, virtual reality, headset, webxr, issues, bcf, guided first model, beginner, 3d printing, print prep, fix, printer bed, lock camera, presentation view, interface size, toolbar, pen, touch, indonesian
 ---
 
-This is what changed in ModelCraft 0.5, compared with 0.4.
+This is what changed in ModelCraft 0.6, compared with 0.5. Models can move now: animate them, render the result as a video, and walk through them in a headset.
 
 ## New
 
-### Files
+### Animation and video
 
-- **Import .skp models.** {{ui:Import}} (or drop the file on the view) reads SketchUp files with ModelCraft's own reader, in the page: faces, groups, components, colors, tags (shown or hidden as in the file), hidden things and soft edges. A component painted different colors in different places stays one component. The import is one undo step, and the status bar says what came in and what did not. See [Bring in an SKP model](topic:import-sketchup-files).
-- **Textures come in.** Faces painted with a textured material in a `.skp` file, and base color textures in a `.glb` file, keep their texture. The ModelCraft file keeps the images when you save. See [File formats in detail](topic:formats).
-- **Check for 3D printing.** {{ui:Export}} › {{ui:Check for 3D printing (STL or 3MF)…}} checks the selection, or everything shown, for holes, edges shared by three or more faces, faces turned the wrong way, shells inside out and shells that pass through themselves. It shows the size, the volume and the overhang, then downloads STL or 3MF of exactly what it checked. 3MF is a new export, with colors. See [Get a model ready for 3D printing](topic:print-3d).
+- **Animation timeline.** {{ui:Views}} › {{ui:Animation timeline}} opens a timeline under the view. Set keys for the camera and for groups and components, and they move smoothly between them (smooth, steady, slowing into a key, or holding). Drag keys along the timeline, play it in the view, or turn on {{ui:Auto key}} to key whatever you move. See [Animate the camera and objects, and render a video](topic:animation).
+- **The animation is kept apart from the model.** It is saved in the file but outside the model's undo: the timeline has its own {{ui:Undo}} and {{ui:Redo}}. Closing the timeline puts the model back in its first pose.
+- **Render a video.** {{ui:Export}} › {{ui:Render video…}} renders the animation frame by frame with the same sky, sun, materials and lamps as a rendered picture, at 480p, 720p, 1080p or the view's shape, 24 to 60 frames a second. It saves a WebM video, or every frame as a PNG picture. It is made on your own computer; nothing is uploaded. See [Render the video](topic:animation#render-the-video).
+- **Walkthrough videos from scenes.** With two scenes or more and no animation of your own, {{ui:Render video…}} moves the camera through the scenes in order, pausing at each. See [Save views as scenes](topic:scenes).
 
-### Pictures
+### Review in VR
 
-- **Render a picture.** {{ui:Export}} › {{ui:Render a picture…}} makes a daylight picture of the view: a sky, the sun, soft shadows, shading in corners, glass and metal looks, four skies, three qualities and sizes up to 4K. {{ui:Stop}} keeps the picture so far. It is made on your own computer; nothing is uploaded. The settings are saved in the file. See [Render a picture of the model](topic:render).
-- **High quality.** {{ui:Mode}} › {{ui:High quality (path traced)}}: light bounces round rooms, glass bends light, and metal and mirrors reflect the model. It builds up step by step within a time limit you choose.
-- **Materials.** The {{ui:Materials}} section under {{ui:Colors}} has 34 materials in 11 groups: brick and block, siding, roofing, wood, stone, tile, concrete, stucco, grass and gravel, glass and metal. Paint them on like a color. The {{ui:Shaded}} style shows them at real size, level on walls and down roof slopes. They are drawn by ModelCraft and free to use (CC0). See [Paint with colors and materials](topic:paint).
-- **Lamps.** The {{ui:Lights}} section adds a {{ui:Lamp}}, a {{ui:Spotlight}} or a {{ui:Light panel}}, with brightness, color, beam and size. Lamps are saved in the file and light the pictures, at night too. See [Light a model with lamps](topic:lights).
-- **Entourage.** The [starter library](topic:starter) has trees, shrubs, a hedge, a potted plant, people and cars for site plans and pictures (CC0).
+- **Review in a VR headset.** {{ui:Views}} › {{ui:Review in VR}} puts you inside the model at full size, standing where the view's camera is. Jump to any floor, turn in 30° steps, measure between two points, cut walls open or make a plan cut over a floor, and see the model as a table-top model. Leaving VR puts the view on screen where your head was. It works with a headset the browser drives; nothing is uploaded. See [Review the model in a VR headset](topic:vr-review).
+- **Issues.** Place an issue where you point in VR, each with a picture of what you saw. Issues are listed with their pictures, shown from where they were placed, saved in the file and saved as BCF for BIM review programs. See [Place an issue](topic:vr-review#place-an-issue).
+- **VR in a live session.** Everyone in VR sees the others' heads, hands and where they point, and edits arrive as they are made. See [With others, live](topic:vr-review#with-others-live).
 
-### Working together
+### Getting started and 3D printing
 
-- **Model together, live.** In CadCraft Studio several people edit one model at once. Each person works in their own group, and moving placed groups never clashes. Loose geometry, not in a group, is reshaped by one person at a time. See [Model together, live](topic:work-live).
+- **A guided first model.** New to 3D? Click {{ui:Guided first model}} on the Start modeling card, or {{ui:Views}} › {{ui:Guided first model}}: four steps from a rectangle to a box that is ready for a 3D printer. The guide watches the model, so it moves on however you do each step, and {{ui:Undo}} takes it back a step. It never opens by itself. See [Let ModelCraft guide your first model](topic:getting-started#let-modelcraft-guide-your-first-model).
+- **Print prep in the 3D printing check.** Each problem now says what is wrong, why it matters and what to do, and the groups with problems are listed with {{ui:Show}}. {{ui:Fix what can be fixed}} closes flat holes, removes inner faces and turns faces the right way in one undo step, then checks again. See [Fix the problems](topic:print-3d#fix-the-problems).
+- **Your printer's bed.** Choose your printer's bed in {{ui:Settings}} to be told when a model won't fit. See [Your printer's bed](topic:print-3d#your-printers-bed).
 
-## Improved
+### Scenes
 
-- **DWG site plans name their dynamic blocks.** Each comes in as the drawing shows it, and the status bar lists the states. See [Model on a site plan from a DWG or DXF](topic:site-plan).
-- **Clearer key names.** The key choice under {{ui:Keys}} and in {{ui:Settings}} now reads "Push-pull" and "Modeler". See [Keys and mouse actions](topic:keyboard).
+- **Lock a scene's camera.** Click the padlock in the {{ui:Scenes}} list. {{ui:Update}} then keeps the view (the style and what is hidden still update), so renders from that scene stay comparable as the design changes. See [Lock a scene's camera](topic:scenes#lock-a-scenes-camera).
 
 ## Fixed
 
-- **Push/pull can stop level with another face.** While you push or pull, point at a face parallel to the one you are moving, such as the top of the box a post stands on: the tip says "On face", and the face ends level with it. When the face ends flush again, its sides go away and the outline you drew stays on the face. See [Push and pull faces into solids](topic:push-pull#pull-to-the-height-of-something-else).
-- **Very small models fit the view.** Fitting the view to a model under 10 cm, such as a circuit board, framed it as if it were 1 m across. It now fits models down to 1 cm.
+- In the Render dialog, the sun's date and time boxes were hard to read in the model theme while "Use another date and time" was off. They are readable now.
+- Presentation view ({{key:Shift+P}}) is clean inside an open group too: the rest of the model no longer fades. See [Presentation view](topic:styles-shadows#presentation-view).
 
 ## In every app
 
-- **CadCraft Studio is the desktop app.** From 0.5 the desktop download is CadCraft Studio: all eight apps in one install. The separate installer for each app stops. ModelCraft still runs in the browser, and as a browser edition you can download.
-- **Installers are not signed yet.** Code signing comes with 0.6. On Windows, if SmartScreen stops the installer, choose {{ui:More info}}, then {{ui:Run anyway}}. The macOS disk image (Apple silicon and Intel, macOS 13 or later) is not signed or notarized: the first time, right-click the app and choose {{ui:Open}}. iPad, Android and iPhone come with 0.6.
-- **Work together live.** In CadCraft Studio, {{ui:Live}} shares the file you have open: teammates on the same network join with a short code and edit with you, each with their own undo. Sessions on your own network are free, for everyone. Invite links over the internet aren't open yet. See [Work together live](common:work-together-live) and [Model together, live](topic:work-live).
-- **Menus, keys and mouse.** In {{ui:Settings}} › {{ui:ModelCraft}} › {{ui:Menus, keys and mouse}}, pick a menu style ({{ui:ModelCraft}}, {{ui:Push-pull}} or {{ui:Modeler}}), give any command your own key, move commands between menus, set the wheel and the mouse buttons, and export or import a style as a `.ccinput.json` file. {{ui:Use this style in every app}} opens every app in its matching style. See [Menus, keys and mouse](topic:menus-keys-and-mouse).
-- **A wider Settings dialog,** in two columns, so more fits without scrolling. See [ModelCraft settings](topic:settings).
-- **Floating and bottom panels fit the window.** A floating panel stays above the status bar and shrinks with a small window; on a short window a panel docked at the bottom leaves the view room. See [Arrange the panels and use a second monitor](common:arrange-panels).
-- **Phones and fold phones.** On a screen up to 760 px wide, or a phone held sideways, the view keeps the screen: panels open as sheets from a bar at the bottom, and the toolbar is one row that scrolls sideways. {{ui:Tools}} hides the toolbar and {{ui:Move}} puts it at the bottom. The view cube sits small in a corner. Turning the phone, or opening and closing a fold phone, keeps your work, the selection and an open dialog. The app bar's {{ui:More}} menu holds the version, Find and the links. Phones work, but ModelCraft is made for larger screens.
-- **Touch tablets.** On a touch screen each toolbar is one row that scrolls sideways instead of wrapping onto several lines.
-- **Spanish** stays a machine-made draft that has not been reviewed yet. Help topics are in English.
+- **The toolbar can't get lost.** While full screen hides the bars, a small {{ui:Show bars}} tab stays at the top of the window. {{ui:Settings}} › {{ui:General}} › {{ui:Reset the layout}} puts the toolbar, panels, screen mode and menu style back to how the app starts (your interface size and panel text size stay). In CadCraft Studio, its own {{ui:Settings}} has {{ui:Reset the layout in every app}}. See [Where did my toolbar go?](common:lost-toolbar).
+- **A menu on the toolbar.** Right-click the toolbar, or press and hold it, to arrange it, lock it so nothing moves by accident, or reset it. Ribbon menu styles collapse to their tab names: a tab opens its tools for one command; double-click a tab or use the pin to keep the ribbon open. See [The toolbar's own menu](common:lost-toolbar#the-toolbars-own-menu).
+- **Interface size.** {{ui:Settings}} › {{ui:General}} › {{ui:Interface size}} makes the bars, toolbars, panels and dialogs 80 % to 140 % of normal, for this app only, so two apps side by side on one monitor both fit. The drawing keeps its own zoom. See [Everything is too big or too small](common:lost-toolbar#everything-is-too-big-or-too-small).
+- **Pen and touch.** On a tablet or a touch-screen laptop with a pen, your palm is ignored while you draw, fingers can be left to moving the view, a two-finger tap undoes and a three-finger tap redoes, and the pen's side button and eraser end can undo or redo. {{ui:Settings}} › {{ui:General}} › {{ui:Pen and touch}}. See [Draw with a pen on a tablet](common:pen-and-touch).
+- **Live sessions can grow past 20 people.** In CadCraft Studio, when more people knock than the usual 20, Studio tells you what to expect and you choose {{ui:Allow anyway}} for this session or {{ui:Keep it at 20}}. {{ui:Recent edits}} in the Live panel shows who changed what. See [Work together live](common:work-together-live#when-many-people-join).
+- **Bahasa Indonesia** is new in {{ui:Settings}} › {{ui:General}} › {{ui:Language}}: a machine-made draft of every word, not yet reviewed by a native speaker. **Spanish (Mexico)** is still a draft too. Help topics are in English.
+- **Installers are still not signed** (signing comes next, in 0.7), and CadCraft Studio is not in an app store yet. Check the SHA-256 beside each file on getcadcraft.com/download. On Windows, if SmartScreen stops the installer, choose {{ui:More info}}, then {{ui:Run anyway}}. On a Mac, the first time, right-click CadCraft Studio and choose {{ui:Open}}. There is no iPad or iPhone build yet.
+- **Fixed:** with the bars hidden, {{ui:Arrange the toolbar…}} in Settings was grayed out, and from the keyboard it lost its place after the first move.
 
 ## Not in this version yet
 
-- Saving `.skp` files, and text, dimensions, scenes, styles and section planes from them. Faces and edges with a tag of their own come in untagged.
-- Textures from Collada files, your own image materials, and textures in exported files (they get each material's color and name).
-- Trim, Split and Outer shell; more than one section cut at a time; DWG and DXF layers as tags.
-- A rendered walkthrough video.
-- [Not built yet](topic:not-built-yet)
+- VR has been tested with a headset emulator only, not yet with a real headset. Inside CadCraft Studio, {{ui:Review in VR}} shows only where the system's web view offers it. Only people in VR show in the headset, and typing in VR isn't built yet.
+- Video speed hasn't been measured on a real graphics card, so render a short video on your own computer first. Videos use the fast renderer, not {{ui:High quality}}. Without the browser's own video encoder, the frames are saved as PNG pictures in a ZIP.
+- High quality (path traced) pictures on the graphics card.
+- 3D printing beyond the check: a supports preview, a beginner toolbar, a wall-thickness check, hollowing and mesh repair aren't built yet.
+
+Everything else is in [What is not built yet](topic:not-built-yet).

@@ -46,6 +46,8 @@ const CSS = `
 .cc-render-row > * { flex: 1 1 0; min-width: 0; }
 .cc-render-date { display: grid; grid-template-columns: minmax(0, 1fr) 4rem; gap: .5rem; }
 .cc-render-date input[type=time] { grid-column: 1 / -1; }
+.cc-render .form-control { background-color: var(--sheet-2); color: var(--ink); border-color: var(--line); }
+.cc-render .form-control:disabled, .cc-render select:disabled { background-color: var(--sheet); color: var(--ink-2); border-color: var(--line); opacity: 1; }
 .cc-render-note { margin: 0; color: var(--ink-2); font-size: var(--fs-sm, .875rem); }
 .cc-render-looks { display: grid; gap: .35rem; max-height: 14rem; overflow: auto; padding-right: .25rem; }
 .cc-render-look { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr) 7.5rem; gap: .45rem; align-items: center; }
@@ -69,7 +71,8 @@ function el(tag, attrs = {}, ...kids) {
   return e;
 }
 
-function injectCss() {
+/** The dialogs' styles (this one and the video dialog, video-ui.js), added to the page once. */
+export function injectCss() {
   if (document.getElementById('cc-render-css')) return;
   const s = document.createElement('style');
   s.id = 'cc-render-css';

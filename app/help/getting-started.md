@@ -3,7 +3,7 @@ title: Get started with ModelCraft
 summary: What ModelCraft is for, how to open it, and your first box from a rectangle to a saved model.
 section: start
 order: 10
-keywords: start, first model, begin, tutorial, introduction, box, massing, 3d, push pull, quick start
+keywords: start, first model, begin, tutorial, introduction, box, massing, 3d, push pull, quick start, guided, guide, beginner, new to 3d
 ---
 
 ModelCraft is a 3D modeler for early design: massing studies, room layouts, quick building forms and the shadows they cast. You draw flat shapes, pull them up into solids, and keep working on them by drawing on their faces. It runs in your web browser, and your models stay on your computer.
@@ -29,6 +29,17 @@ Look at the bottom right corner. The units picker shows what lengths are measure
 - To change it, choose another unit in the picker: {{ui:ft and in}}, {{ui:in}}, {{ui:m}}, {{ui:cm}} or {{ui:mm}}. The model itself does not change size; only how lengths are shown and how bare numbers are read.
 
 A number you type without a unit uses the model's unit. In a feet-and-inches model a bare number is **inches**, so `120` means 10 feet.
+
+## Let ModelCraft guide your first model
+
+New to 3D? On the {{ui:Start modeling}} card, click {{ui:Guided first model}} (it is also in {{ui:Views}}). A small card walks you through four steps, from a flat rectangle to a model ready for a 3D printer:
+
+1. Draw a rectangle on the ground.
+2. Pull it up into a box.
+3. Make the box one object (a group).
+4. Check it for 3D printing, then download a 3MF or STL file.
+
+The card watches the model, not the buttons: it moves on when the step is done, however you did it, and goes back a step when you undo. {{ui:Pick the tool}} picks the tool for you. Close it at any time with the {{ui:×}}.
 
 ## Draw your first box
 

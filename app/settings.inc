@@ -10,6 +10,7 @@
  *   snap      snap to points, edges and axes (default on; also the Snap button in the status bar)
  *   collide   solids stop where they touch instead of passing through (default on; also the status bar button)
  *   corner    corner indicator: view cube (default) / axis icon / none
+ *   bed       3D printer bed for Check for 3D printing: '' (not set, default) / 180 / 220 / 256 / 300 (printprep.js BEDS)
  * Product names here only describe whose controls these resemble (nominative, plain text).
  */
 ?>
@@ -52,6 +53,15 @@
     <label><input type="radio" name="mcCorner" value="none"> <i class="bi bi-slash-circle" aria-hidden="true"></i> <?= Lang::e('set.corner.none') ?></label>
   </div>
   <p class="shell-hint-text"><?= Lang::e('set.corner.hint') ?></p>
+</fieldset>
+<fieldset class="shell-set">
+  <legend><?= Lang::e('set.printbed') ?></legend>
+  <div class="shell-seg" role="radiogroup" aria-label="<?= Lang::e('set.printbed') ?>">
+    <?php foreach (['', '180', '220', '256', '300'] as $__b): /* printprep.js BEDS: sizes only */ ?>
+      <label><input type="radio" name="mcBed" value="<?= e($__b) ?>"> <?= Lang::e('set.printbed.' . ($__b === '' ? 'none' : $__b)) ?></label>
+    <?php endforeach; ?>
+  </div>
+  <p class="shell-hint-text"><?= Lang::e('set.printbed.hint') ?></p>
 </fieldset>
 <?php /* AI assistants and scripts (0.4 part 2 X.7, session agents): host.js fills this with Settings › Assistants (off by default) */ ?>
 <div data-assistants-settings></div>

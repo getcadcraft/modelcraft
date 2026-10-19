@@ -32,7 +32,7 @@ You can also hover a face that is parallel to the one you are pushing, such as t
 
 A face at an angle to the one you are pushing doesn't set a level. The distance follows the pointer. So does a face behind the face you are pushing.
 
-When a pushed face ends flush with the faces around it again, its sides go away. No zero-height sides are left over, and the outline you drew stays on the face, so you can push it again later.
+When a pushed face ends flush with the faces around it again, its sides go away. No zero-height sides are left over, and the outline you drew stays on the face, so you can push it again later. To make it one face again, erase the outline's edges with the {{ui:Eraser}}: the two faces join.
 
 ## Make a box taller or shorter
 

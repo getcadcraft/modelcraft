@@ -14,7 +14,7 @@
  *   sel, setSel(list)       the selection [{t: 'e'|'f'|'i'|'g'|'d', id}] in the open context (g guide, d dimension)
  *   overlay(o)              {lines: [{a, b, kind, dash}], marker: {p, kind}, faces: [[A,B,C]…], rect, poly, points}
  *   tip(text) · vcb(label, text) · print(msg) · changed() · openContext(path) · closeContext()
- *   units                   'ft-in' | 'in' | 'm' | 'cm' | 'mm'
+ *   units                   'ft-in' | 'in' | 'ft' | 'yd' | 'mi' | 'mil' | 'm' | 'cm' | 'mm' | 'um' | 'km'
  * }
  * Clicks: press–release in place = a click; press, drag, release = two clicks (both styles draw).
  * Arrow keys lock the red (→), green (←) and blue (↑) axis, ↓ the last edge's direction; Shift holds

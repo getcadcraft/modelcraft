@@ -3,7 +3,7 @@ title: Get a model ready for 3D printing
 summary: Check that a model is closed and faces the right way, see its size, base and overhangs, fix what is wrong, and download it as STL or 3MF for your slicer.
 section: tasks
 order: 102
-keywords: 3d print, 3d printing, printer, print, slicer, stl, 3mf, watertight, closed, manifold, solid, holes, inside out, overhang, supports, base, bed, millimeters, export
+keywords: 3d print, 3d printing, printer, print, slicer, stl, 3mf, watertight, closed, manifold, solid, holes, inside out, overhang, supports, base, bed, millimeters, export, fix, repair, hollow, bed size, beginner
 ---
 
 A 3D printer's slicer needs a closed shape: no holes, every face pointing out, nothing passing through itself. {{ui:Export}} › {{ui:Check for 3D printing (STL or 3MF)…}} looks for exactly that before you download the file.
@@ -13,9 +13,10 @@ A 3D printer's slicer needs a closed shape: no holes, every face pointing out, n
 1. Select what you want to print: one or more groups or components, or some faces. With nothing selected, everything shown prints.
 2. Click {{ui:Export}} in the {{ui:File}} group, then {{ui:Check for 3D printing (STL or 3MF)…}}.
 
-   The dialog says "Ready to print" or "Not ready to print", lists what is wrong, and gives the size in millimeters, the volume and the number of triangles.
+   The dialog starts with one line: "Ready to print", how many things to fix before printing, or how many to look at first. Each problem has three parts: what is wrong, why it matters, and what to do. Then come the size in millimeters, the volume, the number of triangles and your printer bed.
 
-3. Click {{ui:Download 3MF}} or {{ui:Download STL}}.
+3. If the dialog lists things to fix, click {{ui:Fix what can be fixed}} (see below). The check runs again by itself.
+4. Click {{ui:Download 3MF}} or {{ui:Download STL}}.
 
 What prints is what you see: hidden faces, hidden groups and components, and anything on a hidden tag are left out. Sizes are always in millimeters, the unit slicers expect, whatever unit the model shows.
 
@@ -44,10 +45,23 @@ These are warnings: the model prints, but have a look first.
 
 A hollow part (a closed shell inside another) is fine: its faces point into the hollow, and its volume is taken away.
 
-## Find and fix problems in a group
+## Fix the problems
 
-For a group or component: select it, then in {{ui:Entity info}} click {{ui:Show problems}} to see the holes and stray edges, and {{ui:Fix}} to close flat holes, remove stray edges and turn faces the right way. See [Solid tools](topic:solids). Then run the check again.
+Under **Where the problems are**, the dialog names each group or component that has something wrong (loose faces not in a group are listed as "Faces not in a group"), with what is wrong in it. A component placed several times is listed once: fixing it fixes every copy.
+
+- {{ui:Show}} opens that group and selects the edges and faces that are wrong, so they show highlighted.
+- {{ui:Fix what can be fixed}} fixes all of them at once: it closes holes whose edges lie flat, removes faces inside the shape and stray edges, and turns faces the right way out. It is one step: {{key:Mod+Z}} undoes it. The check then runs again and shows what is left.
+
+What it can't fix (a hole whose edges don't lie flat, a part passing through itself) stays in the list with what to do by hand. You can also fix one group at a time: select it, then use {{ui:Show problems}} and {{ui:Fix}} in {{ui:Entity info}}. See [Solid tools](topic:solids).
+
+## A hollow part
+
+To make a part hollow, draw the hollow as a closed group inside the part, not touching it, and reverse all its faces so they face into the hollow. The check counts it as a hollow and takes its volume away; it is not listed as something to fix.
+
+## Your printer's bed
+
+Choose your printer's bed size in {{ui:Settings}} › {{ui:ModelCraft}} › {{ui:3D printer bed}}. The check then warns when the model is larger than the bed, turned either way on it. See [Settings](topic:settings#3d-printer-bed).
 
 ## Not checked
 
-The check does not look at wall thickness, tiny details your nozzle cannot draw, or whether the model fits your printer's bed. Your slicer shows those.
+The check does not look at wall thickness or tiny details your nozzle cannot draw, and it does not show where supports go. Your slicer's preview shows those. See [Not built yet](topic:not-built-yet#3d-printing).

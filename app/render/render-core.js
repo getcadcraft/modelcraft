@@ -6,6 +6,8 @@
  * file knows nothing about either app's model.
  *
  *   renderStill(scene, settings, {w, h, onProgress(frac, canvas), signal, previewEvery}) → Promise<{blob, w, h, passes, ms, stopped}>
+ *   renderFrames(scene, settings, {w, h, frames, frameAt(i), onFrame(i, canvas), onProgress(i, frac), signal, passes}) → {frames, ms, stopped}
+ *     (0.6 LC.10: video frames through one renderer; see below)
  *   webglInfo() → {ok, halfFloat, renderer}
  *
  *   scene = {
@@ -83,6 +85,43 @@ export async function renderStill(scene, settings, { w, h, onProgress, signal, p
   const t0 = performance.now();
   w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
   const passes = QUALITY[settings.quality] || QUALITY.good;
+  const r = await prepare(scene, settings, w, h);
+  try {
+    const done = await r.accumulate(scene.camera(w / h), passes, { signal, previewEvery, onProgress });
+    if (!done) return { blob: null, w, h, passes: 0, ms: Math.round(performance.now() - t0), stopped: true };
+    const blob = await new Promise((res, rej) => r.canvas.toBlob((bl) => (bl ? res(bl) : rej(new Error('no image'))), 'image/png'));   // i18n-ignore: a media type; never shown
+    return { blob, w, h, passes: done, ms: Math.round(performance.now() - t0), stopped: done < passes };
+  } finally { r.dispose(); }
+}
+
+/**
+ * Frames of an animation (0.6 LC.10) through one renderer: the model, sky, ground and lights are set up once; each frame
+ * moves the camera and any placements that move, then accumulates its passes from nothing, as a still does.
+ *   frameAt(i) → {camera?(aspect) → {world, proj}, matrices?: [number[16] | null] (per scene item, null = as it was)}
+ *   onFrame(i, canvas) (awaited) gets the finished, tone-mapped frame; onProgress(i, frac) after every few passes.
+ *   → {frames: how many were finished, ms, stopped}
+ */
+export async function renderFrames(scene, settings, { w, h, frames, frameAt, onFrame, onProgress, signal, passes } = {}) {
+  const t0 = performance.now();
+  w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
+  const n = Math.max(1, Math.round(passes || QUALITY[settings.quality] || QUALITY.draft));
+  const r = await prepare(scene, settings, w, h);
+  let i = 0;
+  try {
+    for (; i < frames; i++) {
+      if (signal?.aborted) break;
+      const f = (frameAt && frameAt(i)) || {};
+      if (f.matrices) r.setMatrices(f.matrices);
+      const done = await r.accumulate((f.camera || scene.camera)(w / h), n, { signal, previewEvery: Math.max(4, n), onProgress: (k) => onProgress?.(i, k) });
+      if (done < n) break;   // stopped inside the frame: not finished, so not handed on
+      await onFrame(i, r.canvas);
+    }
+    return { frames: i, ms: Math.round(performance.now() - t0), stopped: i < frames };
+  } finally { r.dispose(); }
+}
+
+/** The scene set up once in an offscreen renderer → {canvas, accumulate(camSpec, passes, opts) → passes done, setMatrices(list), dispose()}. */
+async function prepare(scene, settings, w, h) {
   const sky0 = SKIES[settings.sky] || SKIES.clear;
   // the sun below the horizon: night, unless it is the white studio (lamps light the model then)
   const night = !sky0.plain && !scene.sun;
@@ -98,7 +137,12 @@ export async function renderStill(scene, settings, { w, h, onProgress, signal, p
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.localClippingEnabled = !!(scene.clip && scene.clip.length);
   const disposables = [];
-  let done = 0, stopped = false;
+  let done = 0;
+  const dispose = () => {
+    for (const d of disposables) d?.dispose?.();
+    renderer.dispose();
+    renderer.forceContextLoss?.();
+  };
   try {
     const up = basis(scene.up || [0, 0, 1]).up;
     const bb = scene.bounds;
@@ -130,14 +174,16 @@ export async function renderStill(scene, settings, { w, h, onProgress, signal, p
     };
     const edgeMat = new THREE.LineBasicMaterial({ color: '#2a2f36', transparent: true, opacity: 0.55, fog: false, clippingPlanes: clipping });
     disposables.push(edgeMat);
-    for (const it of scene.items) {
-      if (it.lines && !settings.edges) continue;
+    const objs = scene.items.map((it) => {
+      if (it.lines && !settings.edges) return null;
       const mat = it.lines ? edgeMat : matFor(it.look || 'default');
       const o = it.lines ? new THREE.LineSegments(it.geometry, mat) : new THREE.Mesh(it.geometry, mat);
       if (!it.lines) { o.castShadow = it.shadow !== false && !(mat.transparent); o.receiveShadow = true; }
-      if (it.matrix) { o.matrixAutoUpdate = false; o.matrix.fromArray(it.matrix); }
+      o.matrixAutoUpdate = false;
+      if (it.matrix) o.matrix.fromArray(it.matrix);
       three.add(o);
-    }
+      return o;
+    });
     three.updateMatrixWorld(true);
 
     // ---- the sky: a gradient dome around the model (the background; the ground fogs into its horizon colour) and the
@@ -234,14 +280,9 @@ export async function renderStill(scene, settings, { w, h, onProgress, signal, p
       L.shadow.camera.up.set(...(a < b ? e1 : e2));
     };
 
-    // ---- the camera: the app's own framing at this image's aspect; far plane out to the horizon ----
-    const camSpec = scene.camera(w / h);
+    // ---- the camera: the app's own framing at this image's aspect (set per frame); far plane out to the horizon ----
     const cam = new THREE.Camera();
     cam.matrixAutoUpdate = false;
-    cam.matrix.fromArray(camSpec.world);
-    cam.matrixWorld.fromArray(camSpec.world);
-    cam.matrixWorldInverse.copy(cam.matrixWorld).invert();
-    const P0 = farPlane(camSpec.proj, R * 200);
 
     // ---- accumulation: sum the passes, then divide by how many were done ----
     const rtOpts = { type: THREE.HalfFloatType, colorSpace: THREE.LinearSRGBColorSpace, depthBuffer: true };
@@ -268,41 +309,50 @@ export async function renderStill(scene, settings, { w, h, onProgress, signal, p
       renderer.setRenderTarget(null);
       renderer.render(quadScene, ortho);
     };
-    renderer.setRenderTarget(accRT);
-    renderer.setClearColor(0x000000, 1);
-    renderer.clear();
-    for (let i = 0; i < passes; i++) {
-      if (signal?.aborted) { stopped = true; break; }
-      const a = halton(i + 1, 2), b = halton(i + 1, 3);
-      // camera: under a pixel; rows 0 and 1 of the projection += jitter × row 3 (works for both projections)
-      const jx = (a - 0.5) * 2 / w, jy = (b - 0.5) * 2 / h, e = P0.slice();
-      for (let k = 0; k < 4; k++) { e[k * 4] += jx * e[k * 4 + 3]; e[k * 4 + 1] += jy * e[k * 4 + 3]; }
-      cam.projectionMatrix.fromArray(e);
-      cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
-      if (sunOn) place(sun, sunDisc(scene.sun, i, 1.5));
-      place(skyL, hemisphere(i, up));
-      placeLamps(i);
-      renderer.setRenderTarget(passRT);
-      renderer.render(three, cam);
-      quad.material = addMat;
+    const accumulate = async (camSpec, passes, { signal, previewEvery = 4, onProgress } = {}) => {
+      cam.matrix.fromArray(camSpec.world);
+      cam.matrixWorld.fromArray(camSpec.world);
+      cam.matrixWorldInverse.copy(cam.matrixWorld).invert();
+      const P0 = farPlane(camSpec.proj, R * 200);
+      done = 0;
       renderer.setRenderTarget(accRT);
-      renderer.autoClear = false;
-      renderer.render(quadScene, ortho);
-      renderer.autoClear = true;
-      done = i + 1;
-      if (done % previewEvery === 0 || done === passes) {
-        show();
-        onProgress?.(done / passes, canvas);
-        await new Promise((r) => requestAnimationFrame(() => r()));
+      renderer.setClearColor(0x000000, 1);
+      renderer.clear();
+      for (let i = 0; i < passes; i++) {
+        if (signal?.aborted) break;
+        const a = halton(i + 1, 2), b = halton(i + 1, 3);
+        // camera: under a pixel; rows 0 and 1 of the projection += jitter × row 3 (works for both projections)
+        const jx = (a - 0.5) * 2 / w, jy = (b - 0.5) * 2 / h, e = P0.slice();
+        for (let k = 0; k < 4; k++) { e[k * 4] += jx * e[k * 4 + 3]; e[k * 4 + 1] += jy * e[k * 4 + 3]; }
+        cam.projectionMatrix.fromArray(e);
+        cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
+        if (sunOn) place(sun, sunDisc(scene.sun, i, 1.5));
+        place(skyL, hemisphere(i, up));
+        placeLamps(i);
+        renderer.setRenderTarget(passRT);
+        renderer.render(three, cam);
+        quad.material = addMat;
+        renderer.setRenderTarget(accRT);
+        renderer.autoClear = false;
+        renderer.render(quadScene, ortho);
+        renderer.autoClear = true;
+        done = i + 1;
+        if (done % previewEvery === 0 || done === passes) {
+          show();
+          onProgress?.(done / passes, canvas);
+          await new Promise((r) => requestAnimationFrame(() => r()));
+        }
       }
-    }
-    if (!done) return { blob: null, w, h, passes: 0, ms: Math.round(performance.now() - t0), stopped: true };
-    show();
-    const blob = await new Promise((res, rej) => canvas.toBlob((bl) => (bl ? res(bl) : rej(new Error('no image'))), 'image/png'));   // i18n-ignore: a media type; never shown
-    return { blob, w, h, passes: done, ms: Math.round(performance.now() - t0), stopped };
-  } finally {
-    for (const d of disposables) d?.dispose?.();
-    renderer.dispose();
-    renderer.forceContextLoss?.();
+      if (done) show();
+      return done;
+    };
+    const setMatrices = (list) => {
+      list.forEach((m, k) => { const o = objs[k]; if (m && o) o.matrix.fromArray(m); });
+      three.updateMatrixWorld(true);
+    };
+    return { canvas, accumulate, setMatrices, dispose };
+  } catch (e) {
+    dispose();
+    throw e;
   }
 }

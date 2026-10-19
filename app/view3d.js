@@ -14,7 +14,8 @@
  *                image (UVs from the face's own placement in its paint); without the hook they show their colour
  *   v.drawExtra = (g, project(p) → [x, y, depth] | null, colours) => …   the app's own marks on the overlay (lamps)
  * `ui()` returns {path, sel, overlay, guidesOn, dimsOn, present} at draw time. present (0.4 M28, presentation view): no axes,
- * guides, guide points, open-group box, inference marks, hover or selection highlight — only the model (and its dimensions).
+ * guides, guide points, open-group box, inference marks, hover or selection highlight — only the model (and its dimensions);
+ * nothing fades outside an open group (0.6 DC.21).
  * Colours come from the page tokens (paper/model themes).
  */
 import * as THREE from 'three';
@@ -258,7 +259,8 @@ export class View3D {
       const g = this.geometryOf(def, dflt);
       const pb = this.placedBox(def, g, wm);
       if (pb) { box = bboxAdd(box, pb.min); box = bboxAdd(box, pb.max); }
-      const active = path.length >= u.path.length && u.path.every((x, i) => path[i] === x);
+      // presentation view (0.6 DC.21): the whole model as it is, so nothing fades outside an open group
+      const active = u.present || (path.length >= u.path.length && u.path.every((x, i) => path[i] === x));
       const m = active ? mats.on : mats.off;
       if (g.hasFaces && st.mode !== 'wire') {
         const f = new THREE.Mesh(g.faces, m.front);

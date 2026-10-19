@@ -27,7 +27,7 @@ The comma separates the two sizes, so it cannot be a decimal mark. Type `2.5m,3m
 
 1. Press {{key:C}} for a circle or {{key:N}} for a polygon.
 2. To change the number of sides, type it before you click: `12s` (or just `12`) and {{key:Enter}}. A circle starts with 24 sides and a polygon with 6. The tip shows the current number, and ModelCraft keeps it for the next circle until you change it or switch tools.
-3. Click the center, on the ground or on a face.
+3. Click the center, on the ground or on a face. To center it on a face, point at the face's middle ("Center of face") or at the middle of one of its edges ("Midpoint") with the pointer just inside that face: the circle is drawn on that face, even on the narrow end of a long box.
 4. Click to set the radius, or type it ({{ui:Radius}} in the value box) and press {{key:Enter}}.
 
 A circle is a polygon with many sides. When you pull a circle up with Push/pull, its sides are softened so the cylinder reads as one smooth surface.

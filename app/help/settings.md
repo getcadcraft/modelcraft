@@ -45,6 +45,10 @@ To push something through on purpose, click {{ui:Collide}} at the bottom right (
 Collisions are checked for moves and push/pull. {{ui:Rotate}} and {{ui:Scale}} do not check them yet, and loose geometry that touches still joins up, as it always has: keep separate things in [groups](topic:groups-components) so they stay separate.
 :::
 
+## 3D printer bed
+
+The size of your printer's bed: {{ui:Not set}} (the start), 180 × 180 × 180, 220 × 220 × 250, 256 × 256 × 256 or 300 × 300 × 400 mm. Pick the size closest to your printer's build volume. [Check for 3D printing](topic:print-3d) then says when a model is larger than the bed; with {{ui:Not set}}, the size is not checked.
+
 ## Corner indicator
 
 What shows in the corner of the 3D view: **View cube** (the start; top right — click a face, edge or corner to look from there, drag it to orbit, drag its compass ring to turn the model), **Axis icon** (a small X, Y, Z marker at the bottom left that turns with the view: X red, Y green, Z blue) or **None**. See [The view cube](topic:view-cube).

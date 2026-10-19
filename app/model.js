@@ -1957,6 +1957,31 @@ export class Model {
    */
   kept(d, e) { return !!e && e.v >= this.unsafeVersion && e.rev === d.rev; }
   stamp(d) { return { v: this._v, rev: d.rev }; }
+  /**
+   * Placements at animation poses (0.6 LC.10): [{path, m}] sets each placement's own matrix with no undo step and no change
+   * to `dirty`. Only the parent definitions' kept JSON is dropped, so undo snapshots stay right and every geometry built
+   * from a definition stays in use. → how many placements were found.
+   */
+  setPoses(list) {
+    let n = 0;
+    for (const { path, m } of list) {
+      if (!Array.isArray(path) || !Array.isArray(m) || m.length !== 16 || !m.every(Number.isFinite)) continue;
+      let def = this.root, inst = null, parent = null;
+      for (const iid of path) { parent = def; inst = def ? def.insts.get(iid) : null; if (!inst) break; def = this.defs.get(inst.def); }
+      if (!inst) continue;
+      inst.m = m.slice();
+      defStrs.delete(parent);
+      n++;
+    }
+    if (n) this.bumpSafe();
+    return n;
+  }
+  /** A placement by its path from the top: {inst, parent} or null (0.6 LC.10). */
+  placementAt(path) {
+    let def = this.root, inst = null, parent = null;
+    for (const iid of path || []) { parent = def; inst = def ? def.insts.get(iid) : null; if (!inst) return null; def = this.defs.get(inst.def); }
+    return inst ? { inst, parent } : null;
+  }
   /** A definition as JSON, kept with the definition object until it may have been edited in place. */
   defString(d) {
     if (this._editing) return JSON.stringify(defToJSON(d));
@@ -2588,7 +2613,7 @@ export class Model {
   }
 }
 
-export const UNIT_KEYS = ['ft-in', 'in', 'm', 'cm', 'mm'];
+export const UNIT_KEYS = ['ft-in', 'in', 'ft', 'yd', 'mi', 'mil', 'm', 'cm', 'mm', 'um', 'km'];
 let uidN = 0;
 const newUid = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10) + '-' + (uidN++);
 export const STYLE_MODES = ['shaded', 'hidden', 'wire', 'xray'];
@@ -2647,6 +2672,8 @@ export function cleanScene(s) {
   }
   return {
     ...(vis ? { vis } : {}),
+    // a locked camera (0.6 DC.64): Update keeps it; only written when set, so unlocked scenes save as before
+    ...(s.lock === true ? { lock: true } : {}),
     name: cleanText(s.name, 80) || 'Scene',  // i18n-ignore: a fallback name only for a broken file
     cam: { eye: c.eye.slice(), target: c.target.slice(), fov: num(c.fov, 10, 120, 35), persp: c.persp !== false, height: num(c.height, 1e-6, 1e7, 10) },
     style: {

@@ -9,6 +9,7 @@
  *   left    outliner (groups and components in the model) · component definitions
  *   stage   the 3D view (WebGL canvas + a 2D overlay for inference markers and previews)
  *   right   entity info · style (shaded / hidden line / wireframe / x-ray, edges, shadows + sun) · scenes
+ *   under   the animation timeline (0.6 LC.10; hidden until Views › Timeline)
  *   bottom  status: inference tip, messages, the value box (Length / Distance / …), Snap and Collide, units
  * Titles and hints show the SketchUp-style keys; modelcraft.js rewrites them when Settings › Controls is
  * Blender style (data-keys-* marks what it rewrites).
@@ -105,6 +106,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <button type="button" role="menuitem" data-export="print"><?= Lang::e('ui.export.print') ?></button>
                 <hr>
                 <button type="button" role="menuitem" data-export="render"><?= Lang::e('ui.export.render') ?></button>
+                <button type="button" role="menuitem" data-export="video"><?= Lang::e('ui.export.video') ?></button>
               </div>
             </details>
           <?php endif; ?>
@@ -169,6 +171,9 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <hr>
                 <button type="button" role="menuitemcheckbox" aria-checked="true" data-persp><?= Lang::e('ui.views.persp') ?></button>
                 <button type="button" role="menuitemcheckbox" aria-checked="false" data-present><?= Lang::e('ui.views.present') ?> <kbd>Shift+P</kbd></button>
+                <button type="button" role="menuitemcheckbox" aria-checked="false" data-timeline-toggle><?= Lang::e('ui.views.timeline') ?></button>
+                <button type="button" role="menuitem" data-xr-enter aria-disabled="true"><?= Lang::e('ui.views.vr') ?></button>
+                <button type="button" role="menuitem" data-guide-open><?= Lang::e('ui.views.guide') ?></button>
                 <hr>
                 <button type="button" role="menuitemcheckbox" aria-checked="true" data-sec-planes><?= Lang::e('ui.views.sec_planes') ?></button>
                 <button type="button" role="menuitemcheckbox" aria-checked="true" data-sec-cuts><?= Lang::e('ui.views.sec_cuts') ?></button>
@@ -216,8 +221,11 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
         <li><?= $__lx('ui.hint.camera', ['shift' => '<kbd>Shift</kbd>']) ?></li>
         <li><?= Lang::e('ui.hint.local') ?></li>
       </ul>
+      <p class="mc-hint-guide"><button type="button" class="btn-line btn-sm-cc" data-guide-open><i class="bi bi-signpost-2" aria-hidden="true"></i> <?= Lang::e('ui.hint.guide') ?></button></p>
       <div data-recent-files data-max="6"></div>
     </div>
+    <?php /* The guided first model (0.6 LC.21, session model-part-extra_PART_2): firstmodel.js reads the steps from the model; modelcraft.js fills the card. */ ?>
+    <section class="mc-guide" data-guide hidden aria-labelledby="mc-guide-h" aria-live="polite"></section>
     <div class="mc-drop" data-drop hidden><span><i class="bi bi-box-arrow-in-down-right" aria-hidden="true"></i> <?= Lang::e('ui.drop') ?></span></div>
     <div class="mc-scenebar" data-scenebar hidden></div>
     <div class="mc-touchbar" data-touchbar role="toolbar" aria-label="<?= Lang::e('ui.touch.aria') ?>" hidden>
@@ -226,6 +234,9 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
       <button type="button" class="mc-tool" data-touch="undo"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i><span><?= Lang::e('ui.touch.undo') ?></span></button>
     </div>
   </section>
+
+  <?php /* Animation (0.6 LC.10, session lc-model): the timeline under the view, built by timeline.js; hidden until Views › Timeline. */ ?>
+  <section class="mc-timeline" data-timeline aria-label="<?= Lang::e('ui.timeline.aria') ?>" hidden></section>
 
   <aside class="mc-panel mc-right" aria-label="<?= Lang::e('ui.right.aria') ?>">
     <section class="mc-sec">
@@ -301,6 +312,13 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
         <p class="mc-note span" data-sun-info></p>
       </fieldset>
     </section>
+    <?php /* Issues (0.6 LC.19, session lc-model): placed in VR (Views › Review in VR), saved as BCF; xr-mc.js builds the list. */ ?>
+    <section class="mc-sec" data-issues>
+      <h2 class="mc-h" id="mc-issues-h"><?= Lang::e('ui.issues') ?></h2>
+      <ul class="mc-list mc-issues" data-issues-list aria-labelledby="mc-issues-h"></ul>
+      <p class="mc-note" data-issues-empty><?= Lang::e('ui.issues.empty') ?></p>
+      <button type="button" class="btn-line btn-sm-cc" data-issues-bcf disabled><?= Lang::e('ui.issues.bcf') ?></button>
+    </section>
     <section class="mc-sec">
       <div class="mc-sec-head">
         <h2 class="mc-h"><?= Lang::e('ui.scenes') ?></h2>
@@ -334,11 +352,21 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
     <button type="button" class="mc-toggle" data-mc-toggle="collide" aria-pressed="true" title="<?= Lang::e('ui.collide.title') ?>"><?= Lang::e('ui.collide') ?></button>
     <label class="visually-hidden" for="mc-units"><?= Lang::e('ui.units') ?></label>
     <select id="mc-units" class="mc-select mc-units" data-units>
-      <option value="ft-in"><?= Lang::e('ui.units.ftin') ?></option>
-      <option value="in">in</option><?php /* i18n-ignore: a unit symbol */ ?>
-      <option value="m">m</option>
-      <option value="cm">cm</option><?php /* i18n-ignore: a unit symbol */ ?>
-      <option value="mm">mm</option><?php /* i18n-ignore: a unit symbol */ ?>
+      <optgroup label="<?= Lang::e('ui.units.imperial') ?>">
+        <option value="ft-in"><?= Lang::e('ui.units.ftin') ?></option>
+        <option value="in">in</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="ft">ft</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="yd">yd</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="mi">mi</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="mil">mil</option><?php /* i18n-ignore: a unit symbol */ ?>
+      </optgroup>
+      <optgroup label="<?= Lang::e('ui.units.metric') ?>">
+        <option value="um">µm</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="mm">mm</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="cm">cm</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="m">m</option><?php /* i18n-ignore: a unit symbol */ ?>
+        <option value="km">km</option><?php /* i18n-ignore: a unit symbol */ ?>
+      </optgroup>
     </select>
   </footer>
 </main>

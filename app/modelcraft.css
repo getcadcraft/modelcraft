@@ -5,10 +5,11 @@
 .mc {
   display: grid;
   grid-template-columns: 14.5rem minmax(0, 1fr) 17.5rem;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   grid-template-areas:
     "tools tools tools"
     "left stage right"
+    "left timeline right"
     "status status status";
   height: 100%;
   min-height: 0;
@@ -42,6 +43,7 @@
 }
 .mc-menu-list button { font: inherit; font-size: .875rem; font-weight: 500; text-align: left; color: var(--ink); background: none; border: 0; padding: .35rem .8rem; cursor: pointer; }
 .mc-menu-list button:hover, .mc-menu-list button:focus-visible { background: var(--sheet); text-decoration: underline; outline: none; }
+.mc-menu-list button:disabled { opacity: .45; cursor: default; text-decoration: none; background: none; }
 .mc-menu-list button kbd { margin-left: 1.25rem; float: right; font: inherit; font-size: .75rem; color: var(--ink-2); background: none; border: 0; padding: 0; }
 .mc-menu-list hr { margin: .25rem 0; border: 0; border-top: var(--pen-1) solid var(--line); }
 .mc-menu-list [aria-checked="true"]::before { content: "✓ "; }
@@ -173,6 +175,7 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
 .mc-scenebar button { font: inherit; font-size: .8125rem; font-weight: 600; color: var(--ink-2); background: none; border: 0; border-bottom: var(--pen-3) solid transparent; padding: .3rem .8rem .2rem; white-space: nowrap; cursor: pointer; }
 .mc-scenebar button:hover { color: var(--ink); }
 .mc-scenebar button[aria-current="true"] { color: var(--ink); border-bottom-color: var(--action); }
+.mc-scenebar .mc-scene-lockmark { margin-left: .3rem; font-size: .7rem; }
 
 /* ask() dialog */
 .mc-dialog { width: min(30rem, calc(100vw - 2rem)); padding: 0; color: var(--ink); background: var(--sheet-2); border: var(--pen-2) solid var(--ink); border-radius: var(--radius); }
@@ -210,8 +213,8 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
   .mc-menu-list { position: fixed; top: auto; left: 1rem; right: 1rem; min-width: 0; }
   .mc {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 60vh auto auto auto;
-    grid-template-areas: "tools" "stage" "status" "right" "left";
+    grid-template-rows: auto 60vh auto auto auto auto;
+    grid-template-areas: "tools" "stage" "timeline" "status" "right" "left";
     height: auto;
   }
   .mc-left, .mc-right { border: 0; border-top: var(--pen-2) solid var(--ink); }
@@ -258,8 +261,76 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
 .mc-print-verdict[data-print-ok="1"] { color: var(--layer-green); }
 .mc-print-verdict[data-print-ok="0"], .mc-print-problems { color: var(--layer-red); }
 .mc-print-facts { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* print prep (0.6 LC.21): each row = what is wrong · why it matters · what to do; the parts with problems */
+.mc-prep-h { margin: .7rem 0 .3rem; font-size: .875rem; font-weight: 700; }
+.mc-print ul.mc-print-problems, .mc-print ul.mc-print-warnings { color: var(--ink); }
+.mc-prep-row { margin-bottom: .45rem; }
+.mc-prep-row > span { display: block; }
+.mc-prep-what { font-weight: 600; }
+.mc-print-problems .mc-prep-what { color: var(--layer-red); }
+.mc-prep-why, .mc-prep-todo { color: var(--ink-2); }
+.mc-prep-todo::before { content: "\2713\00a0"; color: var(--layer-green); }
+.mc-prep-parts li { margin-bottom: .2rem; }
+/* the guided first model (0.6 LC.21): a card where the Start modeling card was */
+.mc-hint-guide { margin: .6rem 0 0; }
+.mc-hint-guide button { pointer-events: auto; }
+.mc-guide {
+  position: absolute; z-index: 2; top: 1rem; left: 1rem; width: min(24rem, calc(100% - 2rem));
+  padding: .75rem 1rem; font-size: .875rem; background: var(--sheet-2);
+  border: var(--pen-2) solid var(--ink); border-radius: var(--radius);
+}
+.mc-guide-top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.mc-guide-step { margin: 0; color: var(--ink-2); font-size: .8125rem; }
+.mc-guide-h { margin: .2rem 0 .4rem; font-size: 1rem; font-weight: 700; font-stretch: 112%; }
+.mc-guide p { margin: 0 0 .5rem; }
+.mc-guide-list { margin: 0 0 .6rem; padding-left: 1.2rem; color: var(--ink-2); font-size: .8125rem; }
+.mc-guide-list .is-done { text-decoration: line-through; }
+.mc-guide-list .is-now { color: var(--ink); font-weight: 700; }
 /* Lights (0.5 RC.11 (d)) */
 .mc-lights-add { display: flex; flex-wrap: wrap; gap: .375rem; margin-bottom: .5rem; }
 .mc-lights li { display: flex; align-items: center; gap: .35rem; }
 .mc-lights li.is-sel .mc-linkbtn { font-weight: 700; }
 .mc-light-presets { display: flex; flex-wrap: wrap; gap: .25rem; }
+
+/* ---- Animation timeline (0.6 LC.10, timeline.js): a bar under the view; a name column, then the time lanes ---- */
+.mc-timeline { grid-area: timeline; --tl-name: 9.5rem; min-width: 0; background: var(--sheet-2); border-top: var(--pen-2) solid var(--ink); font-size: .8125rem; }
+.mc-timeline[hidden] { display: none; }
+.mc-tl-head { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .35rem; padding: .25rem .5rem; border-bottom: var(--pen-1) solid var(--line); }
+.mc-tl-head .mc-tool { flex-direction: row; gap: .3rem; min-height: 1.9rem; padding: .15rem .45rem; }
+.mc-tl-head .mc-select, .mc-tl-head .mc-input { width: auto; min-height: 1.9rem; }
+.mc-tl-head .mc-num { width: 4.5rem; }
+.mc-tl-time { font-variant-numeric: tabular-nums; min-width: 8.5rem; padding: 0 .35rem; }
+.mc-tl-field { display: inline-flex; align-items: center; gap: .3rem; margin: 0; }
+.mc-tl-sep { width: var(--pen-1); align-self: stretch; background: var(--line); margin: 0 .2rem; }
+.mc-tl-head [data-tl-close] { margin-left: auto; }
+.mc-tl-lanes { position: relative; max-height: 9rem; overflow-y: auto; padding-bottom: .25rem; }
+.mc-tl-ruler, .mc-tl-row { display: grid; grid-template-columns: var(--tl-name) minmax(0, 1fr); align-items: center; }
+.mc-tl-ruler { position: sticky; top: 0; z-index: 2; background: var(--sheet-2); }
+.mc-tl-scrubwrap { position: relative; padding: 0 .7rem; }   /* the range thumb (1rem) centres 1.2rem in, as the lanes do */
+.mc-tl-scrub { width: 100%; margin: .2rem 0 0; accent-color: var(--action); }
+.mc-tl-ticks { position: relative; height: 1rem; margin: 0 .5rem; color: var(--ink-2); font-size: .6875rem; font-variant-numeric: tabular-nums; }
+.mc-tl-ticks span { position: absolute; left: calc(var(--k) * 100%); transform: translateX(-50%); }
+.mc-tl-row { min-height: 1.6rem; border-top: var(--pen-1) solid var(--grid); }
+.mc-tl-row.is-gone .mc-tl-name { color: var(--ink-2); font-style: italic; }
+.mc-tl-name { display: flex; align-items: center; gap: .25rem; padding: 0 .5rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mc-tl-name .mc-icon { margin-left: auto; }
+.mc-tl-lane { position: relative; height: 1.6rem; margin: 0 1.2rem; cursor: pointer; }
+.mc-tl-key { position: absolute; top: 50%; left: calc(var(--k) * 100%); width: .8rem; height: .8rem; padding: 0; transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--sheet); border: var(--pen-2) solid var(--ink); border-radius: 1px; cursor: grab; touch-action: none; }
+.mc-tl-key.is-hold { background: var(--ink-2); }
+.mc-tl-key.is-sel, .mc-tl-key:focus-visible { background: var(--action); border-color: var(--action); outline: var(--pen-2) solid var(--action); outline-offset: 2px; }
+.mc-tl-playhead { position: absolute; top: 0; bottom: 0; width: var(--pen-2); background: var(--layer-red); pointer-events: none; z-index: 3;
+  left: calc(var(--tl-name) + 1.2rem + (100% - var(--tl-name) - 2.4rem) * var(--tl-at, 0)); }
+.is-touch .mc-tl-key { width: 1.1rem; height: 1.1rem; }
+@media (max-width: 760px) {
+  .mc-timeline { --tl-name: 6rem; }
+  .mc-tl-head .mc-tool span { display: none; }
+}
+
+/* ---- Issues (0.6 LC.19, xr-mc.js): placed in VR, each with its picture ---- */
+.mc-issues li { grid-template-columns: 3.5rem minmax(0, 1fr) auto; align-items: center; }
+.mc-issues img, .mc-issue-noimg { display: block; width: 3.5rem; height: 2.625rem; object-fit: cover; border: var(--pen-1) solid var(--line); background: var(--sheet-2); }
+.mc-issue-text { display: grid; min-width: 0; }
+.mc-issue-text strong, .mc-issue-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-issue-text small { color: var(--ink-2); }
+.mc-tools [data-xr-enter][aria-disabled="true"] { color: var(--ink-2); }

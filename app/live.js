@@ -259,6 +259,13 @@ export function createLive(model, opts = {}) {
     app: 'modelcraft', schema: SCHEMA, model, onApplied: null,
     get client() { return client; },
     onLocalChange(cb) { live.report = cb; },
+    // presence (0.6 LC.19, session lc-model): only design review in a headset (xr/xr-session.js) sends any — heads, hands and
+    // pointers of the people in VR; the client keeps the newest of each peer and hands them here
+    others: new Map(),
+    drawPresence(peers) { live.others = new Map(peers); },
+    setPresence(p) { client?.setPresence(p); },
+    peers() { return live.others; },
+    nameOf(c) { const p = client && client.peers && client.peers.get(c); return (p && p.name) || t('live.someone'); },
     apply(ops) {
       // a tool previewing (push / pull, move: begin → preview… → commit) redraws from its starting copy on every frame:
       // others' edits go into that copy too, so neither the preview nor its step loses them

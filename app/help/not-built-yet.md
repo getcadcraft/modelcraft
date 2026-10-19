@@ -22,6 +22,17 @@ ModelCraft is an early build. This page lists what it does not do yet, so you do
 | Locks on more than one inference at a time | Lock one direction with an arrow key, then snap to a point |
 | Resizing along a slant, or from a dimension end that is not on a corner | Place the dimension on two corners, along an edge or along red, green or blue |
 
+## Animation
+
+| Not yet | Instead, today |
+|---|---|
+| Animating faces, edges, the sun's time of day, the style or what is hidden | Make the moving part a group or component; render a separate video for another time of day |
+| A camera that follows a drawn path, or looks at a moving object | Set more camera keys along the way ([Animate](topic:animation)) |
+| Videos with the high-quality (path-traced) renderer, or sound | Render with {{ui:Good}} quality; add sound in a video editor |
+| Exporting the animation to glTF or other model files | Render a video, or save the `.modelcraft` file |
+| Typing a comment or a title on an issue in VR, voice notes, moving a section plane by hand in VR | Place the issue in VR, then add its words in a BCF program; set a section plane in the view before you go in: see [Review the model in a VR headset](topic:vr-review) |
+| Seeing people at the desk in VR (only people in VR show), recording a VR walk | Ask them to join in VR, or make an [animation](topic:animation) of the walk |
+
 ## Organizing and viewing
 
 | Not yet | Instead, today |
@@ -56,12 +67,22 @@ ModelCraft is an early build. This page lists what it does not do yet, so you do
 | Save As with a name, backup files | Rename the downloaded file. After a crash, ModelCraft offers your unsaved work back ("Recover your work?") |
 | Cloud saving and sync between computers | Not available yet. Save files to your computer, and copy them where you need them |
 
+## 3D printing
+
+| Not yet | Instead, today |
+|---|---|
+| Hollowing a model with a wall thickness and a drain hole | Most slicers hollow a print with their infill setting; for a real hollow, draw the inner shape as a group and [reverse its faces](topic:print-3d#a-hollow-part) |
+| Showing the faces that need support in the view | The [check](topic:print-3d) says how much of the surface needs support; your slicer's preview shows where |
+| Checking for walls too thin to print | Look at the layer preview in your slicer |
+| Filling holes whose rim is not flat, or untangling a part that passes through itself | Draw the missing faces, or use [Intersect faces](topic:intersect) and erase what is inside |
+| A beginner toolbar with fewer tools | Follow the [guided first model](topic:getting-started#let-modelcraft-guide-your-first-model): it picks each tool for you |
+
 ## Performance
 
 Undo keeps a full copy of the model for each step, so very large imports make every edit slower. Keep imports lean, and save and reopen to clear the history.
 
 ## Apps and platforms
 
-- **Desktop:** ModelCraft runs in the browser on Mac, Windows and Linux, and in CadCraft Studio, the desktop app with all eight apps in one install. iPad, Android and iPhone come with 0.6.
+- **Desktop:** ModelCraft runs in the browser on Mac, Windows and Linux, and in CadCraft Studio, the desktop app with all eight apps in one install. On Android, CadCraft Studio installs from its APK on getcadcraft.com/download; iPad and iPhone come with 0.6.
 - **Touch:** see [Orbit, pan and zoom](topic:orbit-pan-zoom) for the finger gestures. Pressure and pen tilt are not used.
 - **Sheets:** ModelCraft [prints one view per page](topic:export-model#print-the-view-or-save-it-as-a-pdf); there are no sheet layouts with several views or a title block. Export to CadCraft-friendly DWG/DXF for drawings to scale.

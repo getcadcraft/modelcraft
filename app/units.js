@@ -2,10 +2,10 @@
 import { t } from "./i18n.js";
 /**
  * units.js — lengths typed and shown in ModelCraft. No DOM. The model is in meters; the display
- * unit is the model's `units` ('ft-in' | 'in' | 'm' | 'cm' | 'mm').
+ * unit is the model's `units` ('ft-in' | 'in' | 'ft' | 'yd' | 'mi' | 'mil' | 'm' | 'cm' | 'mm' | 'um' | 'km').
  *
  *   parseLength(text, unit) → meters | null   10'  10'6"  10'-6 1/2"  6"  6 1/2"  3/4"  1.5ft  18in
- *                                              3.2m  320cm  3200mm  and a bare number in the unit
+ *                                              3.2m  320cm  3200mm  0.5km  40um  2yd  1.5mi  250mil  and a bare number in the unit
  *                                              (feet-and-inches models take a bare number as inches)
  *   formatLength(m, unit)  · formatArea(m², unit) · formatVolume(m³, unit)
  *   parseValue(text, unit) → what the value box was given (see below)
@@ -14,9 +14,12 @@ import { t } from "./i18n.js";
 
 export const IN = 0.0254;          // exact by definition (international inch, 1959)
 export const FT = 0.3048;
+export const YD = 0.9144;
+export const MI = 1609.344;
+export const MIL = IN / 1000;      // a thousandth of an inch (thou)
 /** Unit names in the page's language (getters: read when asked for). */
-export const UNIT_LABELS = Object.defineProperties({}, Object.fromEntries(['ft-in', 'in', 'm', 'cm', 'mm'].map((k) => [k, { get: () => t('m3d.units.name.' + k.replace('-', '_')), enumerable: true }])));
-const SUFFIX = { mm: 0.001, cm: 0.01, m: 1, in: IN, inch: IN, inches: IN, ft: FT, feet: FT, foot: FT, '"': IN, "'": FT };
+export const UNIT_LABELS = Object.defineProperties({}, Object.fromEntries(['ft-in', 'in', 'ft', 'yd', 'mi', 'mil', 'm', 'cm', 'mm', 'um', 'km'].map((k) => [k, { get: () => t('m3d.units.name.' + k.replace('-', '_')), enumerable: true }])));
+const SUFFIX = { um: 1e-6, 'µm': 1e-6, 'μm': 1e-6, mm: 0.001, cm: 0.01, m: 1, km: 1000, mil: MIL, mils: MIL, thou: MIL, yd: YD, yard: YD, yards: YD, mi: MI, mile: MI, miles: MI, in: IN, inch: IN, inches: IN, ft: FT, feet: FT, foot: FT, '"': IN, "'": FT };
 
 export function parseLength(text, unit = 'm') {
   if (typeof text !== 'string') return null;
@@ -42,7 +45,7 @@ export function parseLength(text, unit = 'm') {
   m = s.match(/^(\d+)\s*\/\s*(\d+)\s*("|in)?$/);
   if (m && +m[2]) { const v = +m[1] / +m[2]; return sign * v * (m[3] ? IN : unitScale(unit)); }
   // number + suffix
-  m = s.match(new RegExp(`^${N}\\s*(mm|cm|m|inches|inch|in|feet|foot|ft|"|')?$`));
+  m = s.match(new RegExp(`^${N}\\s*(mm|cm|km|um|µm|μm|inches|inch|in|feet|foot|ft|yards|yard|yd|miles|mile|mi|mils|mil|thou|m|"|')?$`));
   if (m) {
     const v = +m[1];
     if (!Number.isFinite(v)) return null;
@@ -66,7 +69,7 @@ export function localeUnits(locale) {
   return IMPERIAL_REGIONS.includes(region.toUpperCase()) ? 'ft-in' : 'mm';
 }
 /** Meters per bare number in a unit (feet-and-inches: inches). */
-export function unitScale(unit) { return { 'ft-in': IN, in: IN, m: 1, cm: 0.01, mm: 0.001 }[unit] ?? 1; }
+export function unitScale(unit) { return { 'ft-in': IN, in: IN, ft: FT, yd: YD, mi: MI, mil: MIL, m: 1, cm: 0.01, mm: 0.001, um: 1e-6, km: 1000 }[unit] ?? 1; }
 
 const trim = (x, d) => { const s = x.toFixed(d); return s.includes('.') ? s.replace(/\.?0+$/, '') : s; };
 function gcd(a, b) { return b ? gcd(b, a % b) : a; }
@@ -88,25 +91,41 @@ export function formatLength(m, unit = 'm') {
     const ft = Math.floor(total16 / (12 * 16)), rest = (total16 - ft * 12 * 16) / 16;
     s = ft ? `${ft}' ${inchText(rest)}"` : `${inchText(rest)}"`;
   } else if (unit === 'in') s = inchText(a / IN) + '"';
+  else if (unit === 'ft') s = trim(a / FT, 4) + ' ft';
+  else if (unit === 'yd') s = trim(a / YD, 3) + ' yd';
+  else if (unit === 'mi') s = a >= MI ? trim(a / MI, 4) + ' mi' : trim(a / FT, 3) + ' ft';   // a mile model shows the small lengths in feet
+  else if (unit === 'mil') s = trim(a / MIL, 2) + ' mil';
+  else if (unit === 'um') s = trim(a * 1e6, 2) + ' µm';
   else if (unit === 'mm') s = trim(a * 1000, 1) + ' mm';
   else if (unit === 'cm') s = trim(a * 100, 2) + ' cm';
+  else if (unit === 'km') s = a >= 1000 ? trim(a / 1000, 3) + ' km' : trim(a, 3) + ' m';   // a kilometer model shows the small lengths in meters
   else s = trim(a, 3) + ' m';
   return (neg ? '-' : '') + s;
 }
 // millimeter models show areas from 0.01 m² and volumes from 0.01 m³ in square/cubic meters
 // (a 4 × 3 m room reads "12 m²", not "12000000 mm²"); smaller ones stay in mm² / mm³
 export function formatArea(a, unit = 'm') {
-  if (unit === 'ft-in') return t('m3d.units.sqft', { v: trim(a / (FT * FT), 2) });
+  if (unit === 'ft-in' || unit === 'ft') return t('m3d.units.sqft', { v: trim(a / (FT * FT), 2) });
+  if (unit === 'yd') return t('m3d.units.sqyd', { v: trim(a / (YD * YD), 2) });
+  if (unit === 'mi') return Math.abs(a) >= MI * MI * 0.01 ? t('m3d.units.sqmi', { v: trim(a / (MI * MI), 3) }) : t('m3d.units.sqft', { v: trim(a / (FT * FT), 2) });
+  if (unit === 'um') return trim(a * 1e12, 1) + ' µm²';
+  if (unit === 'mil') return t('m3d.units.sqin', { v: trim(a / (IN * IN), 4) });
   if (unit === 'in') return t('m3d.units.sqin', { v: trim(a / (IN * IN), 2) });
   if (unit === 'mm') return Math.abs(a) >= 0.01 ? trim(a, 3) + ' m²' : trim(a * 1e6, 0) + ' mm²';
   if (unit === 'cm') return trim(a * 1e4, 1) + ' cm²';
+  if (unit === 'km') return Math.abs(a) >= 1e6 ? trim(a / 1e6, 3) + ' km²' : trim(a, 3) + ' m²';
   return trim(a, 3) + ' m²';
 }
 export function formatVolume(v, unit = 'm') {
-  if (unit === 'ft-in') return t('m3d.units.cuft', { v: trim(v / (FT ** 3), 2) });
+  if (unit === 'ft-in' || unit === 'ft') return t('m3d.units.cuft', { v: trim(v / (FT ** 3), 2) });
+  if (unit === 'yd') return t('m3d.units.cuyd', { v: trim(v / (YD ** 3), 2) });
+  if (unit === 'mi') return Math.abs(v) >= MI ** 3 * 0.01 ? t('m3d.units.cumi', { v: trim(v / (MI ** 3), 3) }) : t('m3d.units.cuft', { v: trim(v / (FT ** 3), 2) });
+  if (unit === 'um') return trim(v * 1e18, 1) + ' µm³';
+  if (unit === 'mil') return t('m3d.units.cuin', { v: trim(v / (IN ** 3), 4) });
   if (unit === 'in') return t('m3d.units.cuin', { v: trim(v / (IN ** 3), 1) });
   if (unit === 'mm') return Math.abs(v) >= 0.01 ? trim(v, 3) + ' m³' : trim(v * 1e9, 0) + ' mm³';
   if (unit === 'cm') return trim(v * 1e6, 1) + ' cm³';
+  if (unit === 'km') return Math.abs(v) >= 1e9 ? trim(v / 1e9, 3) + ' km³' : trim(v, 3) + ' m³';
   return trim(v, 3) + ' m³';
 }
 
