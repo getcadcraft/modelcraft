@@ -1,28 +1,30 @@
-# Install ModelCraft 0.4 (browser edition)
+# Install {{name}} {{version}} (browser edition)
 
-ModelCraft runs in your web browser. This folder is the whole app: plain files, nothing to build and nothing to install
+{{name}} runs in your web browser. This folder is the whole app: plain files, nothing to build and nothing to install
 on the computer that serves it. You need a web server, any web server, because browsers only run apps like this
 one when it comes from `http://` or `https://`.
 
-Your files stay on your computer: nothing is uploaded, and the app never contacts getcadcraft.com. The app opens and saves files on the machine running the browser.
+{{privacy}} The app opens and saves files on the machine running the browser.
 
 ## 1. Get it
 
 Pick one:
 
-- **Download the zip** `modelcraft-browser-edition-v0.4.0.zip` from the releases page: https://github.com/getcadcraft/modelcraft/releases/tag/modelcraft-v0.4.0
+- **Download the zip** `{{zip}}` from the releases page: {{releases}}
   Check it if you like: the SHA-256 checksum is listed next to the download.
-- **Or clone the repository** and use the folder `browser-edition/v0.4/`:
+- **Or build it from the source** (Node.js 20.19 or newer and PHP 8.1 or newer; the libraries are downloaded by exact
+  version and checked):
 
   ```sh
-  git clone https://github.com/getcadcraft/modelcraft.git
-  cd modelcraft/browser-edition/v0.4
+  git clone --branch v{{semver}} {{repo}}.git
+  cd {{slug}}
+  node devshell/edition.mjs --version {{version}}     # → dist/{{folder}}/
   ```
 
 ## 2. Put it on a web server
 
-Unzip it, then copy the folder `modelcraft-browser-edition-v0.4.0` anywhere your web server serves files from. Its own folder, a subfolder, or
-the top of a site: all work, for example `https://example.com/tools/modelcraft/`.
+Unzip it, then copy the folder `{{folder}}` anywhere your web server serves files from. Its own folder, a subfolder, or
+the top of a site: all work, for example `https://example.com/tools/{{slug}}/`.
 
 No web server yet? Any of these serves the folder you are in on your own computer. Run one inside the unzipped folder:
 
@@ -46,8 +48,8 @@ AddType font/woff2 .woff2
 **nginx.**
 
 ```nginx
-location /modelcraft/ {
-    alias /var/www/modelcraft/;          # the unzipped folder
+location /{{slug}}/ {
+    alias /var/www/{{slug}}/;          # the unzipped folder
     types { application/wasm wasm; text/javascript js; application/json json; font/woff2 woff2; text/css css; text/html html; image/svg+xml svg; image/png png; image/x-icon ico; }
 }
 ```
@@ -56,8 +58,8 @@ location /modelcraft/ {
 
 ```caddy
 example.com {
-    handle_path /modelcraft/* {
-        root * /var/www/modelcraft
+    handle_path /{{slug}}/* {
+        root * /var/www/{{slug}}
         file_server
     }
 }
@@ -69,10 +71,12 @@ example.com {
 ## 3. Open it
 
 Open the folder's address in Chrome, Edge, Firefox or Safari, for example `http://localhost:8000/` or
-`https://example.com/tools/modelcraft/`. That's it. Press F1 in the app for help.
+`https://example.com/tools/{{slug}}/`. That's it. Press F1 in the app for help.
 
 To use it with no connection, click **Save for offline** in the app's top bar once. The browser keeps a copy and opens
 it from that copy when the network is gone.
+
+{{threads}}
 
 ## Why double-clicking index.html does not work
 
@@ -105,6 +109,6 @@ and remove the offline copy from the top bar, or clear the site's data in your b
 
 ## License
 
-ModelCraft is licensed under the Apache License 2.0 (`LICENSE`). The libraries it includes and their licenses are listed in
-`THIRD_PARTY.md`; each one's own license sits beside it under `assets/vendor/`. "ModelCraft" and "CadCraft" are trademarks:
+{{name}} is licensed under the Apache License 2.0 (`LICENSE`). The libraries it includes and their licenses are listed in
+`THIRD_PARTY.md`; each one's own license sits beside it under `assets/vendor/`. "{{name}}" and "CadCraft" are trademarks:
 a fork must use another name (`TRADEMARKS.md`).
