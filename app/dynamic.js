@@ -22,6 +22,7 @@
  *        (the parts' own definitions stay shared); it remembers `dyn = {src: src.id, size}`, so it can be stretched
  *        again from the original. Call inside model.change.
  */
+import { t } from './i18n.js';
 import { mmul, translation } from './vec.js';
 import { copyOwnGeometry } from './model.js';
 
@@ -61,6 +62,7 @@ const scaleAxis = (k, f, o) => {
 };
 
 export function stretchDef(model, src, size, name) {
+  if (src.mods) throw new Error(t('app.mods.no_stretch'));
   const B = compBox(model, src);
   if (!B) throw new Error('empty');   // i18n-ignore: callers check first
   const L = [0, 1, 2].map((k) => B.max[k] - B.min[k]);
