@@ -334,3 +334,9 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
 .mc-issue-text strong, .mc-issue-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mc-issue-text small { color: var(--ink-2); }
 .mc-tools [data-xr-enter][aria-disabled="true"] { color: var(--ink-2); }
+
+/* Modifier recipes in Entity info. */
+.mc-modifiers { margin-block: .75rem; }
+.mc-modifier { min-width: 0; margin-block: .5rem; padding: .5rem; border: var(--pen-1) solid var(--line); border-radius: .25rem; }
+.mc-modifier legend { float: none; width: auto; padding-inline: .25rem; font-size: inherit; font-weight: 600; }
+.mc-modifier .mc-props { margin-block: .5rem; }

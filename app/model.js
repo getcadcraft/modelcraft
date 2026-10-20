@@ -35,6 +35,7 @@ import {
   frame, to2, rayTri, ident, mmul, translation, apply, applyDir, invert, det3, bboxAdd,
 } from './vec.js';
 import { earcut } from './earcut.js';
+import { cleanModifiers } from './modifiers.js';
 import { BoxTree, boxesOf } from './bvh.js';
 import { t } from "./i18n.js";
 
@@ -1739,6 +1740,7 @@ export class Model {
     const src = this.context(from), dst = this.context(to);
     const inst = src?.def.insts.get(iid);
     if (!inst || !dst) throw new Error(t('m3d.model.move_gone'));
+    if (src.def.mods || dst.def.mods) throw new Error(t('app.mods.bake_first'));
     // everything inside the moved definition, itself included
     const reach = new Set(), visit = (id, depth) => { if (reach.has(id) || depth > 64) return; reach.add(id); for (const i of this.defs.get(id)?.insts.values() || []) visit(i.def, depth + 1); };
     visit(inst.def, 0);
@@ -2163,6 +2165,7 @@ export class Model {
     const inst = def.insts.get(iid);
     if (!inst) return [];
     const src = this.defs.get(inst.def);
+    if (src?.mods || def.mods) throw new Error(t('app.mods.bake_first'));
     def.insts.delete(iid);
     const out = [];
     if (src) {
@@ -2185,6 +2188,28 @@ export class Model {
     return out.filter((s) => (s.t === 'e' ? def.edges.has(s.id) : s.t === 'f' ? def.faces.has(s.id) : def.insts.has(s.id)));
   }
 
+  /** Apply a recipe to independent plain geometry, keeping the definition id and all its copies. */
+  bakeModifiers(defId) {
+    const src = this.defs.get(defId);
+    if (!src?.mods) return;
+    const out = new Def(src.id, src.kind, src.name);
+    // Keep each copy's vertices separate, including overlapping array elements.
+    const off = this.hiddenTags();
+    const visit = (d, m, color = null, hidden = false) => {
+      const vm = new Map(), rc = curveRemapper(out), mirror = det3(m) < 0;
+      for (const [id, p] of d.verts) vm.set(id, vAdd(out, apply(m, p)));
+      for (const e of d.edges.values()) eAdd(out, vm.get(e.a), vm.get(e.b), e.soft, rc(e.curve), hidden || e.hidden);
+      for (const [cid, sp] of d.splines) out.splines.set(rc(cid), { ...sp, pts: sp.pts.map(p => apply(m, p)) });
+      for (const f of d.faces.values()) {
+        const loops = f.loops.map(l => l.map(v => vm.get(v)));
+        fAdd(out, mirror ? loops.map(l => l.reverse()) : loops, f.color || color, undefined, hidden || f.hidden);
+      }
+      for (const i of d.insts.values()) visit(this.defs.get(i.def), mmul(m, i.m), i.color || color, hidden || i.hidden || off.has(i.tag));
+    };
+    visit(src, ident());
+    this.defs.set(defId, out);
+  }
+
   /** Give one instance its own copy of its definition. */
   makeUnique(def, iid) {
     const inst = def.insts.get(iid);
@@ -2201,8 +2226,8 @@ export class Model {
   purge() {
     for (;;) {
       const used = this.instanceCounts();
-      // an original a stretched copy was made from stays, so the copy can be stretched again (0.4 M26)
-      const origin = new Set([...this.defs.values()].filter((d) => d.dyn && used.get(d.id)).map((d) => d.dyn.src));
+      // Keep the source of a live stretch/modifier recipe, even when it is not itself placed.
+      const origin = new Set([...this.defs.values()].filter((d) => (d.dyn || d.mods) && used.get(d.id)).map((d) => (d.mods || d.dyn).src));
       const dead = [...this.defs.keys()].filter((id) => id !== 'root' && !used.get(id) && !origin.has(id));
       if (!dead.length) break;
       for (const id of dead) this.defs.delete(id);
@@ -2234,6 +2259,7 @@ export class Model {
     const need = new Map();
     const visit = (d, depth) => {
       if (depth > 32) return;
+      if (d.mods && !need.has(d.mods.src) && scratch.def(d.mods.src)) { need.set(d.mods.src, scratch.def(d.mods.src)); visit(scratch.def(d.mods.src), depth + 1); }
       for (const i of d.insts.values()) if (!need.has(i.def) && scratch.def(i.def)) { need.set(i.def, scratch.def(i.def)); visit(scratch.def(i.def), depth + 1); }
     };
     visit(top, 0);
@@ -2276,7 +2302,7 @@ export class Model {
       const nm = cleanText(dj.name, 120);
       map.set(dj.id, this.newDef(kind, nm && !names.has(nm) ? nm : undefined).id);
     }
-    const remap = (j) => ({ ...j, insts: (Array.isArray(j.insts) ? j.insts : []).map((i) => {
+    const remap = (j) => ({ ...j, ...(j.mods ? { mods: { ...j.mods, src: map.get(j.mods.src) } } : {}), insts: (Array.isArray(j.insts) ? j.insts : []).map((i) => {
       if (!i || !ids.has(i.def)) fail(t('m3d.model.an_instance_points_at_a_missing'));
       return { ...i, def: map.get(i.def) };
     }) });
@@ -2424,6 +2450,7 @@ export class Model {
     if (F) while (k < E.path.length && k < F.path.length && E.path[k] === F.path[k]) k++;
     const P = F ? E.path.slice(0, k) : E.path;
     const ctx = this.context(P);
+    if (ctx.def.mods) throw new Error(t('app.mods.bake_first'));
     const ld = applyDir(ctx.inv, d), s = len(ld), dl = norm(ld);
     if (E.path.length > P.length) {
       // the moving end is inside a group or component the fixed end is not in: the whole group moves
@@ -2476,6 +2503,7 @@ export class Model {
   /** A group's or component's size along its own red (0), green (1) or blue (2) axis: its far side moves. */
   setDefSize(defId, axis, size) {
     const def = this.defs.get(defId), bb = def && this.bbox(def);
+    if (def?.mods) throw new Error(t('app.mods.bake_first'));
     if (!bb) throw new Error(t('m3d.model.it_is_empty'));
     if (!(size > EPS)) throw new Error(t('m3d.model.a_size_must_be_above_zero'));
     const cur = bb.max[axis] - bb.min[axis];
@@ -2527,13 +2555,20 @@ export class Model {
     }
     if (!defs.has('root')) fail(t('m3d.model.it_has_no_root'));
     for (const d of defs.values()) for (const inst of d.insts.values()) if (!defs.has(inst.def)) fail(t('m3d.model.an_instance_points_at_a_missing'));
+    for (const d of defs.values()) if (d.mods) {
+      const src = defs.get(d.mods.src);
+      if (d.id === 'root' || d.dyn || !src || src === d || src.dyn || src.mods || d.verts.size || d.edges.size || d.faces.size)
+        fail(t('app.mods.source_only'));
+    }
     // no definition may contain itself
     const state = new Map();
     const visit = (id) => {
       if (state.get(id) === 1) fail(t('m3d.model.a_group_contains_itself'));
       if (state.get(id) === 2) return;
       state.set(id, 1);
-      for (const inst of defs.get(id).insts.values()) visit(inst.def);
+      const d = defs.get(id);
+      if (d.mods) visit(d.mods.src);
+      for (const inst of d.insts.values()) visit(inst.def);
       state.set(id, 2);
     };
     for (const id of defs.keys()) visit(id);
@@ -2695,6 +2730,7 @@ export function copyOwnGeometry(src, dst) {
 function defToJSON(d) {
   return {
     id: d.id, kind: d.kind, name: d.name, next: d.next, ...(d.starter ? { starter: d.starter } : {}), ...(d.dyn ? { dyn: { src: d.dyn.src, size: d.dyn.size.slice() } } : {}),
+    ...(d.mods ? { mods: cleanModifiers(d.mods) } : {}),
     verts: [...d.verts].map(([id, p]) => [id, p[0], p[1], p[2]]),
     edges: [...d.edges].map(([id, e]) => (e.hidden ? [id, e.a, e.b, e.soft ? 1 : 0, e.curve || 0, 1] : e.curve ? [id, e.a, e.b, e.soft ? 1 : 0, e.curve] : e.soft ? [id, e.a, e.b, 1] : [id, e.a, e.b])),
     faces: [...d.faces].map(([id, f]) => { const o = { id, loops: f.loops }; if (f.color) o.color = f.color; if (f.hidden) o.hidden = true; return o; }),
@@ -2735,6 +2771,7 @@ function defFromJSON(d, j, fail = (m) => { throw new Error(m); }) {
   if (typeof j.starter === 'string' && /^[a-z0-9_]{1,32}$/.test(j.starter)) d.starter = j.starter;   // 0.4 M25: which starter thing it is
   // 0.4 M26: a stretched copy remembers its original and size
   if (j.dyn && typeof j.dyn.src === 'string' && /^d\d{1,9}$/.test(j.dyn.src) && Array.isArray(j.dyn.size) && j.dyn.size.length === 3 && j.dyn.size.every((x) => Number.isFinite(x) && x >= 0)) d.dyn = { src: j.dyn.src, size: j.dyn.size.slice() };
+  if (j.mods !== undefined) d.mods = cleanModifiers(j.mods);
   const intId = (x) => Number.isInteger(x) && x > 0 && x < 1e9;
   let max = 0;
   for (const v of Array.isArray(j.verts) ? j.verts : []) {

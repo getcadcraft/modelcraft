@@ -29,6 +29,7 @@
  * `window.modelcraft` = {model, cam, tools, view, host, ui, settings, clip()} for tests and the console.
  */
 import { Model, connected, eraseSel, reverseFaces, solidInfo, faceArea, cleanScene, curveInfo, setCurveRadius, PALETTE, paintFaces, paintInstance, isColor, isMaterialPaint, setMaterialColors, setImageColors, isImagePaint, flipSel, hideSel, isolateSel, unhideAll, hiddenCount, softenEdges, intersectFaces, solidProblems, fixSolid, faceNormal, cleanStoreys } from './model.js';
+import { canModify, modifierDef, setModifiers } from './modifiers.js';
 import { Camera, VIEWS, lerpCam } from './camera.js';
 import { sceneOf, warmScene, angleLayout, formatDeg } from './infer.js';
 import { Tools, TOOL_NAMES, TOOL_KEYS } from './tools.js';
@@ -125,6 +126,7 @@ function init(root) {
     changed() { scheduleInfo(); view.invalidate(); warmPicking(); },
     openContext(path) {
       if (!model.context(path)) return;
+      if (model.context(path).def.mods) { print(t('app.mods.bake_first')); return; }
       host.path = path; host.sel = []; tools.set(tools.name === 'place' ? 'select' : tools.name);
       print(t('app.ctx.editing', { name: model.context(path).def.name }));
       scheduleInfo(); view.invalidate();
@@ -134,6 +136,10 @@ function init(root) {
       const leaving = host.path[host.path.length - 1];
       host.path = host.path.slice(0, -1);
       host.sel = [{ t: 'i', id: leaving }];
+      // Edit source jumps through the generated definition; closing skips that read-only level.
+      if (model.context(host.path)?.def.mods) {
+        const result = host.path.pop(); host.sel = [{ t: 'i', id: result }];
+      }
       scheduleInfo(); view.invalidate();
     },
   };
@@ -975,6 +981,7 @@ function init(root) {
   }
   function afterHistory() {
     if (!model.context(host.path)) host.path = [];
+    while (model.context(host.path)?.def.mods) host.path.pop();
     const def = model.context(host.path).def;
     host.sel = host.sel.filter((s) => (s.t === 'e' ? def.edges.has(s.id) : s.t === 'f' ? def.faces.has(s.id) : s.t === 'i' ? def.insts.has(s.id) : s.t === 'd' ? model.dims.has(s.id) : s.t === 's' ? model.sections.has(s.id) : model.guides.has(s.id)));
     sceneIndex = Math.min(sceneIndex, model.scenes.length - 1);
@@ -1099,6 +1106,7 @@ function init(root) {
   function explodeSel() {
     const insts = host.sel.filter((s) => s.t === 'i');
     if (!insts.length) { print(t('app.explode.none')); return; }
+    if (insts.some(s => model.def(ctxDef().insts.get(s.id)?.def)?.mods)) { print(t('app.mods.bake_first')); return; }
     const out = model.change(t('app.undo.explode'), (m) => {
       const def = m.context(host.path).def;
       const all = [];
@@ -1557,7 +1565,7 @@ function init(root) {
           onclick: () => { model.change(t(inst.hidden ? 'app.undo.unhide' : 'app.undo.hide'), (m) => hideSel(m.context(path).def, [{ t: 'i', id: iid }], !inst.hidden), [model.context(path).def.id]); host.setSel(host.sel.filter((s) => s.id !== iid)); afterHistory(); } },
           el('i', { className: inst.hidden ? 'bi bi-eye-slash' : 'bi bi-eye', 'aria-hidden': 'true' }));
         const li = el('li', { dataset: { iid: String(iid) } }, el('div', { className: 'mc-node-row' }, btn, eye));
-        if (d.insts.size) { const sub = el('ul'); walk(d, p, sub, depth + 1); if (sub.children.length) li.append(sub); }
+        if (d.insts.size && !d.mods) { const sub = el('ul'); walk(d, p, sub, depth + 1); if (sub.children.length) li.append(sub); }
         ul.append(li);
       }
     };
@@ -1799,16 +1807,28 @@ function init(root) {
         const sc = [0, 1, 2].map((q) => Math.hypot(inst.m[q * 4], inst.m[q * 4 + 1], inst.m[q * 4 + 2]));
         if (bb) [t('app.info.width'), t('app.info.depth'), t('app.info.height')].forEach((lb, q) => {
           const own = bb.max[q] - bb.min[q], placed = own * sc[q];
-          if (placed > 1e-6) lenBox(lb, 'mc-size' + q, placed, (L) => model.change(t(d.kind === 'component' ? 'app.undo.resize_component' : 'app.undo.resize_group'), (m) => m.setDefSize(d.id, q, L / sc[q]), [d.id]));
+          if (d.mods) row(lb, formatLength(placed, u));
+          else if (placed > 1e-6) lenBox(lb, 'mc-size' + q, placed, (L) => model.change(t(d.kind === 'component' ? 'app.undo.resize_component' : 'app.undo.resize_group'), (m) => m.setDefSize(d.id, q, L / sc[q]), [d.id]));
           else row(lb, formatLength(0, u));
         });
-        if (!(s.closed && !d.insts.size)) solidCheck(d, sel[0].id, notes);
-        softenRow(props, () => ({ defId: d.id, eids: [...d.edges.keys()] }));
+        if (!d.mods) {
+          if (!(s.closed && !d.insts.size)) solidCheck(d, sel[0].id, notes);
+          softenRow(props, () => ({ defId: d.id, eids: [...d.edges.keys()] }));
+        }
         // 0.4 M26: a component made of parts stretches its parts by their rules, for this copy only
-        if (d.kind === 'component' && (d.insts.size || d.dyn)) btn(t('app.dyn.stretch'), () => stretchDialog(sel[0].id));
+        if (!d.mods && d.kind === 'component' && (d.insts.size || d.dyn)) btn(t('app.dyn.stretch'), () => stretchDialog(sel[0].id));
         if (d.dyn) notes.push(el('p', { className: 'mc-note' }, t('app.dyn.is', { name: model.def(d.dyn.src)?.name || '' })));
-        btn(t('app.info.edit'), () => host.openContext([...host.path, sel[0].id]));
-        btn(t('app.info.explode'), explodeSel);
+        if (d.mods) {
+          btn(t('app.mods.edit_source'), () => {
+            const first = model.def(d.id).insts.keys().next().value;
+            host.openContext([...host.path, sel[0].id, first]);
+          });
+          btn(t('app.mods.bake'), () => { model.change(t('app.mods.bake'), m => m.bakeModifiers(d.id)); afterHistory(); });
+        } else {
+          btn(t('app.info.edit'), () => host.openContext([...host.path, sel[0].id]));
+          btn(t('app.info.explode'), explodeSel);
+        }
+        if (d.mods || canModify(d)) modifierControls(d, sel[0].id, notes);
         if (d.kind === 'component' && (counts.get(d.id) || 0) > 1) btn(t('app.info.make_unique'), () => { model.change(t('app.info.make_unique'), (m) => m.makeUnique(m.context(host.path).def, sel[0].id), [model.context(host.path).def.id]); scheduleInfo(); });
         if (d.kind === 'group') btn(t('app.undo.make_component'), () => { model.change(t('app.undo.make_component'), (m) => { const dd = m.def(d.id); dd.kind = 'component'; dd.name = m.uniqueName(t('app.info.component')); }, [d.id]); scheduleInfo(); });
       }
@@ -2357,6 +2377,65 @@ function init(root) {
     }, { once: true });
     document.body.append(frame);
     print(t('app.print.opening'));
+  }
+  // ---- Ordered modifiers on an ordinary group/component ----
+  function modifierControls(d, iid, notes) {
+    const box = el('section', { className: 'mc-modifiers', 'aria-label': t('app.mods.title') },
+      el('h3', { className: 'mc-h' }, t('app.mods.title')));
+    const parentId = ctxDef().id;
+    const change = edit => {
+      try {
+        model.change(t('app.mods.undo'), m => {
+          const cur = m.def(d.id), ops = cur.mods ? structuredClone(cur.mods.ops) : [];
+          edit(ops);
+          if (cur.mods) setModifiers(m, cur, ops);
+          else m.def(parentId).insts.get(iid).def = modifierDef(m, cur, ops).id;
+        });
+        afterHistory();
+      } catch (err) { print(err.message); }
+    };
+    const button = (label, fn, disabled = false) => el('button', { type: 'button', className: 'mc-linkbtn', disabled, onclick: fn }, label);
+    const add = el('div', { className: 'mc-actions' },
+      button(t('app.mods.add_scale'), () => change(ops => ops.push({ type: 'scale', factors: [1, 1, 1] }))),
+      button(t('app.mods.add_array'), () => change(ops => ops.push({ type: 'array', count: 2, offset: [1, 0, 0] }))));
+    box.append(add);
+    if (d.mods) {
+      box.append(el('p', { className: 'mc-note' }, t('app.mods.note')));
+      if (!d.mods.ops.length) box.append(el('p', { className: 'mc-note' }, t('app.mods.empty')));
+      d.mods.ops.forEach((op, index) => {
+        const item = el('fieldset', { className: 'mc-modifier' }, el('legend', {}, t('app.mods.' + op.type)));
+        const enabled = el('input', { type: 'checkbox', checked: op.enabled !== false });
+        enabled.addEventListener('change', () => change(ops => { ops[index].enabled = enabled.checked; }));
+        item.append(el('label', {}, enabled, ' ' + t('app.mods.enabled')));
+        const fields = el('div', { className: 'mc-props' });
+        const input = (key, value, parse, write, type = 'text') => {
+          const id = 'mc-mod-' + index + '-' + key;
+          const inp = el('input', { id, type, className: 'mc-input', value, step: 'any' });
+          inp.addEventListener('change', () => {
+            const v = parse(inp.value);
+            if (v === null || !Number.isFinite(v)) { print(t('app.mods.bad')); inp.value = value; return; }
+            change(ops => write(ops[index], v));
+            // Invalid recipes leave the model untouched; restore the visible field too.
+            const current = model.def(d.id)?.mods?.ops[index];
+            if (current && JSON.stringify(current) === JSON.stringify(op)) inp.value = value;
+          });
+          fields.append(el('label', { for: id }, t('app.mods.' + key)), inp);
+        };
+        if (op.type === 'scale') ['x', 'y', 'z'].forEach((ax, k) =>
+          input('factor.' + ax, op.factors[k], x => x.trim() ? Number(x) : NaN, (o, v) => { o.factors[k] = v; }, 'number'));
+        else {
+          input('count', op.count, x => x.trim() ? Number(x) : NaN, (o, v) => { o.count = v; }, 'number');
+          ['x', 'y', 'z'].forEach((ax, k) => input('offset.' + ax, formatLength(op.offset[k], model.units),
+            x => parseLength(x, model.units), (o, v) => { o.offset[k] = v; }));
+        }
+        item.append(fields, el('div', { className: 'mc-actions' },
+          button(t('app.mods.up'), () => change(ops => { [ops[index - 1], ops[index]] = [ops[index], ops[index - 1]]; }), index === 0),
+          button(t('app.mods.down'), () => change(ops => { [ops[index], ops[index + 1]] = [ops[index + 1], ops[index]]; }), index === d.mods.ops.length - 1),
+          button(t('app.mods.remove'), () => change(ops => ops.splice(index, 1)))));
+        box.append(item);
+      });
+    }
+    notes.push(box);
   }
   // ---- Components that stretch (0.4 M26) ----
   const dynLib = () => import('./dynamic.js');
