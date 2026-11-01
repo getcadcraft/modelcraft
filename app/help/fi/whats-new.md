@@ -1,0 +1,109 @@
+---
+title: Uutta versiossa 0.7
+summary: Verkot ja muokkaimet, veistäminen, UV-koordinaatit ja käyräobjektit, polunjäljitys näytönohjaimella ja Renderöi-työtila, reaaliaikainen live-näkymä sirottelulla ja panoraamoilla, solmumateriaalit, Animoi-työtila luilla ja fysiikalla, USD-, FBX-, STEP- ja .3dm-tiedostot sekä 3D-tulostustyökalut Aloittelija-tyylillä.
+keywords: mitä uutta, mitä on uutta, julkaisutiedot, muutosloki, muutokset, 0.7, versio, uudet ominaisuudet, verkko, verkot, verkkotyötila, muokkaimet, alijako, laskos, uv, avaa tasoksi, saumat, käyrät, käyräobjektit, NURBS, Bézier, veistäminen, verkota uudelleen, uudelleentopologia, jako, laskenta, polunjäljitys, webgpu, renderöi-työtila, renderöintijono, mp4, exr, kohinanpoisto, fysikaalinen taivas, hdri, ies, syvyysterävyysalue, valojen sekoitus, sumu, kaustiikka, live-näkymä, reaaliaika, kävely, sirottelu, panoraama, kierros, katselin, varjostus, solmut, solmumateriaalit, materiaalikirjasto, materialx, dekaalit, tekstuurimaalaus, tekstuurin paistaminen, animoi, kaavioeditori, leikkeet, muotoavaimet, ohjaimet, luuranko, luut, pinnoitus, ik, rajoitteet, fysiikka, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D-kiintokappaleet, tuet, seinämän paksuus, ontoksi, korjaus, aloittelija, avustajat, koneesi, yksiköt, portugali
+from: b9fc43e2
+---
+
+Tämä kertoo, mikä on muuttunut ModelCraft-sovelluksessa versiosta 0.6 versioon 0.7. ModelCraft mallintaa nyt verkkoja työnnä/vedä-geometrian lisäksi, renderöi näytönohjaimella ja sisältää työtilan jokaiselle työlajille: valitse se työkalurivin vasemmalla puolella olevasta luettelosta {{ui:Työtila}}.
+
+## Uutta
+
+### Verkot
+
+- **Verkot.** Valitse ryhmä tai komponentti ja napsauta kohdassa {{ui:Kohteen tiedot}} vaihtoehtoa {{ui:Muunna verkoksi}}: siitä tulee verkko, jonka pinnoissa voi olla minkä tahansa määrän kulmia ja jotka voivat kantaa tekstuurikoordinaatteja, normaaleja, värejä ja painoja. {{ui:Muunna geometriaksi}} palauttaa sen takaisin. Kumoaminen verkossa säilyttää vain sen, minkä kukin vaihe muutti. Verkon sisältävän tiedoston avaamiseen tarvitaan ModelCraft 0.7. Katso [Verkot](topic:meshes).
+- **Verkko-työtila.** Kaksoisnapsauta verkkoa tai valitse luettelosta {{ui:Työtila}} kohta {{ui:Verkko}}, niin voit muokata sen kärkipisteitä, särmiä ja pintoja: silmukat ja renkaat, suhteellinen muokkaus, pursotus, sisennys, viistäminen, silmukkaleikkaus, veitsi, puolitus, pyöritys, yhdistäminen, liuotus, täyttö, ruudukkotäyttö, silta ja liu'utus sekä viimeisimmän toiminnon asetukset, joita voi muuttaa jälkikäteen paneelissa. Aloita tasosta, kuutiosta, pallosta, vanteesta ja muista. Työnnä/vedä-näppäimet ja mallintajan näppäimet toimivat molemmat. Katso [Muokkaa verkkoa Verkko-työtilassa](topic:mesh-edit).
+- **Muokkaimet.** Peilaus, matriisi, alijakopinta, viistäminen, kiinteyttäminen, logiikkaoperaatio, siirto, hitsaus, harventaminen, tasoitus, hila, käyrämuodonmuutos ja kutistuskääre muuttavat verkon näkymää muuttamatta sitä. Pinoa niitä, kytke kukin päälle tai pois näkymään ja renderöintiin, ja {{ui:Käytä}} yksi, kun haluat sen pysyvästi. Katso [Verkon muokkaimet](topic:modifiers).
+- **Alijako laskoksilla.** {{ui:Laskos}} Verkko-työtilassa pitää valitut särmät teräviä alijakopinnan alla. Renderöinnit voivat käyttää enemmän tasoja kuin näkymä, ja suuressa verkossa näkymä näyttää alemman tason ja kertoo siitä. Katso [Alijakopinta](topic:modifiers#subdivision-surface).
+- **Käyräobjektit.** Bézier-, NURBS- ja suoraviivaisia käyriä, joista saa putken, nauhan, kapenevan muodon tai täytetyn levyn, sekä teksti käyränä. Muokkaa niiden pisteitä {{ui:Käyrä}}-työtilassa ja kun muoto on kohdallaan, {{ui:Verkoksi}}. Katso [Käyräobjektit](topic:curves).
+- **UV-työtila.** Merkitse saumat (tai anna ModelCraftin merkitä ne teräville särmille), {{ui:Avaa tasoksi}} ja {{ui:Pakkaa}}, tai projisoi laatikolla, sylinterillä, pallolla tai näkymästä. UV-editori 3D-näkymän vieressä siirtää, kääntää ja skaalaa paloja, ja ruutukuvio sekä venytysvärit näyttävät tuloksen. Katso [Asettele verkon UV-koordinaatit](topic:uv).
+- **Veistäminen.** {{ui:Veistä}}-työtilassa on piirto-, savi-, tasoitus-, tartunta-, paisutus-, laskos-, nipistys-, litistys- ja maskisivellin sekä peilaus X-akselin yli, ja {{ui:Yksityiskohta}} lisää kolmioita sitä mukaa kuin veistät. Kynän paine asettaa siveltimen koon ja voimakkuuden. Kukin veto on yksi kumoamisvaihe. Katso [Veistä verkko](topic:sculpt).
+- **Verkota uudelleen ja uudelleentopologia.** {{ui:Verkota uudelleen}} tekee koko verkosta uudelleen tasaisin kolmioin, sulkee reiät ja yhdistää päällekkäiset osat. Puhtaan verkon rakentamiseksi yksityiskohtaisen verkon päälle valitse se kohdasta {{ui:Uudelleentopologia}}: siirtämäsi pisteet asettuvat sen pinnalle. Katso [Verkota uudelleen](topic:mesh-edit#remesh).
+
+### Piirtäminen
+
+- **Jaa särmä tai käyrä.** Työkalu {{ui:Jaa}} merkitsee leikkauskohdat, kun liikut särmää pitkin, ja jakaa napsautuksella tai kirjoitetulla luvulla. Kun särmä, kaari tai ympyrä on valittuna, kirjoita `/5`. {{ui:Kohteen tiedot}} › {{ui:Jaa…}} kysyy lukumäärää ja on tarkoitettu tablet-laitteille. Kaari tai ympyrä jaetaan yhtä suuriin kulmiin todellisella kaarella. Katso [Jaa särmä tai käyrä yhtä suuriin osiin](topic:divide).
+- **Laskutoimitukset arvokentässä.** Kirjoita `2.5/3`, `12'6"+3/4"`, `(24'-0")/3` tai `2*450mm` mitä tahansa pituutta varten ja `90/2` kulmaa varten. Laskutoimitus, jota ei voi suorittaa, kertoo, mikä on vialla ja missä. Katso [Laskutoimitukset](topic:value-box#calculations).
+
+### Renderöinti
+
+- **Polunjäljitys näytönohjaimella.** {{ui:Renderöi kuva…}} › {{ui:Korkea laatu (polunjäljitys)}} ajaa CadCraft-ohjelman oman polunjäljittäjän näytönohjaimella siellä, missä selaimessa on WebGPU. Kuvan alla oleva rivi kertoo, mikä moottori sen teki. {{ui:Pysäytä}} säilyttää kuvan ja {{ui:Jatka}} jatkaa siitä. Ilman WebGPU-tukea kuva polunjäljitetään WebGL-tekniikalla kuten ennenkin. Katso [Korkea laatu](topic:render#high-quality).
+- **Renderöinti näkymässä.** {{ui:Renderöi}}-työtila polunjäljittää näkymän itsensä ja alkaa alusta, kun kiertää tai muokkaat: renderöi {{ui:Alue}}, napsauta kohtaa {{ui:Tarkenna}}, aseta {{ui:Yksityiskohta}}. Se vaatii WebGPU-tuen. Katso [Renderöinti näkymässä](topic:render#render-in-the-view).
+- **Materiaalit, valot ja taivas.** Korkean laadun kuvat varjostavat jokaisen pinnan OpenPBR-materiaalimallilla (pinnoitteet, karvaisuus, ohuet kalvot, värilliset lasit, hehku). WebGPU-tuen kanssa on myös {{ui:Fysikaalinen taivas}}, jossa on {{ui:Utu}}, {{ui:Taivaskuva (HDRI)}} ja valmistajien IES-valoprofiilit lampuille. Katso [Taivaat ja valoprofiilit](topic:render#skies-and-light-profiles-on-the-graphics-card).
+- **Kamera kuin valokuvakoneessa.** Valotus aukkoarvosta, suljinajasta ja ISO-herkkyydestä joka tilassa. WebGPU-tuen kanssa myös syvyysterävyysalue, kaksipistenäkymä, valkotasapaino, 360°-panoraamat (myös stereona) ja kuutiokartat. Katso [Kamera](topic:render#the-camera).
+- **Viimeistele kuva renderöinnin jälkeen.** Sävytä se ({{ui:ACES filmic}}, {{ui:AgX}}, {{ui:Filmic}} tai {{ui:Vakio}}, kontrasti, hehku, häikäisy, reunahämärrys, `.cube`-väritaulukko), sekoita taivas, aurinko ja kunkin lamppuryhmän valot, ja tarkastele renderöintielementtejä yksi kerrallaan, kaikki ilman uudelleenrenderöintiä. Jäljelle jäävä rakeisuus poistetaan kohinanpoistajalla omalla tietokoneellasi. Katso [Viimeistele kuva](topic:render#finish-the-picture) ja [Sekoita valot renderöinnin jälkeen](topic:render#mix-the-lights-after-the-render).
+- **Lisää tapoja tallentaa renderöinti.** 16-bittinen PNG, monikerroksinen EXR, jossa on jokainen renderöintielementti ja valoryhmä, sekä renderöintitiedosto (`.ccrender`), joka avautuu uudelleen sekoituksensa ja sävytyksensä kanssa. Katso [Tallenna kuva](topic:render#save-the-picture).
+- **Sumu, savu ja kaustiikka.** Aurinko ja lamput valaisevat sumun ja utun, valonsäteineen. Mukana on yksi savupatsas tai pilvi, kaustiikka lasin ja peilien alla sekä mukautuva näytteenotto, joka pysähtyy jo puhtaisiin pikseleihin. Vain näytönohjaimella. Katso [Sumu, savu, kohina ja kaustiikka](topic:render#fog-smoke-noise-and-caustics).
+- **Renderöintijono ja MP4.** Lisää korkean laadun kuvia ja kokonaisia animaatioita {{ui:Renderöintijono}}-jonoon. Ne renderöidään peräkkäin, ja jono säilyy, vaikka sivu suljetaan. Se vaatii WebGPU-tuen. Videot voi tallentaa myös MP4-muodossa, jos selain pystyy kirjoittamaan sen. Katso [Renderöintijono](topic:render#the-render-queue) ja [Renderöi video](topic:animation#render-the-video).
+
+### Live-näkymä ja esitykset
+
+- **Live-näkymä.** {{ui:Vie}} › {{ui:Live-näkymä}} näyttää mallin reaaliaikaisena näkymän vieressä ja seuraa jokaista muokkausta ja kameraa: auringon varjot, materiaalit, lamput ja seinistä heijastuva valo. {{ui:Kävele}} sen läpi, vedä {{ui:Aika}}- ja {{ui:Kuukausi}}-kenttää siirtääksesi aurinkoa, tai siirrä se {{ui:Uusi ikkuna}}-ikkunaan. Se käyttää WebGPU-tekniikkaa, jos selain tukee sitä, muuten WebGL 2 -tekniikkaa. Katso [Live-näkymä](topic:live-view).
+- **Sirottelu.** Levitä ruohoa, kukkia, kiviä, puita ja ihmisiä pinnoille tai siveltimellä seitsemästä uudesta ympäristökohteesta ja muusta kirjastosta. Sarjat tallennetaan tiedostoon. Katso [Sirottele kasveja, kiviä ja ihmisiä](topic:live-view#scatter-plants-rocks-and-people).
+- **Jakaminen.** 360°-panoraama, panoraamakierros, jossa kohteiden välillä on nuolia, erillinen katselin (yksi verkkosivu, joka aukeaa offline-tilassa eikä lataa mitään internetistä) ja video kameran reitistä, kaikki reaaliaikaisella ilmeellä. Katso [Jakaminen](topic:live-view#share-panoramas-tours-a-viewer-a-video).
+- **VR reaaliaikaisella ilmeellä.** {{ui:Tarkastele VR:ssä}} näyttää mallin materiaaleineen, taivaineen, auringon varjoineen, lamppuineen, sirotelluin kohteineen ja heijastuvan valon. Katso [Miltä se näyttää](topic:vr-review#what-it-looks-like).
+
+### Materiaalit
+
+- **Solmuilla tehdyt materiaalit.** {{ui:Varjostus}}-työtila rakentaa tiedoston omat materiaalit solmukaavioina: kuvat, kohina ja ruutukuviot, Voronoi-solut, aallot, tiilet, laatat, puu, marmori, liukuvärit, lika ja reunakuluma, värityöt, matematiikka, kohokartat ja normaalikartat, kokonaiseksi OpenPBR-materiaaliksi. Näkymä näyttää jokaisen muutoksen heti. Katso [Tee materiaaleja solmuilla](topic:shading).
+- **Kirjastomateriaalit ja omat tekstuurisarjat.** Varjostus-paneeli luettelee kirjaston materiaalit: kuusitoista CC0-tekstuurisarjaa, joista kunkin lähde on merkitty. Napsauta yhtä, jotta se otetaan käyttöön, tai vedä se pinnalle. {{ui:Kuvat tai zip…}} tai {{ui:Kansio…}} luo materiaalin omista kartoistasi, jotka tunnistetaan tiedostonimistään. Katso [Kirjaston materiaalit](topic:shading#materials-from-the-library).
+- **MaterialX sisään ja ulos.** Vie materiaali MaterialX-muodossa (OpenPBR Surface tai Standard Surface, tekstuurit PNG-muodossa) ja tuo MaterialX-tiedostot kuvineen. Katso [MaterialX](topic:shading#materialx).
+- **Dekaalit ja tekstuurimaalaus.** Aseta kuva pinnalle dekaalina, jolla on oma materiaali, ja maalaa materiaalin kuvaan pyöreällä siveltimellä. Katso [Dekaalit](topic:shading#decals) ja [Maalaa tekstuuriin](topic:shading#paint-on-the-texture).
+- **Tekstuurien paistaminen.** Paista ympäristön varjostus (ambient occlusion), kaarevuus, valaistus ja yksityiskohtaisen kohteen normaalit kuviksi verkon UV-koordinaattien mukaan tietokoneen prosessoriytimillä. Katso [Paista tekstuureja](topic:shading#bake-textures).
+
+### Animaatio
+
+- **Animoi-työtila.** Aseta avainkehys kohteen sijaintiin, kiertoon ja kokoon, kunkin lampun kirkkauteen, levitykseen ja väriin sekä linssin kulmaan suoraan paneelissa. Aikajanalle tulee {{ui:Käyrät}}-näkymä (Bézier-kahvat, toistot) ja {{ui:Leikkeet}}-näkymä, joka tallentaa avaimet toimintoina, jotka voi sijoittaa uudelleen ja sekoittaa. Useiden rivien avaimia voi siirtää, venyttää, kopioida ja liittää. Katso [Animoi mikä tahansa ominaisuus](topic:animate).
+- **Muotoavaimet ja ohjaimet.** Verkossa on sen muita muotoja, joita sekoitetaan liukusäätimillä. Liukusäätimiin voi asettaa avainkehyksiä, tai ne voi asettaa muista arvoista pienellä lausekkeella. Katso [Muotoavaimet](topic:animate#shape-keys-morphs) ja [Ohjaimet](topic:animate#drivers).
+- **Luurangot.** Aseta luita verkkoon, anna {{ui:Automaattiset painot}} jakaa pisteet niiden kesken tai maalaa painot. Asettele luut ja aseta niille avainkehyksiä, lineaarinen tai kaksoiskvaternioni-pinnoitus. Katso [Luurangot](topic:animate#armatures-bones-that-bend-a-mesh).
+- **IK ja rajoitteet.** Ulottaminen (IK) napaan kanssa, kohdistus, muunnosten kopiointi, rajoitukset, lapsi-suhde ja polun seuranta luille ja kohteille. Katso [IK ja rajoitteet](topic:animate#ik-and-constraints).
+- **Fysiikka.** Ryhmät ja komponentit putoavat, pinoutuvat ja törmäävät laatikoina tai palloina, ja {{ui:Paista fysiikka}} säilyttää tuloksen avainkehyksinä. Katso [Fysiikka](topic:animate#physics-drop-stack-and-collide).
+
+### Tiedostot
+
+- **USD.** {{ui:Tallenna muodossa}} ({{key:Mod+Shift+S}}) tallentaa mallin tiedostoina `.usda`, `.usdc` tai `.usdz`. ModelCraftin tallentama USD-tiedosto avautuu uudelleen ilman menetyksiä. Muiden ohjelmien USD avautuu tai tuodaan verkkoina, ryhminä, komponentteina, lampputeina ja kameroina. {{ui:Tallenna}} kirjoittaa edelleen `.modelcraft`-tiedoston. Katso [Tallenna, avaa ja vie USD](topic:usd).
+- **glTF, täysin.** glTF-tiedostot tuodaan muokattavina verkkoina normaaleineen, UV-koordinaatteineen, kärkipisteiden väreineen ja tekstuureineen. Solmut tulevat ryhminä, valot lamppuina ja kamerat kohtauksina. Draco- ja meshopt-tiedostot ovat mukana. `.gltf` avautuu, kun se pudotetaan yhdessä tiedostojensa kanssa. Vienti kirjoittaa verkot, tekstuurit, lamput ja kamerat. Katso [glTF](topic:formats#gltf-glb-gltf).
+- **FBX-, PLY-, STL- ja Alembic-tuonti.** FBX 2011 ja uudemmat (verkot, UV-joukot, materiaalit, upotetut tekstuurit, valot, kamerat), PLY ja STL väreineen sekä Alembic-välimuistit ensimmäisellä näytteellään. OBJ tuodaan `.mtl`-tiedostoineen ja kuvineen, kun pudotat ne yhdessä. Katso [Tiedostomuodot tarkemmin](topic:formats).
+- **Lisää vientiä.** PLY väreineen, STL maalattujen pintojen väreineen ja OBJ tekstuureineen yhdessä zip-tiedostossa. Katso [Tiedostomuodot tarkemmin](topic:formats).
+- **STEP-tiedostot.** {{ui:Tuo}} lukee STEP-osat ja -kokoonpanot (AP203, AP214, AP242) suljettuina verkkoina todellisessa koossaan, jokainen osa siinä kohdassa, johon tiedosto sen sijoittaa. Katso [STEP](topic:formats#step-step-stp).
+- **.3dm-tiedostot.** {{ui:Tuo}} lukee `.3dm`-malleja: verkot, monipintakappaleet ja pursotukset (tiedostoon tallennetuista verkoista, muuten ModelCraftin kolmioimina), käyrät särminä, lohkot komponentteina ja tasot tunnisteina. Katso [Tuo .3dm-malli](topic:import-3dm-files).
+- **3D-kiintokappaleet DWG- ja DXF-tiedostoista.** Piirustuksen tuonti tuo nyt mukanaan myös sen 3D-kiintokappaleet, alueet ja kappaleet. Kukin tulee omana ryhmänään, ja suljetut kiintokappaleina. Katso [Mallinna asemapiirroksella](topic:site-plan#what-comes-in).
+
+### 3D-tulostus
+
+- **Tulostustyökalut.** {{ui:Tarkista 3D-tulostusta varten (STL tai 3MF)…}} › **Tulostustyökalut** sisältää {{ui:Tukien esikatselu}} (ulokkeet, pylväät tai puumaiset tuet, suunnilleen kuinka paljon materiaalia), {{ui:Seinämän paksuus}} (tulostukseen liian ohuet seinämät, luetteloituina {{ui:Näytä}}-toiminnolla), {{ui:Ontoksi}} (antamasi paksuiset seinämät, joissa on tyhjennysreikiä) ja {{ui:Korjaus}} (jokainen korjaus luetteloituna; päällekkäiset osat liittyvät vain pyydettäessä). {{ui:Ontoksi}} ja {{ui:Korjaus}} antavat ryhmän, jonka tasaiset sivut ovat yksittäisiä pintoja, tai verkon, jos tulos ei sulkeudu tai siinä on liian monta pintaa. Tilarivi kertoo, kumpi. Katso [Tuet, seinämän paksuus, ontoksi tekeminen ja korjaus](topic:print-tools).
+
+### Avustajat ja koneesi
+
+- **Lisää tekoälyavustajille.** Avustaja voi nyt luetella pinnat ja materiaalit, työntää/vetää, maalata, luoda ryhmiä, lisätä ja näyttää kohtauksia, lisätä verkkoja, muokata muokkaimien pinoja, viedä USD-tiedostoja, renderöidä kuvan ja täyttää renderöintijonon. Katso [Käytä ModelCraftia tekoälyavustajien kanssa](topic:use-with-ai-assistants).
+- **Koneesi.** {{ui:Asetukset}} › {{ui:ModelCraft}} › {{ui:Renderöinti}} › {{ui:Koneesi}} näyttää grafiikan, prosessoriytimet ja muistin, jotka tämä selain sallii sovelluksen käyttää, sekä tason, joka määrää, mistä live-näkymä alkaa. Katso [Millä koneesi renderöi](topic:your-machine).
+
+## Korjattu
+
+- {{ui:Kiintokappaleet}} › {{ui:Yhdiste}}, {{ui:Erotus}} ja {{ui:Leikkaus}} saattoivat palauttaa ryhmän, joka ei ollut suljettu, minkä kokoisena tahansa. Ne sulkeutuvat nyt.
+- {{ui:Kiintokappaleet}} › {{ui:Erotus}} oli harmaana, kun mitään ei ollut valittuna, vaikka se valitsee kaksi osaansa vuorotellen valintasi jälkeen.
+- Animaation aikajanalla kirjoitetut näppäimet eivät menneet mihinkään, eikä {{key:Mod+S}} myöskään. {{key:Mod+Z}} ja {{key:Mod+Y}} ovat siellä aikajanan omat kumoa- ja tee uudelleen -toiminnot. Muut {{key:Mod}}-näppäimet menevät sovellukseen.
+
+## Kaikissa sovelluksissa
+
+- **Yksiköt.** {{ui:Asetukset}} › {{ui:Yleiset}} › {{ui:Yksiköt}} sisältää yhden luettelon pituudelle, pinta-alalle, tilavuudelle, kulmalle ja kaltevuudelle. Niissä ovat yksiköiden määritelmien mukaiset tarkat koot (US survey foot on oma yksikkönsä). Kytke pois yksiköt, joita et koskaan käytä, niin ne poistuvat yksikköluetteloista. Merkitse tähdellä yksi, niin uusi työ alkaa siinä. Tiedosto säilyttää aina oman yksikkönsä. ModelCraft-sovelluksessa arvokentän vieressä oleva yksikköluettelo seuraa kytkimiä (mallin oma yksikkö pysyy aina siinä). Tähti asettaa uuden mallin yksikön, kun ModelCraftilla on tuo yksikkö, ja pituus, joka kirjoitetaan minkä tahansa yksikön merkillä, luetaan siinä yksikössä. Katso [Yksiköt, kirjoitetut arvot ja yksikköluettelot](common:unit-lists).
+- **Tiiviimpi asettelu ja paneelit, jotka piiloutuvat.** {{ui:Asetukset}} › {{ui:Yleiset}} › {{ui:Asettelun tiheys}} › {{ui:Tiivis}} mahduttaa näytölle enemmän (kosketusnäytöt ja puhelimet säilyttävät suuret painikkeensa). Jokaisella sivupaneelilla on kapea otsikkopalkki. Vedä se kiinnittääksesi tai irrottaaksesi paneelin, pudota se toisen paneelin palkkiin jakaaksesi yhden kehyksen välilehdiksi, lukitse se liukumaan reunaan tai piilota se ja tuo takaisin reunasta. Katso [Järjestä paneelit](common:arrange-panels#make-the-layout-denser).
+- **Valintaikkunat liikkuvat.** Vedä valintaikkunaa otsikkopalkistaan pois piirustuksen tieltä. Se palaa siihen, mihin jätit sen. Kaksoisnapsauta otsikkopalkkia keskittääksesi sen uudelleen. Katso [Siirrä valintaikkunaa](common:arrange-panels#move-a-dialog).
+- **Ohjeita tekoälyavustajille.** Kymmenen valmista pyyntöä omalle avustajallesi (siistiä piirustus, tulosta sarja, tarkista piirustuksia, kysy mallilta kysymyksiä, laske määrälaskennan yhteissumma, kokeile osan muunnelmaa…), jokaisessa kutsutut työkalut ja tarvittavat oikeudet. Testimme toistavat jokaisen. Sovelluksissa ei ole tekoälyä. Katso [Ohjeita tekoälyavustajille](common:assistants-recipes).
+- **Kielet.** **Português (Portugal)** on uusi kohdassa {{ui:Asetukset}} › {{ui:Yleiset}} › {{ui:Kieli}}. Se sekä **Português (Brasil)**, **Español (México)** ja **Bahasa Indonesia** sisältävät nyt sovellusten kaikki sanat luonnoksina, joita äidinkielenään puhuva ei ole vielä tarkistanut. Ohjeaiheet ovat englanniksi.
+- **CadCraft Studio** kertoo, miksi päivitystarkistus epäonnistui (järjestelmälle ei ole vielä tiedostoa, ei verkkoyhteyttä, allekirjoitus on väärä), eikä vain ”Valmis”. Se lakkaa palauttamasta Mitä uutta -korttia, jonka suljit, ennen kuin uudempi julkaisu on saatavilla.
+
+## Ei vielä tässä versiossa
+
+- **0.7 ei ole allekirjoitettu koodilla.** Allekirjoitus ja Microsoft Store -paketti siirtyivät versioon 0.8, koska sertifikaatin vahvistus ei ole vielä valmis. Tarkista kunkin tiedoston vieressä oleva SHA-256-tiiviste osoitteessa getcadcraft.com/download. Windowsissa, jos SmartScreen pysäyttää asennusohjelman, valitse {{ui:Lisätietoja}} ja sitten {{ui:Suorita silti}}. Macissa ensimmäisellä kerralla napsauta CadCraft Studiota hiiren kakkospainikkeella ja valitse {{ui:Avaa}}. CadCraft Studio ei ole vielä sovelluskaupassa, eikä iPad- tai iPhone-versiota ole vielä.
+- Kulman ja kaltevuuden luettelot kohdassa {{ui:Yksiköt}} tallennetaan, mutta yksikään kenttä ei lue niitä vielä.
+- Renderöintiä näytönohjaimella (WebGPU) on testattu täällä vain ohjelmistokorvikkeella, ei vielä oikeilla näytönohjaimilla. Renderöi siis ensin jotain pientä omalla tietokoneellasi. Sama koskee live-näkymää, ja VR-näkymää on kokeiltu toistaiseksi vain kuulokeemulaattorilla.
+- Ilman WebGPU-tukea ei ole Renderöi-työtilaa eikä renderöintijonoa. Korkean laadun kuvista puuttuvat syvyysterävyysalue, fysikaalinen taivas, taivaskuva, sumu, savu, kaustiikka ja valojen sekoitus.
+- {{ui:Renderöi kuva…}} ei piirrä vielä sirotelluja kohteita. Ne näkyvät live-näkymässä, sen panoraamoissa, katselimessa ja videossa.
+- Lamput animoituvat näkymässä, mutta renderöity video käyttää lamppuja sellaisina kuin ne ovat alkaessaan.
+- Luita ja animaatiota ei vielä lueta eikä kirjoiteta glTF-, FBX- tai USD-tiedostoihin. Pinnoitetut mallit tulevat lepoasennossa painoineen, eikä glTF- ja FBX-materiaaleja perusvärin tai tekstuurin lisäksi säilytetä vielä.
+- STEP-värejä ja kokoonpanon osien nimiä ei vielä lueta. `.3dm`-tuonti on testattu tiedostoilla, jotka formaatin työkalupakki on kirjoittanut, ei vielä mallinnusohjelman itsensä tiedostoilla. SubD-kohteet, teksti ja mitoitukset jätetään pois.
+- CivilCraft-kasvikirjasto on ModelCraft-sovelluksessa, mutta kasvien sijoittaminen siitä ei ole vielä toteutettu.
+- Tekstuurin maalaaminen työnnä/vedä-pinnoille toistuu materiaalin laatan mukaan. Maalataksesi vain yhden pinnan muunna se verkoksi ja avaa se tasoksi.
+
+Kaikki muu on kohdassa [Ei vielä toteutettu](topic:not-built-yet).

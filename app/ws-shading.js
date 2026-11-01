@@ -43,6 +43,7 @@ import { swatchPixels } from './render/three-mats.js';
 import { isMaterialPaint, toBase64 } from './model.js';
 import { listMaterials, loadMaterial, graphFor, sourceOf } from './shading/library.js';
 import { pickMaps, textureSetGraph } from './shading/texset.js';
+import { fromPhoto, decodePhoto } from './photo-material.js';   // 0.8 EG.62
 import { openZip } from './skp/zip.js';
 import { readMaterialX, writeMaterialX, ident } from './shading/mtlx.js';
 import { zipStored } from './render/webm.js';
@@ -75,6 +76,7 @@ const NEEDS_MAT = new Set(['duplicate', 'delete', 'paint', 'add', 'frame']);
 st.brush = { radius: 12, color: '#3a6ea5', strength: 0.8, hardness: 0.5 };
 st.decal = { width: 0.5 };
 st.strokes = [];
+st.photo = { size: 1, rough: 0.65 };   // 0.8 EG.62: the tile size in metres and the base roughness the panel's "From a photo" uses
 st.bake = { maps: { ao: true, curvature: true, normal: false, light: false }, size: 512, rays: 32, dist: 0, width: 1, cage: 2, busy: null };   // texture painting's undo: [{key, snap}], newest last
 
 export const SHADING_WS = registerWorkspace({
@@ -220,6 +222,49 @@ export async function useLibraryMaterial(host, entry) {
     host.print(t('shading.lib.failed', { name: entry.name, why: t('shading.lib.why.' + (['sha256', 'too_big', 'not_material', 'bad_graph'].includes(e.code) ? e.code : 'fetch')) }));
     return null;
   }
+}
+
+/** A made picture (a map from photo-material.js) into the model's pictures and the bake's → its key 'img:<id>'. */
+function addMadePicture(name, im, avg) {
+  const data = toBase64(pngBytes(im.w, im.h, pictureRgb(im)));
+  const id = model.addImage({ name, mime: 'image/png', data, avg });
+  materials.images.set('img:' + id, im);
+  return 'img:' + id;
+}
+/**
+ * 0.8 EG.62: one photo (raw pixels from photo-material.js decodePhoto) → a tiling material: colour, roughness and a normal map worked
+ * out from it, as a node material of the file (the Shading panel's button and the assistant's material_make both end here).
+ * opts: name, size (metres the photo shows across = the tile), crop, flatten, seamless, roughness, bump (photo-material.js).
+ * preview: true makes the maps and reports, adding nothing. → {id, name, paint ('mat:<id>'), size, maps, ...stats, notes}
+ */
+export function makeMaterialFromPhoto(photo, { name = '', size = 1, preview = false, ...opts } = {}) {
+  if (!model) throw new Error('No model is open.');
+  const tile = Math.min(100, Math.max(0.01, Number.isFinite(size) ? size : 1));
+  const r = fromPhoto(photo, opts);
+  const title = String(name || 'Photo material').slice(0, 80);
+  if (preview) return { id: null, name: title, paint: null, size: tile, maps: ['color', 'roughness', 'normal'], ...r.stats, notes: r.notes };
+  const keys = {
+    color: addMadePicture(title + ' (color)', r.color, r.stats.meanColor),
+    roughness: addMadePicture(title + ' (roughness)', r.roughness, '#808080'),
+    normal: addMadePicture(title + ' (normal)', r.normal, '#8080ff'),
+  };
+  const graph = textureSetGraph({ color: 1, roughness: 1, normal: 1 }, { name: title, size: [tile, tile], convention: 'opengl', key: (role) => keys[role] });
+  const id = materials.create(title, graph);
+  onEdit();
+  return { id, name: title, paint: 'mat:' + id, size: tile, maps: ['color', 'roughness', 'normal'], ...r.stats, notes: r.notes };
+}
+/** The Shading panel's "From a photo": a picture file → the material, opened. */
+async function materialFromPhotoFile(host, file) {
+  const { t } = host;
+  if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 32 * 1048576) { host.print(t('shading.photo.bad')); return null; }
+  try {
+    const photo = await decodePhoto(file.type, new Uint8Array(await file.arrayBuffer()));
+    const name = file.name.replace(/\.[a-z0-9]+$/i, '').replace(/[_\-.]+/g, ' ').trim() || t('shading.photo.default_name');
+    const r = makeMaterialFromPhoto(photo, { name, size: st.photo.size, roughness: st.photo.rough });
+    open(host, r.id);
+    host.print(t('shading.photo.done', { name: r.name, size: r.size, before: r.seam.before, after: r.seam.after }));
+    return r.id;
+  } catch (e) { host.print(t('shading.photo.bad')); return null; }
 }
 
 const PIC_MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
@@ -379,6 +424,19 @@ function libraryPanel(host, box) {
       el('button', { type: 'button', className: 'btn-line btn-sm-cc', dataset: { shadingImport: '' }, onclick: () => files.click() }, t('shading.import.files')),
       el('button', { type: 'button', className: 'btn-line btn-sm-cc', dataset: { shadingImportDir: '' }, onclick: () => folder.click() }, t('shading.import.folder'))),
     el('p', { className: 'mc-note' }, t('shading.import.how')));
+  // 0.8 EG.62: a material from one photo
+  const photoFile = el('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp', hidden: true, dataset: { shadingPhotoFile: '' } });
+  photoFile.addEventListener('change', () => { const f = photoFile.files && photoFile.files[0]; photoFile.value = ''; if (f) materialFromPhotoFile(host, f); });
+  const photoSize = el('input', { type: 'number', className: 'mc-input', id: 'mc-shading-photo-size', min: '0.01', max: '100', step: 'any', value: String(st.photo.size), dataset: { shadingPhotoSize: '' } });
+  photoSize.addEventListener('change', () => { const v = parseFloat(photoSize.value); st.photo.size = Number.isFinite(v) && v > 0 ? Math.min(100, v) : 1; photoSize.value = String(st.photo.size); });
+  const photoRough = el('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(st.photo.rough), id: 'mc-shading-photo-rough', dataset: { shadingPhotoRough: '' } });
+  photoRough.addEventListener('input', () => { st.photo.rough = parseFloat(photoRough.value); });
+  box.append(el('h3', { className: 'mc-h' }, t('shading.photo.h')),
+    el('label', { for: 'mc-shading-photo-size' }, t('shading.photo.size')), photoSize,
+    el('label', { for: 'mc-shading-photo-rough' }, t('shading.photo.rough')), photoRough,
+    el('div', { className: 'mc-shading-acts' }, photoFile,
+      el('button', { type: 'button', className: 'btn-line btn-sm-cc', dataset: { shadingPhoto: '' }, onclick: () => photoFile.click() }, t('shading.photo.pick'))),
+    el('p', { className: 'mc-note' }, t('shading.photo.how')));
   // MT.4: MaterialX
   const mxFiles = el('input', { type: 'file', multiple: true, accept: '.mtlx,.zip,image/png,image/jpeg,image/webp,application/zip', hidden: true, dataset: { shadingMxFiles: '' } });
   const mxFolder = el('input', { type: 'file', multiple: true, webkitdirectory: '', hidden: true, dataset: { shadingMxFolder: '' } });

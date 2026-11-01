@@ -19,7 +19,7 @@ Pick {{ui:Shading}} in the Workspace list. The 3D view keeps the top of the scre
 
 ## Materials from the library
 
-The panel's **Material library (LibraryCraft)** lists the library's materials, each with a preview rendered by CadCraft's path tracer. They are texture sets released under CC0, credited to the people who made them.
+The panel's **Material library (Library)** lists the library's materials, each with a preview rendered by CadCraft's path tracer. They are texture sets released under CC0, credited to the people who made them.
 
 - Click one to bring it into the file (its pictures come with it) and, with faces or groups selected, paint them.
 - Drag one onto a face or a group in the view to paint just that.

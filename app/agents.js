@@ -16,12 +16,14 @@
  * The page (modelcraft.js) calls installAgents({...}) once.
  */
 import { meshDef, solidInfo, pushPull, paintFaces, paintInstance, faceNormal, faceArea, isPaint, PALETTE, cleanScene } from './model.js';
-import { MATERIALS } from './render/materials.js';
+import { MATERIALS, material, documentMaterials } from './render/materials.js';
 import { makePrimitive, PRIMITIVES } from './mesh/primitives.js';
 import { MODS, MOD_TYPES, cleanMods, newMod } from './mesh/modifiers.js';
 import { parseLength, formatLength } from './units.js';
-import { getHost, toolResult } from "./host.js";
+import { getHost, toolResult, stackRollback, peekUndo } from "./host.js";
 import { renderTools } from './render-tools.js';
+import { lookTools } from './look-tools.js';
+import { photoTools } from './photo-tools.js';
 
 const r6 = (v) => Math.round(v * 1e6) / 1e6;
 
@@ -112,7 +114,7 @@ export function paintOf(v) {
   const pal = PALETTE.find(([n]) => n.toLowerCase() === s.toLowerCase());
   if (pal) return pal[1];
   const id = s.replace(/^mat:/i, '').toLowerCase();
-  if (MATERIALS.some((m) => m.id === id)) return 'mat:' + id;
+  if (material(id)) return 'mat:' + id;   // the library's, then the open file's own (0.8 EG.62: a material made from a photo)
   throw new Error('"' + s + '" is not a colour (#rrggbb), a palette colour (' + PALETTE.map(([n]) => n).join(', ') + ') or a material (materials_list).');
 }
 
@@ -212,13 +214,13 @@ export function installAgents(app) {
   const unit = () => model.units || 'm';
   const P = (p) => [lengthOf(p[0], unit()), lengthOf(p[1], unit()), p.length > 2 ? lengthOf(p[2], unit()) : 0];
   const edit = (label, fn) => { const r = model.change(PREFIX + label, fn); app.changed(); return r; };
-  C.configure({ title: 'ModelCraft', info: () => ({ units: unit(), groups: model.root.insts.size }) });
+  C.configure({ title: 'ModelCraft', rollback: stackRollback(() => model), info: () => ({ units: unit(), groups: model.root.insts.size }) });
   C.tool({ name: 'app_info', group: 'read', title: 'About this window', description: 'ModelCraft\'s window: the model\'s display unit, how many groups and components it has, unsaved changes, and the permissions the person allowed.',
     run: async () => ({ app: 'modelcraft', title: 'ModelCraft', allowed: C.groups, units: unit(), instances: model.root.insts.size, unsaved: !!model.dirty }) });
-  C.tool({ name: 'model_describe', group: 'read', title: 'Describe the model', description: 'The model: display unit, extents (meters, Z up) and size, loose faces and edges, every group and component placed (id, name, where, whether it is a closed solid, volume in m³), components and scenes.',
+  C.tool({ name: 'model_describe', group: 'read', untrusted: true, title: 'Describe the model', description: 'The model: display unit, extents (meters, Z up) and size, loose faces and edges, every group and component placed (id, name, where, whether it is a closed solid, volume in m³), components and scenes.',
     run: async () => describeModel(model) });
   C.tool({ name: 'view_screenshot', group: 'read', title: 'Picture of the view', description: 'A PNG of the 3D view as shown (up to 1600 px on the long side).',
-    inputSchema: obj({ maxSize: { type: 'integer', minimum: 200, maximum: 1600, default: 1200 } }),
+    inputSchema: obj({ maxSize: { description: 'Longest side of the picture in pixels (200 to 1600; default 1200).', type: 'integer', minimum: 200, maximum: 1600, default: 1200 } }),
     run: async (a) => {
       const c = app.canvas && app.canvas();
       if (!c || typeof document === 'undefined') throw new Error('No view to take a picture of.');
@@ -229,8 +231,8 @@ export function installAgents(app) {
       out.getContext('2d').drawImage(c, 0, 0, out.width, out.height);
       return toolResult([{ type: 'image', data: out.toDataURL('image/png').replace(/^data:image\/png;base64,/, ''), mimeType: 'image/png' }], { width: out.width, height: out.height });
     } });
-  C.tool({ name: 'box_add', group: 'edit', title: 'Add a box', description: 'A box as a new group: its lowest corner at `at` [x, y] or [x, y, z] and its size [width (x), depth (y), height (z)]. Numbers are in the model\'s display unit; text such as "10\'", "3.2m" or "600mm" works too. One undo step.',
-    inputSchema: obj({ at: pt, size: { type: 'array', items: len, minItems: 3, maxItems: 3 }, name: { type: 'string', maxLength: 80 } }, ['size']),
+  C.tool({ name: 'box_add', group: 'edit', rollbackPreview: true, title: 'Add a box', description: 'A box as a new group: its lowest corner at `at` [x, y] or [x, y, z] and its size [width (x), depth (y), height (z)]. Numbers are in the model\'s display unit; text such as "10\'", "3.2m" or "600mm" works too. One undo step.',
+    inputSchema: obj({ at: { ...pt, description: 'The box\'s lowest corner [x, y] or [x, y, z], in the display unit (numbers or text such as \'3ft\').' }, size: { description: 'Size [width (x), depth (y), height (z)] in the display unit.', type: 'array', items: len, minItems: 3, maxItems: 3 }, name: { description: 'Name of the new group.', type: 'string', maxLength: 80 } }, ['size']),
     run: async (a) => {
       const [w, d, h] = a.size.map((v) => lengthOf(v, unit()));
       if (!(w > 0 && d > 0 && h > 0)) throw new Error('A box needs a width, depth and height above zero.');
@@ -238,8 +240,8 @@ export function installAgents(app) {
       const r = edit('box', (m) => addSolid(m, boxPolys(w, d, h), a.name || 'Box', at));
       return { ...r, undo: PREFIX + 'box' };
     } });
-  C.tool({ name: 'cylinder_add', group: 'edit', title: 'Add a cylinder', description: 'A cylinder as a new group standing on `center` [x, y] or [x, y, z], with a radius and a height (display unit, or text with a unit), 24 sides unless given. One undo step.',
-    inputSchema: obj({ center: pt, radius: len, height: len, sides: { type: 'integer', minimum: 3, maximum: 96, default: 24 }, name: { type: 'string', maxLength: 80 } }, ['radius', 'height']),
+  C.tool({ name: 'cylinder_add', group: 'edit', rollbackPreview: true, title: 'Add a cylinder', description: 'A cylinder as a new group standing on `center` [x, y] or [x, y, z], with a radius and a height (display unit, or text with a unit), 24 sides unless given. One undo step.',
+    inputSchema: obj({ center: { ...pt, description: 'The cylinder\'s base centre [x, y] or [x, y, z] in the display unit.' }, radius: { description: 'Radius in the display unit.', ...len, description: 'Radius in the display unit.' }, height: { description: 'Height in the display unit.', ...len, description: 'Height in the display unit.' }, sides: { description: 'Number of sides of the polygon (3 to 96; default 24).', type: 'integer', minimum: 3, maximum: 96, default: 24 }, name: { description: 'Name of the new group.', type: 'string', maxLength: 80 } }, ['radius', 'height']),
     run: async (a) => {
       const r = lengthOf(a.radius, unit()), h = lengthOf(a.height, unit());
       if (!(r > 0 && h > 0)) throw new Error('A cylinder needs a radius and height above zero.');
@@ -247,36 +249,36 @@ export function installAgents(app) {
       const res = edit('cylinder', (m) => addSolid(m, cylinderPolys(r, h, a.sides), a.name || 'Cylinder', at));
       return { ...res, undo: PREFIX + 'cylinder' };
     } });
-  C.tool({ name: 'instance_move', group: 'edit', title: 'Move a group', description: 'Move a group or component (id from model_describe) by [dx, dy] or [dx, dy, dz]. One undo step.',
-    inputSchema: obj({ id: { type: 'integer', minimum: 1 }, by: pt }, ['id', 'by']),
+  C.tool({ name: 'instance_move', group: 'edit', rollbackPreview: true, title: 'Move a group', description: 'Move a group or component (id from model_describe) by [dx, dy] or [dx, dy, dz]. One undo step.',
+    inputSchema: obj({ id: { description: 'The group or component\'s id, from model_describe.', type: 'integer', minimum: 1 }, by: { ...pt, description: 'Movement [dx, dy] or [dx, dy, dz] in the display unit.' } }, ['id', 'by']),
     run: async (a) => { const by = [lengthOf(a.by[0], unit()), lengthOf(a.by[1], unit()), a.by.length > 2 ? lengthOf(a.by[2], unit()) : 0]; edit('move', (m) => moveInstance(m, a.id, by)); return { moved: a.id, undo: PREFIX + 'move' }; } });
-  C.tool({ name: 'instances_erase', group: 'edit', title: 'Erase groups', description: 'Erase groups or components placed in the model (ids from model_describe). One undo step.',
-    inputSchema: obj({ ids: { type: 'array', items: { type: 'integer', minimum: 1 }, minItems: 1, maxItems: 1000 } }, ['ids']),
+  C.tool({ name: 'instances_erase', group: 'edit', rollbackPreview: true, title: 'Erase groups', description: 'Erase groups or components placed in the model (ids from model_describe). One undo step.',
+    inputSchema: obj({ ids: { description: 'Ids of the groups or components to erase, from model_describe.', type: 'array', items: { type: 'integer', minimum: 1 }, minItems: 1, maxItems: 1000 } }, ['ids']),
     run: async (a) => { edit('erase', (m) => eraseInstances(m, a.ids)); return { erased: a.ids.length, undo: PREFIX + 'erase' }; } });
   // ---- 0.7 AS.5
   const INST = { type: 'integer', minimum: 1, description: 'A group or component id (model_describe); leave it out for the loose geometry.' };
   C.tool({ name: 'faces_list', group: 'read', title: 'List faces', description: 'Faces of the loose geometry or of a group or component (in its own axes): id, outward normal, area (m²), centre (meters), paint. Push/pull and paint take these ids.',
-    inputSchema: obj({ instance: INST, offset: { type: 'integer', minimum: 0, default: 0 }, limit: { type: 'integer', minimum: 1, maximum: 2000, default: 200 } }),
+    inputSchema: obj({ instance: INST, offset: { description: 'How many results to skip, for paging (default 0).', type: 'integer', minimum: 0, default: 0 }, limit: { description: 'Most results to return in one call (use offset for the next page).', type: 'integer', minimum: 1, maximum: 2000, default: 200 } }),
     run: async (a) => facesOf(model, a.instance, a) });
-  C.tool({ name: 'materials_list', group: 'read', title: 'List materials', description: 'The materials paint takes (by id), by category, with the colour each shows in the view; also the palette colours by name.',
-    run: async () => ({ materials: MATERIALS.map((m) => ({ id: m.id, category: m.cat, color: m.color })), palette: PALETTE.map(([name, hex]) => ({ name, hex })) }) });
-  C.tool({ name: 'push_pull', group: 'edit', title: 'Push/pull a face', description: 'Push or pull a face (id from faces_list) of the loose geometry or a group by a distance (display unit, or text with a unit; positive = out of its front), as the Push/Pull tool does: a face on a solid moves, a lone face becomes a solid. In a component every copy follows. One undo step.',
-    inputSchema: obj({ instance: INST, face: { type: 'integer', minimum: 0 }, distance: lenAny }, ['face', 'distance']),
+  C.tool({ name: 'materials_list', group: 'read', untrusted: true, title: 'List materials', description: 'The materials paint takes (by id), by category, with the colour each shows in the view; the open file\'s own materials (fileMaterials: names come from the file); also the palette colours by name.',
+    run: async () => ({ materials: MATERIALS.map((m) => ({ id: m.id, category: m.cat, color: m.color })), fileMaterials: documentMaterials().map((m) => ({ id: m.id, name: m.name || '', color: m.color })), palette: PALETTE.map(([name, hex]) => ({ name, hex })) }) });
+  C.tool({ name: 'push_pull', group: 'edit', rollbackPreview: true, title: 'Push/pull a face', description: 'Push or pull a face (id from faces_list) of the loose geometry or a group by a distance (display unit, or text with a unit; positive = out of its front), as the Push/Pull tool does: a face on a solid moves, a lone face becomes a solid. In a component every copy follows. One undo step.',
+    inputSchema: obj({ instance: INST, face: { description: 'Face id, from faces_list.', type: 'integer', minimum: 0 }, distance: { description: 'How far to push (negative) or pull (positive), in the display unit.', ...lenAny, description: 'How far to push (negative) or pull (positive), in the display unit.' } }, ['face', 'distance']),
     run: async (a) => {
       const d = lengthOf(a.distance, unit());
       const r = edit('push/pull', (m) => pushPullFace(m, a.instance, a.face, d));
       return { mode: r.mode, distance: r6(r.distance), face: r.face, undo: PREFIX + 'push/pull' };
     } });
-  C.tool({ name: 'paint', group: 'edit', title: 'Paint', description: 'Paint faces (ids from faces_list, of the loose geometry or a group) or a whole group or component (its faces without their own paint) with a colour (#rrggbb or a palette name) or a material from materials_list; null = the default. One undo step.',
-    inputSchema: obj({ instance: INST, faces: { type: 'array', items: { type: 'integer', minimum: 0 }, maxItems: 100000 }, paint: { type: ['string', 'null'], maxLength: 60 } }, ['paint']),
+  C.tool({ name: 'paint', group: 'edit', rollbackPreview: true, title: 'Paint', description: 'Paint faces (ids from faces_list, of the loose geometry or a group) or a whole group or component (its faces without their own paint) with a colour (#rrggbb or a palette name) or a material from materials_list; null = the default. One undo step.',
+    inputSchema: obj({ instance: INST, faces: { description: 'Face ids to paint, from faces_list.', type: 'array', items: { type: 'integer', minimum: 0 }, maxItems: 100000 }, paint: { description: 'Name of a paint or material (PALETTE or a material key); null clears the paint.', type: ['string', 'null'], maxLength: 60 } }, ['paint']),
     run: async (a) => { const p = paintOf(a.paint); const r = edit('paint', (m) => paintWith(m, { instance: a.instance ?? null, faces: a.faces, paint: p })); return { ...r, paint: p, undo: PREFIX + 'paint' }; } });
-  C.tool({ name: 'group_make', group: 'edit', title: 'Make a group', description: 'Make a group (or a component, whose copies all change together) of loose faces (ids from faces_list) and placed groups (ids from model_describe). One undo step. → the new group\'s id.',
-    inputSchema: obj({ faces: { type: 'array', items: { type: 'integer', minimum: 0 }, maxItems: 100000 }, instances: { type: 'array', items: { type: 'integer', minimum: 1 }, maxItems: 10000 }, component: { type: 'boolean', default: false }, name: { type: 'string', maxLength: 80 } }),
+  C.tool({ name: 'group_make', group: 'edit', rollbackPreview: true, title: 'Make a group', description: 'Make a group (or a component, whose copies all change together) of loose faces (ids from faces_list) and placed groups (ids from model_describe). One undo step. → the new group\'s id.',
+    inputSchema: obj({ faces: { description: 'Face ids of the loose geometry to make into the group, from faces_list.', type: 'array', items: { type: 'integer', minimum: 0 }, maxItems: 100000 }, instances: { description: 'Ids of existing groups or components to put into the new one.', type: 'array', items: { type: 'integer', minimum: 1 }, maxItems: 10000 }, component: { description: 'true makes a component (copies change together); default false makes a group.', type: 'boolean', default: false }, name: { description: 'Name of the new group or component.', type: 'string', maxLength: 80 } }),
     run: async (a) => { const id = edit(a.component ? 'make component' : 'make group', (m) => makeGroupOf(m, { faces: a.faces || [], instances: a.instances || [], component: a.component, name: a.name })); return { instance: id, undo: PREFIX + (a.component ? 'make component' : 'make group') }; } });
   // ---- 0.7 AS.6: meshes and modifiers (mesh's MD.2 / MD.3)
   const SIZES = { size: true, r: true, h: true, R: true };
-  C.tool({ name: 'mesh_add', group: 'edit', title: 'Add a mesh', description: 'A mesh object, as the Mesh workspace\'s Add makes it: ' + PRIMITIVES.join(', ') + '; sizes (size, r, h, R: display unit or text with a unit) and counts (segs, rings, subdiv, x, y, ring). It stands on `at` [x, y] or [x, y, z]. One undo step. Edit mode and modifiers then work on it.',
-    inputSchema: obj({ primitive: { type: 'string', enum: PRIMITIVES }, at: pt, name: { type: 'string', maxLength: 80 }, options: { type: 'object', additionalProperties: { anyOf: [{ type: 'number' }, { type: 'string', maxLength: 40 }, { type: 'boolean' }] } } }, ['primitive']),
+  C.tool({ name: 'mesh_add', group: 'edit', rollbackPreview: true, title: 'Add a mesh', description: 'A mesh object, as the Mesh workspace\'s Add makes it: ' + PRIMITIVES.join(', ') + '; sizes (size, r, h, R: display unit or text with a unit) and counts (segs, rings, subdiv, x, y, ring). It stands on `at` [x, y] or [x, y, z]. One undo step. Edit mode and modifiers then work on it.',
+    inputSchema: obj({ primitive: { description: 'plane, grid, cube, circle, cylinder, cone, uvsphere, icosphere or torus.', type: 'string', enum: PRIMITIVES }, at: { ...pt, description: 'Where to put it [x, y] or [x, y, z] in the display unit.' }, name: { description: 'Name of the new mesh object.', type: 'string', maxLength: 80 }, options: { description: 'The primitive\'s settings (size, segments, radius …), as the Mesh workspace\'s Add panel has them.', type: 'object', additionalProperties: { anyOf: [{ type: 'number' }, { type: 'string', maxLength: 40 }, { type: 'boolean' }] } } }, ['primitive']),
     run: async (a) => {
       const o = {};
       for (const [k, v] of Object.entries(a.options || {})) o[k] = SIZES[k] ? lengthOf(v, unit()) : v;
@@ -284,14 +286,14 @@ export function installAgents(app) {
       const r = edit('add ' + a.primitive, (m) => addMeshPrimitive(m, a.primitive, o, a.name || a.primitive, at));
       return { ...r, undo: PREFIX + 'add ' + a.primitive };
     } });
-  C.tool({ name: 'modifiers_list', group: 'read', title: 'List modifiers', description: 'A mesh object\'s modifier stack in order (index from 1, type, on, shown in the view and in renders, settings), and the modifier types there are with their default settings.',
-    inputSchema: obj({ instance: { type: 'integer', minimum: 1 } }, ['instance']),
+  C.tool({ name: 'modifiers_list', group: 'read', untrusted: true, title: 'List modifiers', description: 'A mesh object\'s modifier stack in order (index from 1, type, on, shown in the view and in renders, settings), and the modifier types there are with their default settings.',
+    inputSchema: obj({ instance: { description: 'The mesh object\'s id, from model_describe.', type: 'integer', minimum: 1 } }, ['instance']),
     run: async (a) => ({ modifiers: modifierRows(meshDefOf(model, a.instance)), types: Object.fromEntries(MOD_TYPES.map((k) => [k, MODS[k].defaults])) }) });
-  C.tool({ name: 'modifier_add', group: 'edit', title: 'Add a modifier', description: 'Add a modifier to the end of a mesh object\'s stack: ' + MOD_TYPES.join(', ') + ', with settings (the rest keep their defaults; boolean / shrinkwrap targets, array curves and lattice cages name another object\'s def from model_describe). Nothing is applied for good: the mesh stays as drawn. One undo step.',
-    inputSchema: obj({ instance: { type: 'integer', minimum: 1 }, type: { type: 'string', enum: MOD_TYPES }, settings: { type: 'object' }, name: { type: 'string', maxLength: 60 } }, ['instance', 'type']),
+  C.tool({ name: 'modifier_add', group: 'edit', rollbackPreview: true, title: 'Add a modifier', description: 'Add a modifier to the end of a mesh object\'s stack: ' + MOD_TYPES.join(', ') + ', with settings (the rest keep their defaults; boolean / shrinkwrap targets, array curves and lattice cages name another object\'s def from model_describe). Nothing is applied for good: the mesh stays as drawn. One undo step.',
+    inputSchema: obj({ instance: { description: 'The mesh object\'s id, from model_describe.', type: 'integer', minimum: 1 }, type: { description: 'Modifier type: scale, mirror, array, subsurf, bevel, solidify, boolean, displace, weld …', type: 'string', enum: MOD_TYPES }, settings: { description: 'The modifier\'s settings, as modifiers_list shows them for that type.', type: 'object' }, name: { description: 'Name for the modifier (default: its type).', type: 'string', maxLength: 60 } }, ['instance', 'type']),
     run: async (a) => { const rows = edit('add ' + a.type, (m) => editMods(m, a.instance, (L) => { if (L.length >= 32) throw new Error('A stack holds 32 modifiers at most.'); const x = newMod(a.type); L.push({ ...x, name: a.name || '', params: { ...x.params, ...(a.settings || {}) } }); })); return { modifiers: rows, undo: PREFIX + 'add ' + a.type }; } });
-  C.tool({ name: 'modifier_set', group: 'edit', title: 'Change a modifier', description: 'Change one modifier of a mesh object\'s stack (index from modifiers_list): settings, on, shown in the view or in renders, or move it to another index. One undo step.',
-    inputSchema: obj({ instance: { type: 'integer', minimum: 1 }, index: { type: 'integer', minimum: 1, maximum: 32 }, settings: { type: 'object' }, on: { type: 'boolean' }, view: { type: 'boolean' }, render: { type: 'boolean' }, moveTo: { type: 'integer', minimum: 1, maximum: 32 } }, ['instance', 'index']),
+  C.tool({ name: 'modifier_set', group: 'edit', rollbackPreview: true, title: 'Change a modifier', description: 'Change one modifier of a mesh object\'s stack (index from modifiers_list): settings, on, shown in the view or in renders, or move it to another index. One undo step.',
+    inputSchema: obj({ instance: { description: 'The mesh object\'s id, from model_describe.', type: 'integer', minimum: 1 }, index: { description: 'Which modifier, numbered from 1 (see modifiers_list).', type: 'integer', minimum: 1, maximum: 32 }, settings: { description: 'Settings to change (the others stay).', type: 'object' }, on: { description: 'true turns the modifier on, false off.', type: 'boolean' }, view: { description: 'true shows it in the 3D view.', type: 'boolean' }, render: { description: 'true applies it when rendering.', type: 'boolean' }, moveTo: { description: 'Move the modifier to this position in the stack (from 1).', type: 'integer', minimum: 1, maximum: 32 } }, ['instance', 'index']),
     run: async (a) => {
       const rows = edit('change modifier', (m) => editMods(m, a.instance, (L) => {
         const x = L[a.index - 1];
@@ -302,24 +304,25 @@ export function installAgents(app) {
       }));
       return { modifiers: rows, undo: PREFIX + 'change modifier' };
     } });
-  C.tool({ name: 'modifier_remove', group: 'edit', title: 'Remove a modifier', description: 'Remove one modifier (index from modifiers_list) from a mesh object\'s stack. One undo step.',
-    inputSchema: obj({ instance: { type: 'integer', minimum: 1 }, index: { type: 'integer', minimum: 1, maximum: 32 } }, ['instance', 'index']),
+  C.tool({ name: 'modifier_remove', group: 'edit', rollbackPreview: true, title: 'Remove a modifier', description: 'Remove one modifier (index from modifiers_list) from a mesh object\'s stack. One undo step.',
+    inputSchema: obj({ instance: { description: 'The mesh object\'s id, from model_describe.', type: 'integer', minimum: 1 }, index: { description: 'Which modifier to remove, numbered from 1 (see modifiers_list).', type: 'integer', minimum: 1, maximum: 32 } }, ['instance', 'index']),
     run: async (a) => { const rows = edit('remove modifier', (m) => editMods(m, a.instance, (L) => { if (!L[a.index - 1]) throw new Error('There is no modifier ' + a.index + '.'); L.splice(a.index - 1, 1); })); return { modifiers: rows, undo: PREFIX + 'remove modifier' }; } });
   if (app.scene && app.goScene) {
-    C.tool({ name: 'scene_add', group: 'edit', title: 'Save a scene', description: 'Save the view as it is now (camera, style, what is shown) as a scene with this name, as the Scenes panel\'s Add does. One undo step.',
-      inputSchema: obj({ name: { type: 'string', minLength: 1, maxLength: 80 } }, ['name']),
+    C.tool({ name: 'scene_add', group: 'edit', rollbackPreview: true, title: 'Save a scene', description: 'Save the view as it is now (camera, style, what is shown) as a scene with this name, as the Scenes panel\'s Add does. One undo step.',
+      inputSchema: obj({ name: { description: 'Name for the scene.', type: 'string', minLength: 1, maxLength: 80 } }, ['name']),
       run: async (a) => { const s = cleanScene({ name: a.name, ...app.scene() }); edit('add scene', (m) => { m.scenes = [...m.scenes, s]; }); app.scenesChanged?.(); return { scene: s.name, scenes: model.scenes.length, undo: PREFIX + 'add scene' }; } });
-    C.tool({ name: 'scene_show', group: 'edit', title: 'Show a scene', description: 'Go to a saved scene (by name, or its number from 1): its camera, style and what it shows. Changes the view only (no undo step).',
-      inputSchema: obj({ scene: { anyOf: [{ type: 'string', minLength: 1, maxLength: 80 }, { type: 'integer', minimum: 1 }] } }, ['scene']),
-      run: async (a) => {
+    C.tool({ name: 'scene_show', group: 'edit', dryRun: true, title: 'Show a scene', description: 'Go to a saved scene (by name, or its number from 1): its camera, style and what it shows. Changes the view only (no undo step).',
+      inputSchema: obj({ scene: { description: 'A scene name, or its number from 1.', description: 'A scene name, or its number from 1.', anyOf: [{ type: 'string', minLength: 1, maxLength: 80 }, { type: 'integer', minimum: 1 }] } }, ['scene']),
+      run: async (a, ctx) => {
         const i = typeof a.scene === 'number' ? a.scene - 1 : model.scenes.findIndex((s) => s.name.toLowerCase() === String(a.scene).toLowerCase());
         if (!(i >= 0 && i < model.scenes.length)) throw new Error('No scene ' + JSON.stringify(a.scene) + '. Scenes: ' + (model.scenes.map((s) => s.name).join(', ') || 'none') + '.');
-        await app.goScene(i);
+        if (!ctx.preview) await app.goScene(i);
         return { scene: model.scenes[i].name };
       } });
   }
   C.tool({ name: 'undo', group: 'edit', title: 'Undo', description: 'Undo the assistant\'s last steps (only steps labelled "Assistant:" unless any is true).',
-    inputSchema: obj({ steps: { type: 'integer', minimum: 1, maximum: 100, default: 1 }, any: { type: 'boolean', default: false } }),
+    inputSchema: obj({ steps: { description: 'How many steps to undo (default 1).', type: 'integer', minimum: 1, maximum: 100, default: 1 }, any: { description: 'true also undoes steps the person made, not only the assistant\'s (default false).', type: 'boolean', default: false } }),
+    preview: (a) => ({ wouldUndo: peekUndo(model.undoStack, a.steps, a.any, PREFIX) }),
     run: async (a) => {
       const undone = [];
       for (let i = 0; i < a.steps; i++) {
@@ -331,7 +334,7 @@ export function installAgents(app) {
       return { undone };
     } });
   if (app.file) C.tool({ name: 'usd_export', group: 'export', title: 'Export USD', description: 'The model as OpenUSD (groups and components as prims, materials, scenes as cameras), .usda (default), .usdc or .usdz, as File › Save as USD writes it. With a path (Studio) it is written there, else it downloads.',
-    inputSchema: obj({ format: { type: 'string', enum: ['usda', 'usdc', 'usdz'] }, path: { type: 'string', minLength: 1, maxLength: 4096, description: 'Studio: a file inside the folders the person allowed (Settings › Assistants › Folders); without it the file downloads.' }, overwrite: { type: 'boolean', default: false } }),
+    inputSchema: obj({ format: { description: 'usda (text, default), usdc (binary) or usdz (packed with its textures).', type: 'string', enum: ['usda', 'usdc', 'usdz'] }, path: { type: 'string', minLength: 1, maxLength: 4096, description: 'Studio: a file inside the folders the person allowed (Settings › Assistants › Folders); without it the file downloads.' }, overwrite: { description: 'true replaces an existing file at the path (default false: an existing file is never overwritten).', type: 'boolean', default: false } }),
     run: async (a) => {
       const fmt = a.format || (a.path && /\.(usd[acz])$/i.exec(a.path)?.[1].toLowerCase()) || 'usda';
       if (a.path && !new RegExp('\\.' + fmt + '$', 'i').test(a.path)) throw new Error('A .' + fmt + ' file ends in .' + fmt + '.');
@@ -347,5 +350,9 @@ export function installAgents(app) {
     const prepare = async () => ({ ...(await app.render()), scenes: () => (model.scenes || []).map((s) => s.name), ...(app.goScene ? { goScene: (i) => app.goScene(i) } : {}) });
     for (const d of renderTools(C, prepare, { toolResult })) C.tool(d);
   }
+  // ---- 0.8 EG.61 (session model_PART_2): say the scene — time, weather, season, trees, people (look-tools.js)
+  if (app.look) for (const d of lookTools({ app, model, edit, PREFIX })) C.tool(d);
+  // ---- 0.8 EG.62: a material from a photo (photo-tools.js)
+  if (app.photo) for (const d of photoTools({ app, C })) C.tool(d);
   return C;
 }

@@ -170,3 +170,7 @@ Copy, paste, undo, save and open keep the keys listed above. Typed values, the v
 | {{ui:Orbit}} tool, then drag one finger | Orbit |
 
 To type a value on a touch screen, tap the value box at the bottom, type, and press the keyboard's Enter (or Go) key.
+
+## Where Move lives
+
+Move lives in the {{ui:Move}} tool, key {{key:M}}: pick what to move, click a base point, then a second point or type a distance. See [Move, copy and make arrays](topic:move-copy).

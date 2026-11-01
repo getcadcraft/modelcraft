@@ -28,6 +28,7 @@ $__tools = [
         ['act', 'save', 'download', Lang::t('ui.tool.save'), Lang::t('ui.tool.save.title')],
         ['act', 'saveas', 'file-earmark-arrow-down', Lang::t('usd.save_as'), Lang::t('usd.save_as.title')],
         ['act', 'import', 'box-arrow-in-down', Lang::t('ui.tool.import'), Lang::t('ui.tool.import.title')],
+        ['act', 'import-sketch', 'camera', Lang::t('ui.tool.import_sketch'), Lang::t('ui.tool.import_sketch.title')],   // 0.8 EG.36 (round 3)
     ],
     'Draw' => [   // i18n-ignore: group key
         ['tool', 'line', 'slash-lg', Lang::t('ui.tool.line'), Lang::t('ui.tool.line.title')],
@@ -49,6 +50,7 @@ $__tools = [
         ['tool', 'move', 'arrows-move', Lang::t('ui.tool.move'), Lang::t('ui.tool.move.title')],
         ['tool', 'rotate', 'arrow-repeat', Lang::t('ui.tool.rotate'), Lang::t('ui.tool.rotate.title')],
         ['tool', 'scale', 'arrows-angle-expand', Lang::t('ui.tool.scale'), Lang::t('ui.tool.scale.title')],
+        ['act', 'scale-by', 'aspect-ratio', Lang::t('sx.scale.open'), Lang::t('sx.scale.open.title')],   // 0.8 SU.934
         ['tool', 'erase', 'eraser', Lang::t('ui.tool.erase'), Lang::t('ui.tool.erase.title')],
         ['tool', 'tape', 'rulers', Lang::t('ui.tool.tape'), Lang::t('ui.tool.tape.title')],
         ['tool', 'protractor', 'compass', Lang::t('ui.tool.protractor'), Lang::t('ui.tool.protractor.title')],
@@ -57,6 +59,7 @@ $__tools = [
     'Organize' => [   // i18n-ignore: group key
         ['act', 'component', 'boxes', Lang::t('ui.tool.component'), Lang::t('ui.tool.component.title')],
         ['act', 'group', 'collection', Lang::t('ui.tool.group'), Lang::t('ui.tool.group.title')],
+        ['act', 'furnish', 'lamp', Lang::t('ui.tool.furnish'), Lang::t('ui.tool.furnish.title')],   // 0.8 EG.60 (round 3)
         ['act', 'explode', 'grid-3x3-gap', Lang::t('ui.tool.explode'), Lang::t('ui.tool.explode.title')],
     ],
     'Edit' => [   // i18n-ignore: group key
@@ -115,6 +118,14 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <button type="button" role="menuitem" data-export="video"><?= Lang::e('ui.export.video') ?></button>
               </div>
             </details>
+            <?php /* 0.7.1 71.13: Model info (per model, saved in the file) and Preferences (Settings › ModelCraft) */ ?>
+            <details class="mc-menu" data-model-menu>
+              <summary class="mc-tool" title="<?= Lang::e('ui.modelmenu.title') ?>"><i class="bi bi-info-circle" aria-hidden="true"></i><span><?= Lang::e('ui.modelmenu') ?></span></summary>
+              <div class="mc-menu-list" role="menu">
+                <button type="button" role="menuitem" data-act="model-info"><?= Lang::e('ui.modelmenu.info') ?></button>
+                <button type="button" role="menuitem" data-act="preferences"><?= Lang::e('ui.modelmenu.prefs') ?></button>
+              </div>
+            </details>
           <?php endif; ?>
           <?php if ($__group === 'Organize'): /* i18n-ignore: a group key */ ?>
             <details class="mc-menu" data-solid-menu>
@@ -140,6 +151,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <button type="button" role="menuitem" data-act="hide"><?= Lang::e('ui.editmenu.hide') ?> <kbd data-keys-kbd="hide"></kbd></button>
                 <button type="button" role="menuitem" data-act="isolate"><?= Lang::e('ui.editmenu.isolate') ?> <kbd data-keys-kbd="isolate"></kbd></button>
                 <button type="button" role="menuitem" data-act="unhide-all"><?= Lang::e('ui.editmenu.unhide_all') ?> <kbd data-keys-kbd="unhide"></kbd></button>
+                <button type="button" role="menuitem" data-act="del-guides"><?= Lang::e('ui.editmenu.delete_guides') ?></button>
                 <hr>
                 <button type="button" role="menuitem" data-act="flip-x"><?= Lang::e('ui.editmenu.flip_x') ?></button>
                 <button type="button" role="menuitem" data-act="flip-y"><?= Lang::e('ui.editmenu.flip_y') ?></button>
@@ -179,7 +191,13 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <button type="button" role="menuitemcheckbox" aria-checked="false" data-present><?= Lang::e('ui.views.present') ?> <kbd>Shift+P</kbd></button>
                 <button type="button" role="menuitemcheckbox" aria-checked="false" data-timeline-toggle><?= Lang::e('ui.views.timeline') ?></button>
                 <button type="button" role="menuitem" data-xr-enter aria-disabled="true"><?= Lang::e('ui.views.vr') ?></button>
+                <button type="button" role="menuitem" data-ar-enter aria-disabled="true"><?= Lang::e('ui.views.ar') ?></button>
                 <button type="button" role="menuitem" data-guide-open><?= Lang::e('ui.views.guide') ?></button>
+                <hr>
+                <?php /* 0.7.1 MC-KEYS-COMMANDS: view toggles a key can reach (input-modelcraft.js camera.xray / hide-rest / hidden-objects) */ ?>
+                <button type="button" role="menuitemcheckbox" aria-checked="false" data-xray><?= Lang::e('ui.views.xray') ?></button>
+                <button type="button" role="menuitemcheckbox" aria-checked="false" data-hide-rest><?= Lang::e('ui.views.hide_rest') ?></button>
+                <button type="button" role="menuitemcheckbox" aria-checked="false" data-show-hidden><?= Lang::e('ui.views.hidden') ?></button>
                 <hr>
                 <button type="button" role="menuitemcheckbox" aria-checked="true" data-sec-planes><?= Lang::e('ui.views.sec_planes') ?></button>
                 <button type="button" role="menuitemcheckbox" aria-checked="true" data-sec-cuts><?= Lang::e('ui.views.sec_cuts') ?></button>
@@ -190,10 +208,14 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
       </div>
     <?php endforeach; ?>
     <input type="file" class="visually-hidden" accept=".modelcraft,.json,.usd,.usda,.usdc,.usdz" tabindex="-1" aria-hidden="true" data-file-open>
-    <input type="file" class="visually-hidden" accept=".skp,.dae,.obj,.glb,.gltf,.dwg,.dxf,.ply,.stl,.abc,.fbx,.usd,.usda,.usdc,.usdz,.step,.stp,.3dm" tabindex="-1" aria-hidden="true" data-file-import>
+    <input type="file" class="visually-hidden" accept=".skp,.dae,.obj,.glb,.gltf,.dwg,.dxf,.ccbundle,.ply,.stl,.abc,.fbx,.usd,.usda,.usdc,.usdz,.step,.stp,.3dm" tabindex="-1" aria-hidden="true" data-file-import>
     <?php /* 0.7 LC.21 (session print-07): the Beginner menu style's own commands (input-modelcraft.js, beginner-mc.js) — clicked by that style only */ ?>
     <?php foreach (['box', 'cylinder', 'sphere', 'cone', 'roof', 'hole-box', 'hole-cylinder', 'hole', 'solid', 'group', 'align-left', 'align-centerx', 'align-right', 'align-front', 'align-centery', 'align-back', 'align-bottom', 'align-centerz', 'align-top', 'drop'] as $__b): ?>
       <button type="button" hidden data-input-only data-beginner="<?= e($__b) ?>"><?= Lang::e('input.cmd.beginner.' . $__b) ?></button>
+    <?php endforeach; ?>
+    <?php /* 0.7.1 MC-KEYS-META: what Esc and the arrow keys do, as commands a style can give other keys (clicked by the input engine only) */ ?>
+    <?php foreach (['cancel' => 'edit.cancel', 'lock-red' => 'aids.lock-red', 'lock-green' => 'aids.lock-green', 'lock-blue' => 'aids.lock-blue', 'lock-edge' => 'aids.lock-edge', 'nudge-left' => 'camera.nudge-left', 'nudge-right' => 'camera.nudge-right', 'nudge-up' => 'camera.nudge-up', 'nudge-down' => 'camera.nudge-down', 'orbit-left' => 'camera.orbit-left', 'orbit-right' => 'camera.orbit-right', 'orbit-up' => 'camera.orbit-up', 'orbit-down' => 'camera.orbit-down'] as $__a => $__c): ?>
+      <button type="button" hidden data-input-only data-act="<?= e($__a) ?>"><?= Lang::e('input.cmd.' . $__c) ?></button>
     <?php endforeach; ?>
   </div>
 
@@ -326,6 +348,22 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
         <input type="number" id="mc-sun-tz" class="mc-input" min="-14" max="14" step="0.5" data-sun-tz>
         <p class="mc-note span" data-sun-info></p>
       </fieldset>
+    </section>
+    <?php /* Surfaces (0.8 SU.747b, round 3 model_PART_3): NURBS curves and untrimmed surfaces — the shared panel (nurbs-ui/), loaded by surfaces-mc.js on first use. */ ?>
+    <section class="mc-sec" data-nurbs-sec>
+      <h2 class="mc-h" id="mc-nurbs-h"><?= Lang::e('nurbs.ui.title') ?></h2>
+      <div data-nurbs aria-labelledby="mc-nurbs-h">
+        <p class="mc-note"><?= Lang::e('nurbs.ui.intro') ?></p>
+        <button type="button" class="btn-line btn-sm-cc" data-nurbs-open><i class="bi bi-bezier2" aria-hidden="true"></i> <?= Lang::e('nurbs.ui.open') ?></button>
+      </div>
+    </section>
+    <?php /* Nodes (0.8 DC.54, round 3 nodes_PART_3): the node editor — a window over the view, loaded by nodes-mc.js on first use. */ ?>
+    <section class="mc-sec" data-nodes-sec>
+      <h2 class="mc-h" id="mc-nodes-h"><?= Lang::e('nodes.title') ?></h2>
+      <div aria-labelledby="mc-nodes-h">
+        <p class="mc-note"><?= Lang::e('nodes.intro') ?></p>
+        <button type="button" class="btn-line btn-sm-cc" data-nodes-open><i class="bi bi-diagram-3" aria-hidden="true"></i> <?= Lang::e('nodes.open') ?></button>
+      </div>
     </section>
     <?php /* Issues (0.6 LC.19, session lc-model): placed in VR (Views › Review in VR), saved as BCF; xr-mc.js builds the list. */ ?>
     <section class="mc-sec" data-issues>

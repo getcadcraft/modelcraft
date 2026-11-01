@@ -239,6 +239,104 @@ section('units, sun, camera');
   ok(corners.every((c) => c && c[0] > 0 && c[0] < 800 && c[1] > 0 && c[1] < 600), 'zoom extents shows the whole box');
 }
 
+section('orbit about the cursor, orbit/pan speeds, Shift pans mid-orbit, rectangle plane locks (0.7.1: 71.11, 71.17, 71.18)');
+{
+  const { Camera } = await import(path.join(APP, 'camera.js'));
+  const { sceneOf } = await import(path.join(APP, 'infer.js'));
+  const { Tools } = await import(path.join(APP, 'tools.js'));
+  const near = (a, b, tol = 1e-6) => a && b && Math.hypot(a[0] - b[0], a[1] - b[1]) <= tol;
+  const look = (c) => V.norm(V.sub(c.target, c.eye));
+  // 71.11: no pivot = as before; the target as pivot = the same turn; another pivot stays put on screen
+  const a = new Camera(), b = new Camera();
+  const off = V.sub(a.eye, a.target), r0 = V.len(off), yaw = Math.atan2(off[1], off[0]) - 37 * 0.008, pitch = Math.acos(off[2] / r0) + 21 * 0.008;
+  const want = V.add(a.target, [r0 * Math.sin(pitch) * Math.cos(yaw), r0 * Math.sin(pitch) * Math.sin(yaw), r0 * Math.cos(pitch)]);
+  a.orbit(37, -21); b.orbit(37, -21, b.target.slice());
+  ok(V.dist(a.eye, want) < 1e-12 && V.dist(a.eye, b.eye) < 1e-9 && V.dist(b.target, [0, 0, 1]) < 1e-9, 'orbit without a pivot is unchanged; turning about the target as pivot is the same turn');
+  const c = new Camera(); c.setSize(1000, 800);
+  const P = [3, 2, 0.5], s0 = c.project(P);
+  c.orbit(80, 40, P);
+  ok(near(c.project(P), s0) && V.dist(look(c), look(new Camera())) > 0.1, `orbit about a point under the cursor keeps it where it was on screen (${s0.map((x) => x.toFixed(1))})`);
+  c.persp = false; const s1 = c.project(P); c.orbit(-50, 30, P);
+  ok(near(c.project(P), s1), 'and in parallel projection');
+  c.persp = true; c.orbit(0, 5000, P);
+  const pz = Math.acos(V.norm(V.sub(c.eye, c.target))[2]);
+  ok(close(pz, 0.001, 1e-9), `orbit about a point stops just short of straight down, like the old orbit (no flipping over: ${pz})`);
+  const d = new Camera(); d.setSize(1000, 800);
+  const Q = [2, 5, 0], q0 = d.project(Q);
+  d.pan(30, -12, Q);
+  const q1 = d.project(Q);
+  ok(near(q1, [q0[0] + 30, q0[1] - 12]), 'pan with a point under the cursor moves that point exactly with the cursor');
+  const e1 = new Camera(), e2 = new Camera();
+  e1.orbitSpeed = 2; e1.orbit(10, 6); e2.orbit(20, 12);
+  ok(V.dist(e1.eye, e2.eye) < 1e-12, 'orbit speed 2 turns twice as far for the same drag');
+  const f1 = new Camera(), f2 = new Camera();
+  f1.panSpeed = 0.5; f1.pan(40, 20); f2.pan(20, 10);
+  ok(V.dist(f1.eye, f2.eye) < 1e-12 && V.dist(f1.target, f2.target) < 1e-12, 'pan speed 0.5 slides half as far');
+
+  // the Orbit tool: about the host's pivot; Shift held during the drag pans, let go orbits again (71.17)
+  const model = new Model(); model.units = 'm';
+  model.change('box', (m) => { addPolygon(m.root, rectPts([0, 0, 0], [1, 0, 0], [0, 1, 0], 4, 3)); pushPull(m.root, [...m.root.faces.keys()][0], 2); });
+  const cam = new Camera(); cam.setSize(1000, 800); cam.eye = [6, -14, 12]; cam.target = [2, 2, 0]; cam.clip(20);
+  let cache = null, pivotAsked = 0;
+  const host = {
+    model, cam, path: [], sel: [], units: 'm', msgs: [],
+    scene() { if (!cache || cache.version !== host.model.version || cache.model !== host.model) { cache = sceneOf(host.model); cache.model = host.model; } return cache; },
+    setSel(s) { host.sel = s; }, overlay() {}, tip() {}, vcb() {}, print(m) { host.msgs.push(m); }, changed() {},
+    camPivot(x, y) { pivotAsked++; const r = cam.ray(x, y), t0 = host.scene().hit(r)?.t; return Number.isFinite(t0) ? V.add(r.o, V.mul(r.d, t0)) : null; },
+  };
+  const T = new Tools(host);
+  const at = (p) => cam.project(p);
+  T.set('orbit');
+  const top = at([3, 1, 2]);
+  T.down({ x: top[0], y: top[1] });
+  T.move({ x: top[0] + 60, y: top[1] + 25 });
+  ok(pivotAsked === 1 && near(at([3, 1, 2]), top, 1e-6), 'Orbit tool: the point of the box under the cursor stays put while the view turns');
+  const dir0 = look(cam), tgt0 = cam.target.slice();
+  T.move({ x: top[0] + 90, y: top[1] + 40, shift: true });
+  ok(V.dist(look(cam), dir0) < 1e-12 && V.dist(cam.target, tgt0) > 1e-3, 'Shift pressed during the drag: it pans (the view direction stays, the view slides)');
+  T.move({ x: top[0] + 120, y: top[1] + 40 });
+  ok(V.dist(look(cam), dir0) > 1e-3, 'Shift let go: orbiting again in the same drag');
+  T.up({ x: top[0] + 120, y: top[1] + 40 });
+
+  // 71.18: the Rectangle tool's arrow keys lock a plane, not a line
+  const m2 = new Model(); m2.units = 'm';
+  host.model = m2; cache = null;
+  cam.eye = [6, -14, 12]; cam.target = [2, 2, 0]; cam.clip(20);
+  const T2 = new Tools(host);
+  const click = (p, mods) => { const s = at(p); T2.click(s[0], s[1], { ...mods, time: (click.t = (click.t || 0) + 1000) }); };
+  const move = (p) => { const s = at(p); T2.move({ x: s[0], y: s[1] }); };
+  const lastFace = () => { const fs = [...m2.root.faces.values()]; return fs[fs.length - 1]; };
+  T2.set('rect');
+  click([0, 0, 0]);
+  ok(T2.key('ArrowUp') && T2.lock?.kind === 'axis-z', 'Rectangle: Up after the first click locks (blue)');
+  move([3, 2, 0]);
+  ok(T2.tool.wh && close(Math.abs(T2.tool.wh[0]), 3, 1e-6) && close(Math.abs(T2.tool.wh[1]), 2, 1e-6) && /blue plane/.test(T2.tool.lockText()), `Up keeps a rectangle on the level (blue) plane, two dimensions, not a line (${T2.tool.wh})`);
+  click([3, 2, 0]);
+  ok(m2.root.faces.size === 1 && close(faceArea(m2.root, lastFace()), 6, 1e-6), 'and clicking makes the 3 × 2 face');
+  cam.eye = [-8, -12, 9];   // (the plane x = 6 seen at an angle, not edge-on)
+  T2.set('rect');
+  click([6, 0, 0]);
+  T2.key('ArrowRight');
+  move([6, 2, 3]);
+  ok(T2.tool.wh && close(Math.abs(T2.tool.wh[0] * T2.tool.wh[1]), 6, 1e-6) && Math.abs(T2.tool.n[0]) > 1 - 1e-9, `Right locks the red plane: an upright rectangle square to red follows the cursor (${T2.tool.wh})`);
+  click([6, 2, 3]);
+  ok(m2.root.faces.size === 2 && close(faceArea(m2.root, lastFace()), 6, 1e-6) && Math.abs(faceNormal(m2.root, lastFace())[0]) > 1 - 1e-9, 'and clicking makes an upright face square to red');
+  T2.key('ArrowRight');   // the lock ends with the rectangle (Tools.set clears it)
+  ok(!T2.lock, 'the lock ends with the rectangle');
+  // unlocked: snapping to a point off the plane takes the rectangle there; back on the first plane, the first plane again
+  m2.change('post', (m) => addEdge(m.root, [-3, 5, 0], [-3, 5, 3]));
+  cache = null;
+  T2.set('rect');
+  click([-3, 0, 0]);
+  move([-3, 5, 3]);
+  ok(Math.abs(T2.tool.n[0]) > 1 - 1e-9 && close(Math.abs(T2.tool.wh[0] * T2.tool.wh[1]), 15, 1e-6), `the end of an edge off the level plane tips the rectangle up onto the plane through both corners (${T2.tool.n})`);
+  move([-1, 0, 0]);
+  ok(Math.abs(T2.tool.n[2]) > 1 - 1e-9, 'moving back to a point on the level plane puts it back on the level plane');
+  move([-3, 5, 3]);
+  click([-3, 5, 3]);
+  ok(m2.root.faces.size === 3 && close(faceArea(m2.root, lastFace()), 15, 1e-6), 'clicking the off-plane point makes the upright 5 × 3 face');
+}
+
 section('tools, driven by clicks through a camera');
 {
   const { Camera } = await import(path.join(APP, 'camera.js'));
@@ -2604,6 +2702,16 @@ section('beginner 3D and print prep: firstmodel.js + printprep.js (0.6 LC.21)');
 await (await import(path.join(ROOT, 'tools/modelcraft-test/print07.mjs'))).run({ ok, close, section, APP });
 // 0.7 kernel-print: mergeCoplanar keeps every face (print-07 § Found 1), print results as solids — tools/modelcraft-test/kernel-print.mjs
 await (await import(path.join(ROOT, 'tools/modelcraft-test/kernel-print.mjs'))).run({ ok, close, section, APP });
+// 0.8 SU.929 (session sx-split): split for printing — tools/modelcraft-test/split08.mjs
+await (await import(path.join(ROOT, 'tools/modelcraft-test/split08.mjs'))).run({ ok, close, section, APP });
+// 0.8 D8.6 (session model-08): length precision + dimension text size — tools/modelcraft-test/format08.mjs
+await (await import(path.join(ROOT, 'tools/modelcraft-test/format08.mjs'))).run({ ok, close, section, APP });
+// 0.8 (session model-08): add-on data in the file — tools/modelcraft-test/docdata08.mjs
+await (await import(path.join(ROOT, 'tools/modelcraft-test/docdata08.mjs'))).run({ ok, close, section, APP });
+// 0.8 SU.934 (session model-08): scale by factors + shrinkage allowance — tools/modelcraft-test/scale08.mjs
+await (await import(path.join(ROOT, 'tools/modelcraft-test/scale08.mjs'))).run({ ok, close, section, APP });
+// 0.8 GH.2 (session model-08): modifier stack on groups and components — tools/modelcraft-test/gh2.mjs
+await (await import(path.join(ROOT, 'tools/modelcraft-test/gh2.mjs'))).run({ ok, close, section, APP });
 section('push/pull to a face\'s level (0.5 DR.4, Discord)');
 {
   // tangentsoft's model (2026-10-14): a box, a circle on top pulled up into a post, its top offset inward, the inner face

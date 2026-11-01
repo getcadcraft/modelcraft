@@ -13,11 +13,13 @@ You can move the camera at any time, even in the middle of drawing a line or pus
 | To | Do this |
 |---|---|
 | Orbit | Drag with the middle button (press the wheel) |
-| Pan | Drag with the right button, or hold {{key:Shift}} and drag with the middle button |
+| Pan | Drag with the right button, or hold {{key:Shift}} and drag with the middle button. Pressing or letting go of {{key:Shift}} during a drag switches between orbit and pan |
 | Zoom | Turn the wheel. It zooms toward the face under the pointer, or toward the point under it at the depth of the view's center |
 | See the whole model | {{key:Shift+Z}} or {{ui:Extents}} |
 
-Orbit turns the view around the point at the center of the view, not around the pointer. To orbit around a particular part, zoom toward it with the wheel first: zooming moves the center with it.
+Orbit turns the view around the part of the model under the pointer, so that point stays where it is while everything turns around it. Over empty space it turns around the center of the view. Pan keeps the point you grabbed under the pointer.
+
+To always orbit around the center of the view, or to make orbit and pan faster or slower, open {{ui:Settings}} ({{key:Mod+,}}), {{ui:ModelCraft}} tab, **Orbit and pan**. The speeds apply to the mouse, the trackpad, touch and the arrow keys.
 
 A right-click without dragging does nothing; ModelCraft has no right-click menu.
 
@@ -25,7 +27,7 @@ A right-click without dragging does nothing; ModelCraft has no right-click menu.
 
 Use the camera tools in the toolbar, or the keyboard:
 
-1. Press {{key:O}} (or click {{ui:Orbit}}) and drag with the left button to orbit.
+1. Press {{key:O}} (or click {{ui:Orbit}}) and drag with the left button to orbit. Hold {{key:Shift}} during the drag to pan.
 2. Press {{key:H}} (or click {{ui:Pan}}) and drag to pan.
 3. Press {{key:Z}} (or click {{ui:Zoom}}) and drag up to zoom in, down to zoom out.
 4. Press {{key:Space}} to go back to {{ui:Select}}, or press the key of the tool you want next.

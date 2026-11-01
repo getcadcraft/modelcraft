@@ -66,7 +66,7 @@ Choose your printer's bed size in {{ui:Settings}} › {{ui:ModelCraft}} › {{ui
 
 ## Print tools
 
-Under the dialog's findings, **Print tools** opens {{ui:Supports preview}} (where supports go and about how much), {{ui:Wall thickness}} (walls too thin to print), {{ui:Hollow}} and {{ui:Repair}}. See [Supports, wall thickness, hollowing and repair](topic:print-tools).
+Under the dialog's findings, **Print tools** opens {{ui:Supports preview}} (where supports go and about how much), {{ui:Wall thickness}} (walls too thin to print), {{ui:Hollow}} and {{ui:Repair}}. See [Supports, wall thickness, hollowing and repair](topic:print-tools). {{ui:Split for printing}} cuts a model too big for the bed into pieces with connectors and numbered joints: see [Split a big model for printing](topic:print-split).
 
 ## Not checked
 

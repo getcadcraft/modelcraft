@@ -13,6 +13,8 @@ Everything in ModelCraft starts as a flat **face**: a surface closed by edges. Y
 1. Press {{key:R}}.
 2. Click the first corner: on the ground, or on any face of the model.
 3. Move the pointer. The rectangle stays on the ground (or on the face you started on), and the value box ({{ui:Dimensions}}) shows its width and depth. The tip says "Square" when the sides are equal.
+
+   To draw on another plane, point at it: a face that runs through the first corner puts the rectangle on that face, and snapping to a point off the plane (an endpoint, an edge, the blue axis) stands the rectangle up through both corners. Snap back to a point on the first plane and it lies down again. To keep one plane, press an arrow key: {{key:Up}} keeps the rectangle level (the blue plane), {{key:Right}} on the red plane, {{key:Left}} on the green plane. Press the same key again to unlock.
 4. Click the opposite corner, or type the two sizes separated by a comma and press {{key:Enter}}: `4m,3m`, `4000,3000` in a millimeter model, or `12',10'6"` in feet and inches.
 
    A face appears with four edges around it.

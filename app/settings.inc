@@ -10,8 +10,10 @@
  *   snap      snap to points, edges and axes (default on; also the Snap button in the status bar)
  *   collide   solids stop where they touch instead of passing through (default on; also the status bar button)
  *   corner    corner indicator: view cube (default) / axis icon / none
+ *   orbitAt   orbit about the model point under the cursor ('cursor', default) / the view centre ('centre'); orbitSpeed, panSpeed 0.25–3
  *   (no key) Rendering › Your machine: read-only, filled by compute-mc.js (0.7 CU.1)
  *   bed       3D printer bed for Check for 3D printing: '' (not set, default) / 180 / 220 / 256 / 300 (printprep.js BEDS)
+ *   (own key) New models: localStorage modelcraft.template (0.7.1 71.13, model-info.js); File › Model › Preferences… opens this tab
  * Product names here only describe whose controls these resemble (nominative, plain text).
  */
 ?>
@@ -55,6 +57,20 @@
   </div>
   <p class="shell-hint-text"><?= Lang::e('set.corner.hint') ?></p>
 </fieldset>
+<?php /* 0.7.1 MC-ORBIT-CURSOR: orbit about the point under the cursor (on by default) and the orbit / pan speeds (0.25–3, 1 = as before) */ ?>
+<fieldset class="shell-set">
+  <legend><?= Lang::e('set.nav') ?></legend>
+  <label class="shell-check"><input type="checkbox" name="mcOrbitAt"> <?= Lang::e('set.nav.cursor') ?></label>
+  <div class="shell-row">
+    <label for="mc-set-orbit-speed"><?= Lang::e('set.nav.orbit_speed') ?></label>
+    <span class="shell-range"><input type="range" id="mc-set-orbit-speed" name="mcOrbitSpeed" min="0.25" max="3" step="0.25"><output for="mc-set-orbit-speed" class="tabular" data-mc-out="orbitSpeed"></output></span>
+  </div>
+  <div class="shell-row">
+    <label for="mc-set-pan-speed"><?= Lang::e('set.nav.pan_speed') ?></label>
+    <span class="shell-range"><input type="range" id="mc-set-pan-speed" name="mcPanSpeed" min="0.25" max="3" step="0.25"><output for="mc-set-pan-speed" class="tabular" data-mc-out="panSpeed"></output></span>
+  </div>
+  <p class="shell-hint-text"><?= Lang::e('set.nav.hint') ?></p>
+</fieldset>
 <fieldset class="shell-set">
   <legend><?= Lang::e('set.printbed') ?></legend>
   <div class="shell-seg" role="radiogroup" aria-label="<?= Lang::e('set.printbed') ?>">
@@ -63,6 +79,16 @@
     <?php endforeach; ?>
   </div>
   <p class="shell-hint-text"><?= Lang::e('set.printbed.hint') ?></p>
+</fieldset>
+<?php /* 0.7.1 71.13: New models start from the open model's units, display and location (localStorage modelcraft.template; model-info.js) */ ?>
+<fieldset class="shell-set" data-mc-template>
+  <legend><?= Lang::e('set.newmodels') ?></legend>
+  <p class="shell-hint-text" data-mc-template-state></p>
+  <p class="shell-btns">
+    <button type="button" class="btn-line btn-sm-cc" data-mc-template-save><?= Lang::e('set.newmodels.save') ?></button>
+    <button type="button" class="btn-line btn-sm-cc" data-mc-template-clear><?= Lang::e('set.newmodels.clear') ?></button>
+  </p>
+  <p class="shell-hint-text"><?= Lang::e('set.newmodels.hint') ?></p>
 </fieldset>
 <?php /* 0.7: the first-model tour (the guided first model, 0.6 LC.21): again now, and whether it starts by itself the first time */ ?>
 <fieldset class="shell-set">

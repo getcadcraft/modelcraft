@@ -3,7 +3,7 @@ title: Model on a site plan from a DWG or DXF
 summary: Bring a CAD site or floor plan in as lines on the ground, answer the units question, and trace it into faces and masses.
 section: tasks
 order: 100
-keywords: site plan, dwg, dxf, cad, import, dynamic blocks, visibility states, text, hatch, spline, ellipse, 3d face, trace, floor plan, lot, property line, units, underlay, context
+keywords: site plan, dwg, dxf, cad, import, sketch, sketch photo, hand sketch, napkin sketch, photo, paper, pen colours, dynamic blocks, visibility states, text, hatch, spline, ellipse, 3d face, trace, floor plan, lot, property line, units, underlay, context
 ---
 
 ModelCraft can bring in the lines of a 2D CAD drawing, a site plan or a floor plan, and lay them on the ground so you can model on top of them.
@@ -62,3 +62,9 @@ This works best on a clean plan. On a busy survey, tracing on top is faster.
 - The plan is the wrong size: you picked the wrong unit. Undo ({{key:Mod+Z}}) and import again, or [scale](topic:rotate-scale) the group by the right factor (12 between feet and inches, 25.4 between inches and millimeters).
 
 To turn contour lines into ground you can sculpt, see [Terrain](topic:terrain).
+
+## From a photo of a hand sketch
+
+**File › Import a sketch photo…** takes a photo of a sketch on paper (JPEG, PNG or TIFF, straight from a phone is fine) and makes the same kind of edges on the ground. Say which paper it is (or let it find the sheet, taken as A4) and the sketch's scale, 1 : 100 for example. The paper's edge is found and the photo straightened, the ink is traced into lines and arcs, and each pen colour (black, red, blue, green) becomes a group of its own with a tag (**Sketch black**, **Sketch red**, …), all inside one group named after the photo. It is one undo step, and everything happens on this computer: nothing is sent anywhere.
+
+When no paper edge can be found the whole photo is taken as the sheet and the status line says so: measure something you know and scale the group if it is off. Trace the lines into faces as above.

@@ -23,6 +23,7 @@
 
 import { pack, unpack } from './live-client.js';
 import { t } from './i18n.js';
+import { mmul as mmul4 } from './vec.js';
 
 export const SCHEMA = 1;
 export const ID_BLOCK = 1e6;
@@ -218,6 +219,12 @@ const CORE = stateCore({
 
 export function createLive(model, opts = {}) {
   let client = null, g = 0, queued = false;
+  /** Every world matrix a definition is drawn at (root: the identity), at most 1000 (a big array is still "here"). */
+  function worldsOf(defId) {
+    const out = [];
+    model.walk((d, wm) => { if (out.length >= 1000) return false; if (d.id === defId) out.push(wm); return true; });
+    return out;
+  }
   const json = () => model.toJSON();
   const num = (s) => +String(s).replace(/^\D+/, '');
   /** New ids from this client's range: the model's nextId and every definition's next. */
@@ -280,6 +287,37 @@ export function createLive(model, opts = {}) {
     },
     invert(ops) { return CORE.invert(json(), ops); },
     touched: (ops) => CORE.touched(ops),
+    /**
+     * EG.41 (0.8 round 3, model_PART_3; studio/hub/live/assistant-scope.js): where a step landed, on the model as it is now (after the
+     * step), in plan — `box` = [x0, y0, x1, y1] metres of what the ops touch, `sheet` '' (ModelCraft has one place, the model). A
+     * placement counts where it now sits, a definition's geometry everywhere it is placed; a removal, guides, dimensions, sections,
+     * scenes, tags or units can't be pinned to a place: box null (under an area the hub then refuses it, never lets it through).
+     */
+    where(ops) {
+      let box = null, unknown = false, any = false;
+      const grow = (bb) => { if (bb) box = box ? [Math.min(box[0], bb.min[0]), Math.min(box[1], bb.min[1]), Math.max(box[2], bb.max[0]), Math.max(box[3], bb.max[1])] : [bb.min[0], bb.min[1], bb.max[0], bb.max[1]]; };
+      const idOf = (seg) => (typeof seg === 'string' && seg[0] === '#' ? seg.slice(1) : null);
+      for (const op of ops || []) {
+        if (!op || typeof op !== 'object' || !op.o || op.o === 'g') continue;
+        any = true;
+        const p = Array.isArray(op.path) ? op.path : [];
+        if (op.o === 'del' || p[0] !== 'defs') { unknown = true; continue; }
+        if (p.length === 1) continue;   // a new definition: its placement, in the same step, says where
+        const d = model.defs.get(idOf(p[1]));
+        if (!d) { unknown = true; continue; }
+        if (p[2] === 'insts') {
+          const raw = p.length >= 4 ? idOf(p[3]) : op.id, inst = d.insts.get(+raw) || d.insts.get(raw);
+          const placed = inst && model.defs.get(inst.def);
+          if (!placed) { unknown = true; continue; }
+          for (const wm of worldsOf(d.id)) grow(model.bbox(placed, mmul4(wm, inst.m)));
+        } else for (const wm of worldsOf(d.id)) grow(model.bbox(d, wm));
+      }
+      if (!any) return null;
+      return { sheet: '', box: unknown ? null : box };
+    },
+    sheetLabel: () => t('live.where.model'),
+    /** What the person is looking at (the page's view footprint in plan), for "Give it what I'm looking at". */
+    ...(typeof opts.here === 'function' ? { here: () => { try { return opts.here(); } catch { return null; } } } : {}),
     /** The host's checks: no placement of a definition that is gone, and no group placed inside itself. */
     validate(ops) {
       const j = CORE.apply(json(), ops);
@@ -340,7 +378,7 @@ export function createLive(model, opts = {}) {
 export function createLiveAdapter({ host } = {}) {
   const app = globalThis.modelcraft;
   if (!app || !app.model) return null;
-  const a = createLive(app.model);
+  const a = createLive(app.model, { here: app.here });
   a.onApplied = () => { try { app.afterHistory?.(); app.view?.invalidate?.(); } catch (e) { console.error(e); } };
   const lv = host && host.live;
   if (lv && lv.on) {

@@ -22,8 +22,9 @@
  *        (the parts' own definitions stay shared); it remembers `dyn = {src: src.id, size}`, so it can be stretched
  *        again from the original. Call inside model.change.
  */
+import { t } from './i18n.js';
 import { mmul, translation } from './vec.js';
-import { copyOwnGeometry } from './model.js';
+import { copyOwnGeometry, isStacked } from './model.js';
 
 const AX = ['x', 'y', 'z'];
 const EPS = 1e-6;
@@ -61,6 +62,7 @@ const scaleAxis = (k, f, o) => {
 };
 
 export function stretchDef(model, src, size, name) {
+  if (isStacked(src)) throw new Error(t('m3d.model.mods_bake_first'));   // 0.8 GH.2: a stack and a stretch recipe cannot share a definition yet
   const B = compBox(model, src);
   if (!B) throw new Error('empty');   // i18n-ignore: callers check first
   const L = [0, 1, 2].map((k) => B.max[k] - B.min[k]);

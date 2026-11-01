@@ -6,6 +6,10 @@
  *
  * Render settings: the host's `renderSettings` / `saveRenderSettings` when modelcraft.js gives them (shared with the dialog),
  * else this workspace's own (in memory).
+ *
+ * The panel's notes are plain `mc-note` paragraphs in the side panel (0.7.1 71.1: they were `mc-hint`, the stage's floating
+ * hint, so they floated over the toolbar and let clicks through). The long note can be put away (localStorage
+ * `modelcraft.renderHint` = 'off'; "What is this?" brings it back); a status change rewrites only the status line.
  */
 import { registerWorkspace } from './workspaces.js';
 import { Camera } from './camera.js';
@@ -13,7 +17,10 @@ import { invert } from './vec.js';
 
 const G = (cmd, icon) => ({ cmd: 'render-' + cmd, icon, labelKey: 'render.ws.cmd.' + cmd, titleKey: 'render.ws.cmd.' + cmd + '.title' });
 const SCALES = [0.25, 0.5, 0.75, 1];
-let ipr = null, own = null, statusText = '';
+let ipr = null, own = null, statusText = '', statusEl = null;
+const HINT_KEY = 'modelcraft.renderHint';
+const hintOff = () => { try { return localStorage.getItem(HINT_KEY) === 'off'; } catch { return false; } };
+const setHintOff = (off) => { try { if (off) localStorage.setItem(HINT_KEY, 'off'); else localStorage.removeItem(HINT_KEY); } catch { /* this page only */ } };
 
 function camSpec(host, aspect) {
   const c = new Camera();
@@ -42,12 +49,13 @@ async function start(host) {
     settings: () => settingsOf(host),
     save: (s) => saveSettings(host, s),
     t: host.t,
-    onStatus: (s) => { statusText = s; host.renderPanel(); },
+    // only the status line changes (the Detail list stays open while samples come in); the whole panel when it is not shown
+    onStatus: (s) => { statusText = s; if (statusEl?.isConnected) statusEl.textContent = s; else host.renderPanel(); },
   });
   ipr.start();
   host.renderPanel();
 }
-async function leave() { const x = ipr; ipr = null; statusText = ''; await x?.dispose(); }
+async function leave() { const x = ipr; ipr = null; statusText = ''; statusEl = null; await x?.dispose(); }
 
 function command(name, host) {
   if (!ipr) return false;
@@ -66,12 +74,23 @@ function panel(host, box) {
   const scaleSel = el('select', { className: 'mc-select', dataset: { iprScale: '' }, 'aria-label': t('render.ws.scale') },
     ...SCALES.map((k) => el('option', { value: String(k), selected: ipr && ipr.scale === k }, t('render.ws.scale.n', { n: Math.round(k * 100) }))));
   scaleSel.addEventListener('change', () => { if (ipr) ipr.scale = Number(scaleSel.value); });
-  box.append(
-    el('p', { className: 'mc-hint', dataset: { iprStatus: '' }, role: 'status' }, statusText || t('render.ipr.preparing')),
+  statusEl = el('p', { className: 'mc-note', dataset: { iprStatus: '' }, role: 'status' }, statusText || t('render.ipr.preparing'));
+  const mode = ipr && ipr.mode !== 'view' ? ipr.mode : '';
+  // the mode's instruction while region or focus is on; else the long note, unless it was put away
+  let note;
+  if (mode) note = el('p', { className: 'mc-note', dataset: { iprModeHint: mode } }, t(mode === 'region' ? 'render.ws.hint.region' : 'render.ws.hint.focus'));
+  else if (!hintOff()) {
+    note = el('div', { className: 'mc-ipr-hint', dataset: { iprHint: '' } },
+      el('p', { className: 'mc-note' }, t('render.ws.hint')),
+      el('button', { type: 'button', className: 'mc-linkbtn', dataset: { iprHintClose: '' }, onclick: () => { setHintOff(true); host.renderPanel(); } }, t('render.ws.hint.close')));
+  } else note = el('button', { type: 'button', className: 'mc-linkbtn mc-ipr-hint-show', dataset: { iprHintShow: '' }, onclick: () => { setHintOff(false); host.renderPanel(); } }, t('render.ws.hint.show'));
+  // 71.2: append() prints null as "null" — only what there is
+  box.append(...[
+    statusEl,
     el('label', {}, t('render.ws.scale'), scaleSel),
-    el('p', { className: 'mc-hint' }, t(ipr && ipr.mode === 'region' ? 'render.ws.hint.region' : ipr && ipr.mode === 'focus' ? 'render.ws.hint.focus' : 'render.ws.hint')),
-    s.region ? el('p', { className: 'mc-hint' }, t('render.ws.region.on', { w: s.region[2] - s.region[0], h: s.region[3] - s.region[1] })) : null,
-  );
+    note,
+    s.region ? el('p', { className: 'mc-note' }, t('render.ws.region.on', { w: s.region[2] - s.region[0], h: s.region[3] - s.region[1] })) : null,
+  ].filter(Boolean));
   return t('render.ws.heading');
 }
 

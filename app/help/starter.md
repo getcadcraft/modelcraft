@@ -3,7 +3,7 @@ title: Starter library
 summary: About thirty ready-made things to place in a model: doors and windows, furniture, kitchen and bath, columns and stairs, trees, people and a car.
 section: tasks
 order: 39
-keywords: library, starter, entourage, trees, people, cars, plants, shrubs, hedge, components, furniture, door, window, chair, table, sofa, bed, kitchen, bathroom, toilet, stair, column, tree, person, car, warehouse, ready-made
+keywords: furnish, furnish a room, furniture layout, bedroom, living room, kitchen, bathroom, office, rendering, library, starter, entourage, trees, people, cars, plants, shrubs, hedge, components, furniture, door, window, chair, table, sofa, bed, kitchen, bathroom, toilet, stair, column, tree, person, car, warehouse, ready-made
 ---
 
 The {{ui:Starter library}} gives you everyday things at real sizes, so a model reads at a glance: a door to show the scale of a room, a car in a driveway, people and trees around a building.
@@ -31,4 +31,10 @@ Each thing is a **component**: picking the same one again places another copy, a
 
 They are simple shapes, made of solids you can paint, scale or [make unique](topic:groups-components) and change. The wall cabinet hangs at 1.45 m above where you click.
 
-The entourage is drawn by CadCraft and free to use for anything (CC0); the same trees, people and cars are in the LibraryCraft library for BimCraft and CadCraft. A car's windows are painted with the {{ui:Tinted glass}} material, so they are see-through in pictures.
+The entourage is drawn by CadCraft and free to use for anything (CC0); the same trees, people and cars are in the Library library for BimCraft and CadCraft. A car's windows are painted with the {{ui:Tinted glass}} material, so they are see-through in pictures.
+
+## Furnish a room for a rendering
+
+Select the floor of a room (one level face looking up, in the model or inside a group) and use **Organize › Furnish a room…** (the **Furnish** button). Pick what the room is — bedroom, living room, dining room, kitchen, bathroom or office — or let it guess from the size. The starter furniture goes against the walls from the longest wall round, nothing overlaps, and the swing of any starter door placed in the room's walls (and the width of its windows, in front of tall pieces) stays free. It is a default layout by rules for you to review, not a design: the same room always gets the same layout.
+
+Everything comes in **one group** on the tag **Furniture**, as one undo step: Undo, delete the group or hide the tag to take it away. A piece that does not fit is named in the status line and listed in **Problems** as a note. BimCraft's **Furnish a room** uses the same rules.

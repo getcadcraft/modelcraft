@@ -26,6 +26,7 @@ import { manifold } from './solids.js';
 import { rayNearest } from './print-geom.js';
 import { apply } from './vec.js';
 import { PrintOverlay } from './print-view.js';
+import { splitTool } from './print-split-ui.js';   // 0.8 SU.929 sx-split
 
 const MM = 1000;
 
@@ -299,6 +300,7 @@ export function mountPrintTools(ctx) {
   }
 
   const TOOLS = { supports: { run: runSupports, draw: drawSupports }, walls: { run: runWalls, draw: drawWalls }, hollow: { run: runHollow, draw: drawHollow }, repair: { run: runRepair, draw: drawRepair } };
+  TOOLS.split = splitTool({ ctx, card, overlay, el, t, number, radio, soon: () => soon(), close: () => close(), toM, active: () => tool === 'split' });   // 0.8 SU.929 sx-split
 
   // a field's change redraws the card after the event (removing the field inside its own change/blur event throws)
   let soonT = 0;

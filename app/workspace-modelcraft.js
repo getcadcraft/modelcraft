@@ -40,6 +40,8 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
   let engine = null, ctx = null;
 
   // ---- the ribbon: the menu style's tabs, the Workspaces tab, the open workspace's context tab ----
+  // 0.7.1: the menu style's tab of workspace tools (Beginner › Workspaces) is left out: the context tabs below are those tools
+  const onlyWsTools = (tb) => tb.groups.every((g) => [...g.large, ...g.stacks.flat()].every((id) => { const grp = byId.get(id)?.group; return !!grp && grp !== 'model' && !!getWorkspace(grp); }));
   const wsTab = () => ({ tab: 'mc-ws', label: t('app.lay.tab.ws'), groups: [{ id: 'mc-ws', label: t('app.ws.group'), large: listWorkspaces().map((w) => 'ws:' + w.id), stacks: [] }] });
   const contextTabs = () => listWorkspaces().filter((w) => !w.builtin && w.groups.length).map((w) => ({
     tab: 'ws-' + w.id, label: wsName(w.id), context: true,
@@ -54,7 +56,8 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
   function toolbox() {
     const owner = new Map();
     for (const c of I.commands) { const b = c.sel ? root.querySelector(c.sel) : null; if (b && !owner.has(b)) owner.set(b, c.id); }
-    return [...toolbar.querySelectorAll(':scope > [role="group"]')].map((g, i) => ({ id: 'g' + i, label: g.querySelector('.mc-tool-label')?.textContent.trim() || '',
+    // a workspace's own groups are its context tab's (0.7.1: their buttons are registry commands now, so leave them out here)
+    return [...toolbar.querySelectorAll(':scope > [role="group"]:not([data-workspace-group])')].map((g, i) => ({ id: 'g' + i, label: g.querySelector('.mc-tool-label')?.textContent.trim() || '',
       tools: [...g.querySelectorAll('.mc-tool-row > button')].map((b) => owner.get(b)).filter(Boolean) })).filter((g) => g.tools.length);   // the row's own buttons, not its menus' items
   }
 
@@ -96,7 +99,7 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
         tool: name, toolLabel: name === 'select' ? '' : spanText(b) || wsName(wsNow()) };
     },
     endTool() { if ((mc.tools.name || 'select') !== 'select') root.querySelector('.mc-tools [data-tool="select"]')?.click(); },
-    ribbon: () => [...(base.ribbon ? base.ribbon() : []), wsTab(), ...contextTabs()],
+    ribbon: () => [...(base.ribbon ? base.ribbon() : []).filter((tb) => !onlyWsTools(tb)), wsTab(), ...contextTabs()],
     contextTab: () => (wsNow() !== 'model' ? 'ws-' + wsNow() : null),
     toolbox,
     tool(id, block) {

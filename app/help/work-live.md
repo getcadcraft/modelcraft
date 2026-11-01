@@ -1,14 +1,14 @@
 ---
-title: Model together, live
-summary: What changes in ModelCraft while you are in a CadCraft Studio live session: everyone's groups and components in one model, who can reshape what at once, your own undo, and joining from a browser on the same network.
+title: Model together with Live TeamWork
+summary: What changes in ModelCraft while you are in a Live TeamWork session from CadCraft Studio: everyone's groups and components in one model, who can reshape what at once, your own undo, and joining from a browser on the same network.
 section: tasks
 order: 135
-keywords: live, studio live, together, collaborate, session, share live, join, group, component, push pull, undo, host
+keywords: live, live teamwork, studio live, together, collaborate, session, share live, join, group, component, push pull, undo, host
 ---
 
 ## What you will learn
 
-What happens to a model while several people work on it at the same time. CadCraft Studio starts and joins the session (Share live, Join); this page is about the model itself.
+What happens to a model while several people work on it at the same time. CadCraft Studio starts and joins the Live TeamWork session (Share, Join); this page is about the model itself.
 
 ## Work in your own group
 

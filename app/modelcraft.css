@@ -75,6 +75,7 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
 .mc-num { width: 4.5rem; flex: 0 0 auto; }
 .mc-props { display: grid; grid-template-columns: fit-content(45%) minmax(0, 1fr); gap: .4rem .6rem; align-items: center; font-size: .875rem; margin: 0; padding: 0; border: 0; min-width: 0; }
 .mc-props > label, .mc-props .k { color: var(--ink-2); font-weight: 500; }
+.mc-props > .mc-grid, .mc-props > .mc-grid-actions { grid-column: 1 / -1; }   /* 0.8: the shared property grid inside a .mc-props form */
 .mc-props .v { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .mc-props .span { grid-column: 1 / -1; }
 .mc-props + .mc-props { margin-top: .75rem; padding-top: .75rem; border-top: var(--pen-1) solid var(--grid); }
@@ -195,6 +196,32 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
 .mc-dialog-head .mc-h { margin: 0; }
 .mc-dialog-foot { justify-content: flex-end; flex-wrap: wrap; border-top: var(--pen-1) solid var(--line); }
 .mc-dialog-text { margin: 0; padding: 1rem; }
+/* 0.7.1 71.13: Model info (model-info-ui.js): sections left, the section right; a row of sections on narrow screens */
+.mc-dialog.mc-mi { width: min(44rem, calc(100vw - 2rem)); }
+.mc-mi-body { display: grid; grid-template-columns: 10rem minmax(0, 1fr); min-height: 22rem; max-height: min(34rem, 70vh); }
+.mc-mi-tabs { display: flex; flex-direction: column; padding: .5rem 0; border-right: var(--pen-1) solid var(--line); overflow-y: auto; }
+.mc-mi-tab { text-align: left; font: inherit; font-size: .875rem; color: var(--ink); background: none; border: 0; border-left: var(--pen-3) solid transparent; padding: .4rem .75rem; cursor: pointer; }
+.mc-mi-tab:hover { background: var(--sheet); }
+.mc-mi-tab[aria-selected="true"] { border-left-color: var(--action); font-weight: 700; }
+.mc-mi-tab:focus-visible { outline: var(--pen-2) solid var(--action); outline-offset: -2px; }
+.mc-mi-panes { padding: .75rem 1rem 1rem; overflow-y: auto; min-width: 0; }
+.mc-mi-h { margin: 0 0 .6rem; font-size: 1rem; font-weight: 700; font-stretch: 112%; }
+.mc-mi-pane .mc-note { margin-top: .75rem; }
+.mc-mi-about { grid-template-columns: fit-content(35%) minmax(0, 1fr); }
+.mc-mi-about .mc-mi-wide, .mc-mi-about .mc-mi-text { grid-column: 1 / -1; }
+.mc-mi-text { width: 100%; resize: vertical; min-height: 6rem; font: inherit; }
+.mc-mi-dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .3rem 1rem; margin: 0; font-size: .875rem; }
+.mc-mi-dl dt { color: var(--ink-2); font-weight: 500; }
+.mc-mi-dl dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.mc-mi-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.mc-mi-table th, .mc-mi-table td { text-align: left; padding: .25rem .4rem; border-bottom: var(--pen-1) solid var(--grid); }
+.mc-mi-table td.tabular, .mc-mi-table th:last-child { text-align: right; }
+@media (max-width: 760px) {
+  .mc-mi-body { grid-template-columns: minmax(0, 1fr); max-height: 75vh; }
+  .mc-mi-tabs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: var(--pen-1) solid var(--line); padding: 0; }
+  .mc-mi-tab { border-left: 0; border-bottom: var(--pen-3) solid transparent; white-space: nowrap; }
+  .mc-mi-tab[aria-selected="true"] { border-bottom-color: var(--action); }
+}
 
 /* ---- Status bar ---- */
 .mc-status { grid-area: status; display: flex; align-items: center; gap: .9rem; padding: .3rem 1rem; font-size: .8125rem; background: var(--sheet-2); border-top: var(--pen-2) solid var(--ink); min-width: 0; }
@@ -371,6 +398,10 @@ html.cc-compact.cc-land .mc-tl-lanes { max-height: 4rem; }
 .mc-ws-panel .mc-seg [aria-pressed="true"] { background: var(--action); color: var(--on-action); border-color: var(--action); }
 .mc-ws-panel .mc-check { display: flex; gap: .4rem; align-items: center; }
 .mc-ws-panel .mc-mesh-add { display: flex; flex-wrap: wrap; gap: .3rem; }
+/* 0.7.1 71.1: the Render workspace's long note, in the panel (ws-render.js) */
+.mc-ipr-hint { display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; }
+.mc-ws-panel .mc-ipr-hint .mc-note, .mc-ws-panel > .mc-note { margin: 0; }
+.mc-ipr-hint-show { align-self: flex-start; }
 .mc-tools [data-cmd]:disabled { opacity: .45; }
 /* 0.7 MD.3: the modifier stack (mesh/mod-panel.js) */
 .mc-mods { display: flex; flex-direction: column; gap: .5rem; }

@@ -2,9 +2,10 @@
   "app": "modelcraft",
   "css": [
     "modelcraft.css",
-    "compute/compute.css", "shading/shading.css"
+    "compute/compute.css", "shading/shading.css", "nurbs-ui/nurbs-ui.css"
   ],
   "module": "modelcraft.js",
+  "propgrid": true,
   "imports": {
     "three": "/assets/vendor/three/current/three.module.js",
     "three/webgpu": "/assets/vendor/three-webgpu/current/three.webgpu.js",
@@ -23,14 +24,29 @@
     "oidn-weights": "/assets/vendor/oidn-weights/current/rt_hdr_alb_nrm_small.tza"
   },
   "phone": true,
+  "devices": true,
+  "problems": true,
+  "nodes": true,
+  "calc": true,
+  "reasons": true,
+  "teamwork": true,
+  "totals": true,
+  "lessons": true,
+  "ai-suggest": true,
+  "ai-activity": true,
+  "ai-ask": true,
+  "access": true,
+  "fields": true,
   "panels": [
     "move",
     "window"
   ],
   "accepts": [
     "handoff",
-    "live"
+    "live",
+    "site"
   ],
   "input": "input-modelcraft.js",
-  "workspaces": { "layouts": ["docked", "toolbox"], "adapter": "workspace-modelcraft.js" }
+  "workspaces": { "layouts": ["docked", "toolbox", "autorev"], "adapter": "workspace-modelcraft.js" },
+  "engines": true
 }

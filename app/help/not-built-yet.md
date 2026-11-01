@@ -63,6 +63,7 @@ ModelCraft is an early build. This page lists what it does not do yet, so you do
 | Not yet | Instead, today |
 |---|---|
 | Rendering in the view (the {{ui:Render}} workspace), the render queue, and the camera, sky-picture, fog and light-mixing options without WebGPU | {{ui:Render a picture…}} in {{ui:High quality}} uses the WebGL path tracer there, without those options ([Render a picture](topic:render#high-quality)) |
+| Another program drawing the Render picture without a render-engine add-on (CadCraft never runs a program under the GNU GPL licence); panorama or stereo cameras and a sky picture through another program; the Unreal Engine plug-in (the files are written, the plug-in that opens them is not released) | Our own Fast and Path tracer engines; an add-on's engine ([draw the picture with another program](topic:render-other-program)); a USD, glTF or Unreal folder file from the Engine list to take to any program |
 | Scattered plants and rocks in {{ui:Render a picture…}} | They show in the [live view](topic:live-view), its panoramas, viewer and video |
 
 ## Materials and colors
@@ -71,8 +72,8 @@ ModelCraft is an early build. This page lists what it does not do yet, so you do
 |---|---|
 | Inputs other than base color, roughness, metalness, opacity, normal and emission changing across a surface in high-quality pictures (they use their average) | [Make materials with nodes](topic:shading): link them anyway, the view shows them varying |
 | Displacement on push/pull faces | Convert the object to a mesh for displacement |
-| Sharing your own materials to LibraryCraft from the app, and packed (ARM/ORM) or EXR maps in an imported texture set | Keep them in the file; import the separate maps as PNG or JPEG |
-| Materials of the file in Studio Live sessions (they stay on the computer that made them) | Save the file and share it |
+| Sharing your own materials to the Library from the app, and packed (ARM/ORM) or EXR maps in an imported texture set | Keep them in the file; import the separate maps as PNG or JPEG |
+| Materials of the file in Live TeamWork sessions (they stay on the computer that made them) | Save the file and share it |
 | Decals bending around curved surfaces, decals in Undo, or painting several faces' textures at once across a seam | Place smaller decals on each part; paint each side of a seam on its own |
 | Baking onto push/pull faces, baking several objects into one picture, a cage you shape by hand, or baked lighting from lamps | Convert to a mesh and unwrap it; bake each object; raise the search distance; render a picture for lamp light |
 | Painting roughness, metalness or height, painting with pictures (stamps) and texture painting larger than 512 × 512 | Paint the base color here; make other maps in a picture editor and import them as a texture set |

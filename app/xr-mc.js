@@ -149,12 +149,41 @@ export function mountXrMc(o) {
     }
   }
   btn.addEventListener('click', () => { o.closeMenus?.(); enter(); });
+
+  // ---- AR on site (0.8 EG.21, apps-mount_PART_5): Views > View on site (AR), Android phones with Chrome; the alignment is kept in the file ----
+  const arBtn = root.querySelector('[data-ar-enter]');
+  let arAlign = null, arRunning = null;
+  async function enterAR() {
+    if (arRunning) return;
+    const [X, R, L, U] = await Promise.all([import('./xr/xr-session.js'), import('./render-mc.js'), import('./render/looks.js'), import('./units.js')]);
+    const sup = X.arSupportNow();
+    if (!sup.ok) { print(t('xr.ar.why.' + sup.reason)); return; }
+    if (!model.root.faces.size && !model.root.insts.size) { print(t('app.export.empty')); return; }
+    const settings = L.cleanSettings(o.settings());
+    try {
+      arRunning = await X.startAR({
+        scene: () => R.mcScene(model, cam, view.style, settings), version: xrVersion, format: (m) => U.formatLength(m, model.units), settings,
+        alignment: arAlign, saveAlignment: (rec) => { arAlign = rec; model.dirty = true; model.bumpSafe(); },
+        onExit: () => { arRunning = null; print(t('xr.ar.ended')); },
+      });
+      window.modelcraft.ar = arRunning;
+      print(t('xr.ar.started'));
+    } catch (e) { arRunning = null; print(t('xr.ar.failed', { error: String(e?.message || e) })); }
+  }
+  if (arBtn) {
+    // the small DOM-free core says what this browser can do; the AR session's code loads only when someone enters AR
+    import('./xr/xr-core.js').then((X) => { const s = X.arSupportNow(); arBtn.setAttribute('aria-disabled', String(!s.ok)); arBtn.title = s.ok ? t('xr.ar.title') : t('xr.ar.why.' + s.reason); }).catch(() => {});
+    arBtn.addEventListener('click', () => { o.closeMenus?.(); enterAR(); });
+  }
   render();
   return {
     enter, get issues() { return issues; }, get support() { return support; }, get session() { return running; },
     add: (x) => add(x, { vr: false }),
     toJSON: () => (issues.length ? issues.map((x) => ({ ...x, snapshot: x.snapshot ? b64(x.snapshot) : null })) : null),
     load(list) { issues = cleanIssues(list); render(); },
-    reset() { issues = []; render(); },
+    reset() { issues = []; arAlign = null; render(); },
+    enterAR, get arAlignment() { return arAlign; },
+    arJSON: () => (arAlign && arAlign.format === 'cadcraft-ar-alignment' ? arAlign : null),
+    loadAr(x) { arAlign = x && x.format === 'cadcraft-ar-alignment' && ['yaw', 'tx', 'tz'].every((k) => Number.isFinite(x[k])) ? { format: x.format, yaw: x.yaw, tx: x.tx, tz: x.tz, ty: Number.isFinite(x.ty) ? x.ty : 0, residual: Number.isFinite(x.residual) ? x.residual : 0, day: String(x.day || '').slice(0, 10) } : null; },
   };
 }

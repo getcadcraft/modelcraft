@@ -5,7 +5,8 @@
  * (io.js does the formats); nothing is uploaded.
  *
  * Mouse: the active tool gets the left button; middle-drag orbits, Shift + middle-drag or
- * right-drag pans, the wheel zooms at the cursor. Touch: one finger uses the tool, two fingers
+ * right-drag pans (Shift pressed or let go during the drag switches), the wheel zooms at the cursor. Orbit turns about
+ * the point under the cursor and pan keeps it under the cursor (0.7.1; settings orbitAt, orbitSpeed, panSpeed). Touch: one finger uses the tool, two fingers
  * pan and pinch-zoom, three orbit (settings.touch2 swaps them), hold still then drag = orbit. Keys: tool letters (L R C N P M Q S E T D O H Z, Space), numbers and units go
  * to the value box (Enter applies), arrows lock red/green/blue while drawing (orbit otherwise,
  * Shift pans), Esc, Delete, G make component / Shift+G make group, Ctrl+Z/Y/S/O/A, Page Up/Down for scenes, Shift+Z extents.
@@ -26,21 +27,25 @@
  *   touch2   'pan' (default: two fingers pan + pinch, three orbit) | 'orbit' (two fingers orbit + pinch, three pan)
  *   collide  tools.collide (also the Collide button): Move and Push/pull stop where solids touch (collide.js)
  *   corner   'cube' (default; the view cube top right, viewcube.js + viewcube-camera.js) | 'axes' (X/Y/Z triad bottom left) | 'none'
+ *   orbitAt  'cursor' (default: orbit turns about the model point under the cursor, the view centre when there is none) | 'centre'
+ *   orbitSpeed, panSpeed  0.25–3 (default 1): cam.orbitSpeed / cam.panSpeed for every orbit and pan (mouse, trackpad, touch, keys)
  * `window.modelcraft` = {model, cam, tools, view, host, ui, settings, clip()} for tests and the console.
  */
-import { Model, connected, eraseSel, reverseFaces, solidInfo, faceArea, cleanScene, curveInfo, setCurveRadius, PALETTE, paintFaces, paintInstance, isColor, isMaterialPaint, setMaterialColors, setImageColors, isImagePaint, flipSel, hideSel, isolateSel, unhideAll, hiddenCount, softenEdges, intersectFaces, solidProblems, fixSolid, faceNormal, cleanStoreys } from './model.js';
+import { Model, connected, eraseSel, reverseFaces, solidInfo, faceArea, cleanScene, curveInfo, setCurveRadius, PALETTE, paintFaces, paintInstance, isColor, isMaterialPaint, setMaterialColors, setImageColors, isImagePaint, flipSel, hideSel, isolateSel, unhideAll, hiddenCount, softenEdges, intersectFaces, solidProblems, fixSolid, faceNormal, cleanStoreys, isStacked } from './model.js';
 import { Camera, VIEWS, lerpCam } from './camera.js';
-import { sceneOf, warmScene, angleLayout, formatDeg } from './infer.js';
+import { sceneOf, warmScene, angleLayout, formatDeg, setDimTextSize } from './infer.js';
 import { Tools, TOOL_NAMES, TOOL_KEYS } from './tools.js';
 import { View3D } from './view3d.js';
 import { pngName } from './viewimage.js';
-import { formatLength, formatArea, formatVolume, parseLength, localeUnits, UNIT_LABELS } from './units.js';
+import { formatLength, formatArea, formatVolume, parseLength, localeUnits, UNIT_LABELS, setLengthPrecision } from './units.js';
 import { defaultUnit, limitSelect, onUnitsChange } from './unit-prefs.js';   // 0.7 UNITS: Settings › General › Units
 import { exportIFC, exportDAE, exportDXF, toDwgModel, importDXF, importDWG, importDAE } from './io.js';
 import { exportObj } from './io/obj.js';      // 0.7 XF.3: OBJ + MTL with textures (io/; io.js's OBJ stays for the m3d copies)
 import { exportStl } from './io/stl.js';
 import { exportPly } from './io/ply.js';
 import { exportGltf } from './io/gltf-write.js';   // 0.7 XF.1: glTF with mesh UVs, textures, lamps and cameras (io/; io.js's exportGLB stays for the m3d copies)
+import { installSceneHost } from './plc-scene-mc.js';   // 0.8 XE.13: the soft PLC's 3D scene binding (Engines panel)
+import { mountUndoHook } from './undo-hook.js';   // 0.8 EG.77: tells Studio each finished step
 import { dynamicSummary } from './dwg-dynamic.js';   // 0.5 DB.11 (a byte-identical copy of BimCraft's)
 import { sunPosition } from './sun.js';
 import { ident, dist, add, sub, mul, dot, cross, norm } from './vec.js';
@@ -50,6 +55,7 @@ import * as i18n from "./i18n.js";
 import { cameraCubeOptions } from './viewcube-camera.js';
 import { getHost } from "./host.js";
 import { installAgents } from './agents.js';
+import { cleanSay } from './scene-say.js';
 import { Autosave } from "./app-autosave.js";
 import { handoffParam, takeHandoff } from './handoff.js';
 import { MATERIALS, CATEGORIES, material as libMat, planarUV, onMaterialsChanged } from './render/materials.js';
@@ -59,7 +65,7 @@ import { mountTimeline } from './timeline.js';   // 0.6 LC.10: the animation tim
 import { mountXrMc } from './xr-mc.js';   // 0.6 LC.19: review in a headset (xr/), the Issues list
 import { action3d, wheelFactor } from './input-mouse.js';
 import { mountMachineCard, benchParam, openBench } from './compute-mc.js';   // 0.7 CU.1: Settings › Rendering › Your machine; CU.8: ?bench=render
-import { GUIDE_STEPS, guideStep } from './firstmodel.js';   // 0.6 LC.21: the guided first model   // 0.5 IP.3: the menu style's buttons and wheel (input-modelcraft.js)
+import { GUIDE_STEPS, guideStep, guideFacts } from './firstmodel.js';   // 0.6 LC.21: the guided first model   // 0.5 IP.3: the menu style's buttons and wheel (input-modelcraft.js)
 import { getWorkspace, listWorkspaces, toolbarGroups, switcher as wsSwitcher, MODEL_GROUPS, workspaceOfCmd } from './workspaces.js';   // 0.7: Model · Mesh · …
 import './mesh/edit-tool.js';   // 0.7 MD.2: the meshedit tool (registers itself into tools.js)
 import './ws-mesh.js';   // 0.7 MD.2: the Mesh workspace (registers itself)
@@ -67,13 +73,19 @@ import './ws-uv.js';   // 0.7 MD.5: the UV workspace (registers itself)
 import './mesh/curve-tool.js';   // 0.7 MD.6: the curve edit tool (registers itself)
 import './mesh/sculpt-tool.js';   // 0.7 MD.7: the sculpt tool (registers itself)
 import './ws-sculpt.js';   // 0.7 MD.7: the Sculpt workspace (registers itself)
-import { materials as fileMaterials, attachShading } from './ws-shading.js';   // 0.7 MT.1: the Shading workspace (registers itself) and the file's node materials
+import { materials as fileMaterials, attachShading, makeMaterialFromPhoto } from './ws-shading.js';   // 0.7 MT.1: the Shading workspace (registers itself) and the file's node materials
 import { toMesh as curveToMesh, textCurve } from './ws-curve.js';   // 0.7 MD.6: the Curve workspace (registers itself)
 import './ws-render.js';   // 0.7 RN.11: the Render workspace (registers itself)
+import { DocData } from './doc-data.js';
+import { mountModelShell } from './shell-mount.js';   // 0.8 round 3: the shell's seven modules (calc, reasons, totals, lessons, Suggest, activity, Ask)
+import { printProblems } from './problems-modelcraft.js';   // 0.8 P.6: the print check as shared Problems
+import { cleanInfo, cleanFormat, readTemplate, writeTemplate, templateOf } from './model-info.js';   // 0.7.1 71.13: Model info (file `info`) + Preferences › New models
+import { cleanSite } from './site-context.js';   // 0.8 EG.63: the site kept in the file
 import { curvePanel } from './mesh/curve-panel.js';
 import { ModEval, cleanMods, cleanLattice, cleanCurve, makeLattice, worldOf, VIEW_FACES } from './mesh/mod-eval.js';   // 0.7 MD.3: what a mesh with modifiers shows
 import { modPanel } from './mesh/mod-panel.js';
-import { setMeshHooks } from './model.js';
+import { cleanGroup, canModify, modifierDef, setModifiers, GROUP_TYPES, newMod } from './group-mods.js';   // 0.8 GH.2: the stack on a group or component
+import { setMeshHooks, meshDef } from './model.js';
 import { Mesh } from './mesh.js';
 const { t } = i18n;
 /** The display unit in words, lower case ("feet and inches", "millimeters"). */
@@ -104,6 +116,8 @@ function init(root) {
   };
 
   const model = new Model();
+  mountUndoHook({ model });   // 0.8 EG.77
+  installSceneHost({ model });
   const cam = new Camera();
   // 0.7 MT.1: the file's node materials (ws-shading.js): pictures from model.images; an edit is an unsaved change (outside undo, like images)
   attachShading({ model, onEdit: () => { model.dirty = true; model.bumpSafe(); } });
@@ -117,11 +131,25 @@ function init(root) {
   modEval.onNote = (n) => print(t('app.mod.note.' + n));
   // MD.4: the view's subdivision budget follows the machine's tier (Settings › Rendering › Your machine)
   import('./compute-mc.js').then((c) => c.machine()).then(({ info }) => import('./compute/probe.js').then((P) => modEval.setBudget(VIEW_FACES[P.TIER_DEFAULTS[info.tier]?.realtime] || 0))).catch(() => {});
-  setMeshHooks({ clean: cleanMods, cleanLattice, cleanCurve, shown: (d) => modEval.shown(d), rendered: (d) => modEval.rendered(d), lines: (d) => modEval.lines(d) });
+  setMeshHooks({ clean: cleanMods, cleanGroup, cleanLattice, cleanCurve, shown: (d) => modEval.shown(d), rendered: (d) => modEval.rendered(d), lines: (d) => modEval.lines(d) });
   let fileName = t('app.file.untitled');
+  let shell = null;   // 0.8 round 3: shell-mount.js (mounted at the end of init)
+  const selListeners = new Set();   // the shell's design reasons listen for the selection
+  let selKey = '';
+  let printSrc = null, printAnchors = new Map(), printRep = null, printChoice = null, printAt = -1;   // 0.8 P.6: the print check in Problems (below print3d)
+  let sayState = null;   // 0.8 EG.61: the words of the scene (scene-say.js cleanSay): time, weather, season, wet colours
   let renderSettings = null;   // 0.5 RC.11: the Render dialog's settings (render/looks.js cleanSettings shape), kept in the file's view
+  // 0.8 model-08: add-on data in the file (`addons.<id>`, passed through untouched); the door for an add-on is window.ccDocData(id) = {data, setData, keys, onOpen}
+  const docData = new DocData(() => { model.dirty = true; scheduleInfo(); });   // outside undo, like images (the toolbar's New/Save follow)
+  window.ccDocData = (id) => docData.forAddon(id);
+  let modelFormat = null;      // 0.8 D8.6: Model info › Precision and text ({precision, dimSize, textHeight}, model-info.js cleanFormat), the file's `format`
+  /** Hand the file's format to the kernel (length precision, dimension text size) and redraw. */
+  function applyFormat() { setLengthPrecision(modelFormat?.precision ?? null); setDimTextSize(modelFormat?.dimSize ?? 12); showUnits(); view.invalidate(); }
+  let modelSite = null;        // 0.8 EG.63: the site this model sits in (address, sources + day + licence, outlines), kept from an accepted .ccsite.json; the file's `site` (optional key, site-context.js cleanSite)
+  let modelInfo = null;        // 0.7.1 71.13: Model info › About ({author, org, description}, model-info.js cleanInfo), the file's `info`
   let scatterSets = [];        // 0.7 RT.5 (session realtime): the live view's scatter sets (rt/rt-scatter.js), kept in the file's view
   let presentation = false;   // 0.4 M28: only the model on screen (no axes, guides, marks or selection)
+  let hideRest = false, showHidden = false;   // 0.7.1 MC-KEYS-COMMANDS: Views › Hide rest of model, Hidden objects (not in the file)
   let sceneIndex = -1;
   let timeline = null, videoSettings = null, xrmc = null;   // 0.6 LC.10: the animation timeline (mounted below) and the Render video dialog's choices
   let playing = null;
@@ -130,7 +158,8 @@ function init(root) {
   // Myanmar, millimeters elsewhere); the picker changes it for this model and the file keeps it
   // (0.7 UNITS: or the length unit starred in Settings › General › Units, when ModelCraft has it)
   const MC_UNITS = Object.keys(UNIT_LABELS);   // the model units ModelCraft has (ids as in the shared table)
-  const newUnits = () => defaultUnit('length', { offer: MC_UNITS, fallback: localeUnits((navigator.languages && navigator.languages[0]) || navigator.language || '') });
+  // (0.7.1 71.13: Preferences › New models first, when it keeps a start)
+  const newUnits = () => readTemplate(MC_UNITS)?.units || defaultUnit('length', { offer: MC_UNITS, fallback: localeUnits((navigator.languages && navigator.languages[0]) || navigator.language || '') });
   model.units = newUnits();
 
   // ---- host for the tools ----
@@ -147,11 +176,22 @@ function init(root) {
       if (!warmScene(model, more) || !model.warmSnap(more)) warmJob = idle(step);
     });
   }
+  // 0.8 SC.5 (part-model_PART_4): a pick is announced to the page (SuperCad Studio hears `cc-pick` and keeps one selection across its panels);
+  // a pick from another panel comes back through window.ccPickApply(refs). Both are inert outside Super.
+  function announcePick() {
+    try { window.dispatchEvent(new CustomEvent('cc-pick', { detail: { app: 'modelcraft', ids: host.sel.filter((x) => x.t === 'i').map((x) => String(x.id)) } })); } catch { /* no window */ }
+  }
+  window.ccPickApply = (refs) => {
+    const def = model.context(host.path)?.def; if (!def) return false;
+    const sel = (refs || []).map((r) => Number(r.id)).filter((id) => def.insts.has(id)).map((id) => ({ t: 'i', id }));
+    if (!sel.length) return false;
+    host.setSel(sel); return true;
+  };
   const host = {
     model, cam, path: [], sel: [], overlayState: null, mouse: null,
     get units() { return model.units; },
     scene() { if (!sc || sc.version !== model.version) sc = sceneOf(model); return sc; },
-    setSel(s) { host.sel = s.filter(Boolean); scheduleInfo(); view.invalidate(); },
+    setSel(s) { host.sel = s.filter(Boolean); scheduleInfo(); view.invalidate(); announcePick(); },
     toolSet(name) {
       for (const b of root.querySelectorAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === name));
       ui.over.classList.toggle('is-select', name === 'select' || name === 'erase');
@@ -161,9 +201,10 @@ function init(root) {
     tip(t) { ui.tip.textContent = t || ''; },
     vcb(label, text) { ui.vcbLabel.textContent = label || t('ui.vcb'); if (document.activeElement !== ui.vcb) ui.vcb.value = text || ''; },
     print,
-    changed() { scheduleInfo(); view.invalidate(); warmPicking(); },
+    changed() { scheduleInfo(); view.invalidate(); warmPicking(); stalePrint(); shell?.changed(); },
     openContext(path) {
       if (!model.context(path)) return;
+      if (isStacked(model.context(path).def)) { print(t('m3d.model.mods_bake_first')); return; }   // 0.8 GH.2: Edit source or Bake first
       if (model.context(path).def.curve) { wsHost.meshPath = path; setWorkspace('curve'); return; }   // 0.7 MD.6: a curve object opens in the Curve workspace
       if (model.context(path).def.mesh) { wsHost.meshPath = path; setWorkspace('mesh'); return; }   // 0.7 MD.2: a mesh opens in the Mesh workspace
       host.path = path; host.sel = []; tools.set(tools.name === 'place' ? 'select' : tools.name);
@@ -178,26 +219,51 @@ function init(root) {
       const leaving = host.path[host.path.length - 1];
       host.path = host.path.slice(0, -1);
       host.sel = [{ t: 'i', id: leaving }];
+      // 0.8 GH.2: Edit source goes in through the generated definition; closing steps over that read-only level
+      if (isStacked(model.context(host.path)?.def)) { const result = host.path.pop(); host.sel = [{ t: 'i', id: result }]; }
       scheduleInfo(); view.invalidate();
     },
   };
   const view = new View3D(ui.gl, ui.over, {
     model, cam,
-    ui: () => ({ path: host.path, sel: host.sel, overlay: host.overlayState, mouse: host.mouse, present: presentation }),
+    ui: () => ({ path: host.path, sel: host.sel, overlay: host.overlayState, mouse: host.mouse, present: presentation, hideRest, showHidden }),
   });
   const tools = new Tools(host);
+  // 0.8 round 3: things drawn over the view that follow the camera (Problems markers, the Surfaces panel's zebra) run after each draw
+  const afterDraw = new Set();
+  { const draw0 = view.draw.bind(view); view.draw = (...a) => { const r = draw0(...a); for (const fn of afterDraw) fn(); return r; }; }
   // ---- corner indicator (Settings › ModelCraft › Corner indicator): view cube | axis icon | none ----
   const cubeOpts = cameraCubeOptions(cam, { invalidate: () => view.invalidate(), home: () => stdView('iso') });
   const viewCube = mountViewCube(ui.stage, { ...cubeOpts, i18n: { t: i18n.t, has: i18n.has } });
   const axisIcon = mountAxisIcon(ui.stage, { getView: cubeOpts.getView, i18n: { t: i18n.t, has: i18n.has } });
   { const draw0 = view.draw.bind(view); view.draw = () => { draw0(); viewCube.update(); axisIcon.update(); }; }
-  window.modelcraft = { model, cam, tools, view, host, ui, viewCube, axisIcon, cubeView: cubeOpts.getView, presenting: () => presentation,
+  window.modelcraft = { docData: () => docData, file: () => JSON.parse(modelText()), model, cam, tools, view, host, ui, viewCube, axisIcon, cubeView: cubeOpts.getView, presenting: () => presentation,
     afterHistory: () => afterHistory(), print: (m) => print(m), get timeline() { return timeline; }, get xrmc() { return xrmc; },
     setWorkspace: (id) => setWorkspace(id), get workspace() { return wsId; },   // 0.7: workspaces (tests, the console)
-    get fileName() { return fileName; }, get sceneIndex() { return sceneIndex; }, goScene: (i) => goScene(i) };   // 0.7 WS.9: the layouts' adapter (workspace-modelcraft.js)
+    get fileName() { return fileName; }, get sceneIndex() { return sceneIndex; }, goScene: (i) => goScene(i),
+    // 0.8 EG.41 (round 3): what the person is looking at, in plan (live.js here(): "Give it what I'm looking at" in Studio Live)
+    here: () => {
+      const pts = [], z0 = cam.target[2], far = 1e5;
+      for (const [x, y] of [[0, 0], [cam.w, 0], [0, cam.h], [cam.w, cam.h]]) {
+        const r = cam.ray(x, y);
+        if (Math.abs(r.d[2]) < 1e-6) continue;
+        const k = (z0 - r.o[2]) / r.d[2];
+        if (k > 0 && k < far) pts.push([r.o[0] + r.d[0] * k, r.o[1] + r.d[1] * k]);
+      }
+      if (pts.length < 4) { const h = cam.pixelSize(cam.target) * Math.max(cam.w, cam.h) / 2; pts.push([cam.target[0] - h, cam.target[1] - h], [cam.target[0] + h, cam.target[1] + h]); }
+      return { sheet: '', area: [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))] };
+    } };   // 0.7 WS.9: the layouts' adapter (workspace-modelcraft.js)
   let layouts = null;   // 0.7 WS.9: the shell's workspace layouts, once mounted (bottom of init)   // Studio Live (0.5 LV.22, live.js): redraw after others' edits, its messages
   // ---- AI assistants and scripts (0.4 part 2 X.7, session agents; agents.js on host.js's control channel): off until Settings › Assistants ----
-  installAgents({ model, changed: () => host.changed(), canvas: () => view.renderer?.domElement || null, draw: () => view.draw(),
+  installAgents({ model, changed: () => host.changed(),
+    // 0.8 EG.61 (session model_PART_2): say the scene — the model's sun, the Render dialog's settings and the scene's words
+    look: { sun: () => ({ ...view.style.sun }), setSun: (sun) => { view.style = { ...view.style, shadows: true, sun: { ...view.style.sun, ...sun } }; styleToUi(); view.invalidate(); host.changed(); },
+      settings: () => renderSettings, saveSettings: (s) => { renderSettings = s; host.changed(); }, state: () => sayState, saveState: (s) => { sayState = cleanSay(s); },
+      flatColors: async () => { const { mcFlatColors } = await import('./render-mc.js'); return mcFlatColors(model); } },
+    // 0.8 EG.62: a material from a photo — the Shading panel's button and the assistant's material_make end in the same function
+    photo: { pictures: () => [...model.images].map(([id, im]) => ({ id, name: im.name || '', mime: im.mime, kb: Math.round((im.data.length * 3) / 4 / 1024) })),
+      picture: (id) => { const im = model.images.get(String(id).replace(/^img:/, '')); if (!im) return null; const bin = atob(im.data), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return { mime: im.mime, bytes }; },
+      make: (photo, opts) => makeMaterialFromPhoto(photo, opts), has: (id) => fileMaterials.has(id), remove: (id) => { fileMaterials.remove(id); model.dirty = true; model.bumpSafe(); host.changed(); } }, canvas: () => view.renderer?.domElement || null, draw: () => view.draw(),
     // 0.7 AS.5 (session assistants): scenes as the Scenes panel saves and shows them
     scene: () => ({ cam: cam.toJSON(), style: view.style, vis: model.captureVis() }), goScene: (i) => goScene(i, false, { quiet: true }), scenesChanged: () => renderScenes(),
     file: () => JSON.parse(modelText()), base: () => base(),   // 0.7 AS.6: usd_export
@@ -205,7 +271,8 @@ function init(root) {
     render: async () => { const { mcScene } = await import('./render-mc.js'); return { scene: (s) => mcScene(model, cam, view.style, s), viewSize: () => ({ w: ui.gl.clientWidth, h: ui.gl.clientHeight }), settings: () => renderSettings, fileBase: base, download: (blob, name) => download(blob, name, blob.type || 'application/octet-stream'), appName: 'ModelCraft' }; } });
 
   // ---- settings (Settings › ModelCraft; per viewer conveniences only) ----
-  const SET_DEFAULTS = { keys: 'sketchup', scroll: 'auto', touch2: 'pan', snap: true, collide: true, corner: 'cube', bed: '' };
+  const SET_DEFAULTS = { keys: 'sketchup', scroll: 'auto', touch2: 'pan', snap: true, collide: true, corner: 'cube', bed: '', orbitAt: 'cursor', orbitSpeed: 1, panSpeed: 1 };
+  const SPEED = (x) => Number.isFinite(x) && x >= 0.25 && x <= 3;   // 0.7.1 MC-ORBIT-CURSOR: the speed sliders' range
   const settings = (() => {
     const out = { ...SET_DEFAULTS };
     try {
@@ -217,6 +284,9 @@ function init(root) {
       if (typeof v.collide === 'boolean') out.collide = v.collide;
       if (['cube', 'axes', 'none'].includes(v.corner)) out.corner = v.corner;
       if (['', '180', '220', '256', '300'].includes(v.bed)) out.bed = v.bed;   // 0.6 LC.21: printprep.js BEDS
+      if (v.orbitAt === 'cursor' || v.orbitAt === 'centre') out.orbitAt = v.orbitAt;
+      if (SPEED(v.orbitSpeed)) out.orbitSpeed = v.orbitSpeed;
+      if (SPEED(v.panSpeed)) out.panSpeed = v.panSpeed;
     } catch { /* private window: defaults */ }
     return out;
   })();
@@ -229,6 +299,8 @@ function init(root) {
   function applySettings() {
     tools.snapping = settings.snap;
     tools.collide = settings.collide;
+    cam.orbitSpeed = settings.orbitSpeed;
+    cam.panSpeed = settings.panSpeed;
     viewCube.setVisible(settings.corner === 'cube');
     axisIcon.setVisible(settings.corner === 'axes');
     for (const b of root.querySelectorAll('[data-mc-toggle]')) b.setAttribute('aria-pressed', String(!!settings[b.dataset.mcToggle]));
@@ -244,6 +316,13 @@ function init(root) {
       if (co) co.checked = settings.collide;
       settingsDlg.querySelectorAll('input[name="mcCorner"]').forEach((r) => { r.checked = r.value === settings.corner; });
       settingsDlg.querySelectorAll('input[name="mcBed"]').forEach((r) => { r.checked = r.value === settings.bed; });
+      const oa = settingsDlg.querySelector('input[name="mcOrbitAt"]');
+      if (oa) oa.checked = settings.orbitAt === 'cursor';
+      for (const [n, k] of [['mcOrbitSpeed', 'orbitSpeed'], ['mcPanSpeed', 'panSpeed']]) {
+        const r = settingsDlg.querySelector(`input[name="${n}"]`), o = settingsDlg.querySelector(`[data-mc-out="${k}"]`);
+        if (r) r.value = String(settings[k]);
+        if (o) o.textContent = t('set.nav.speed.value', { n: settings[k].toFixed(2) });
+      }
       const kh = settingsDlg.querySelector('[data-mc-keys-hint]');
       if (kh) kh.textContent = blender()
         ? t('app.keys.hint.blender')
@@ -267,6 +346,13 @@ function init(root) {
       else if (t.name === 'mcCollide') setSetting('collide', t.checked);
       else if (t.name === 'mcCorner') setSetting('corner', t.value);
       else if (t.name === 'mcBed') setSetting('bed', t.value);
+      else if (t.name === 'mcOrbitAt') setSetting('orbitAt', t.checked ? 'cursor' : 'centre');
+    });
+    // 0.7.1: the orbit and pan speed sliders act while they move
+    settingsDlg.addEventListener('input', (e) => {
+      const k = { mcOrbitSpeed: 'orbitSpeed', mcPanSpeed: 'panSpeed' }[e.target.name];
+      const v = k && Number(e.target.value);
+      if (SPEED(v)) setSetting(k, v);
     });
     settingsDlg.addEventListener('cc-settings-reset', () => { Object.assign(settings, SET_DEFAULTS); persist(); applySettings();
       // the push-pull keys again: a Modeler style goes back to ModelCraft's own (IP.3: the style and the keys stay one)
@@ -374,6 +460,7 @@ function init(root) {
     // 0.7: Model's tools work in the Model workspace (the others bring their own)
     if (wsId !== 'model' && name !== 'select') { print(t('app.ws.model_tool', { ws: t(getWorkspace(wsId).labelKey) })); return; }
     tools.set(name, arg);
+    shell?.tool(name);   // 0.8 EG.23: lessons hear which tool ran
     for (const b of root.querySelectorAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === name));
     ui.over.classList.toggle('is-select', name === 'select' || name === 'erase');
     ui.over.classList.toggle('is-orbit', name === 'orbit' || name === 'pan');
@@ -534,6 +621,43 @@ function init(root) {
       inp.addEventListener('change', () => { const v = parseLength(inp.value, u); if (v === null || !Number.isFinite(v)) { print(t('app.len.bad')); inp.value = formatLength(meters, u); return; } apply(v); });
       return inp;
     };
+    if (window.ccPropGrid) {   // 0.8 PANEL-COMPACT: the lamp's fields in the shared property grid (the form below stays where the shell has no grid)
+      const L1 = t('app.light.cat.light'), P1 = t('app.light.cat.position');
+      const lenRow = (id, cat, label, meters) => ({ id, category: cat, label, type: 'text', value: formatLength(meters, u), maxLength: 40 });
+      const rows2 = [{ id: 'lumens', category: L1, label: t('app.light.lumens'), type: 'number', value: L.lumens, min: 1, max: 200000, step: 50 },
+        { id: 'color', category: L1, label: t('app.light.color'), type: 'color', value: L.color }];
+      if (L.kind === 'spot') rows2.push({ id: 'angle', category: L1, label: t('app.light.angle'), type: 'number', value: L.angle, min: 5, max: 170, step: 5 });
+      if (L.kind === 'area') rows2.push(lenRow('w', L1, t('app.light.width'), L.size[0]), lenRow('d', L1, t('app.light.depth'), L.size[1]));
+      else rows2.push(lenRow('b', L1, t('app.light.bulb'), L.size[0]));
+      rows2.push(lenRow('x', P1, t('app.light.x'), L.p[0]), lenRow('y', P1, t('app.light.y'), L.p[1]), lenRow('z', P1, t('app.light.height'), L.p[2]));
+      const host2 = el('div', { className: 'mc-grid' });
+      ccPropGrid.create(host2, { label: lightName(selLight, L), key: 'light', rows: rows2, onChange: (id, v) => {
+        if (id === 'lumens') return changeLight({ lumens: Number(v) });
+        if (id === 'color') return changeLight({ color: v });
+        if (id === 'angle') return changeLight({ angle: Number(v) });
+        const m = parseLength(String(v), u);
+        if (m === null || !Number.isFinite(m)) { print(t('app.len.bad')); renderLights(true); return; }
+        if (id === 'w') changeLight({ size: [m, L.size[1]] });
+        else if (id === 'd') changeLight({ size: [L.size[0], m] });
+        else if (id === 'b') changeLight({ size: [m, m] });
+        else if (id === 'x') changeLight({ p: [m, L.p[1], L.p[2]] });
+        else if (id === 'y') changeLight({ p: [L.p[0], m, L.p[2]] });
+        else if (id === 'z') changeLight({ p: [L.p[0], L.p[1], m] });
+      } });
+      const presets2 = el('span', { className: 'mc-light-presets' }, [['warm', '#ffd2a1'], ['neutral', '#fff1dc'], ['cool', '#eef3ff']].map(([k, c]) => {
+        const b = el('button', { type: 'button', className: 'btn-line btn-sm-cc', title: t('app.light.' + k) }, t('app.light.' + k));
+        b.addEventListener('click', () => changeLight({ color: c }));
+        return b;
+      }));
+      const del2 = el('button', { type: 'button', className: 'btn-line btn-sm-cc', dataset: { lightDelete: '' } }, t('app.light.delete'));
+      del2.addEventListener('click', () => {
+        const id = selLight, nm = lightName(id, model.lights.get(id));
+        model.change(t('app.undo.light.delete'), (m) => m.deleteLight(id), []);
+        selLight = null; host.changed(); renderLights(true); print(t('app.light.deleted', { name: nm }));
+      });
+      lightEdit.replaceChildren(host2, el('div', { className: 'mc-row mc-grid-actions' }, presets2, del2));
+      return;
+    }
     const lum = el('input', { type: 'number', id: 'mc-light-lm', className: 'mc-input', min: '1', max: '200000', step: '50', value: String(L.lumens), dataset: { lightLumens: '' } });
     lum.addEventListener('change', () => changeLight({ lumens: Number(lum.value) }));
     const col = el('input', { type: 'color', id: 'mc-light-col', value: L.color, dataset: { lightColor: '' } });
@@ -580,6 +704,22 @@ function init(root) {
     }
     g.setLineDash([]);
   };
+  // 0.8 D8.5 rest (round 3, model_PART_3): while a drag orbits, a small marker shows the point it turns about (the model point picked at
+  // the start, or the view's centre over empty space)
+  { const extra0 = view.drawExtra;
+    view.drawExtra = (g, project, c) => {
+      extra0(g, project, c);
+      if (!camDrag || !camDrag.orbiting || presentation) return;
+      const s = project(camDrag.pivot || cam.target);
+      if (!s) return;
+      g.save(); g.setLineDash([]); g.lineWidth = 1.5; g.strokeStyle = c.sel || c.ink;
+      g.beginPath(); g.arc(s[0], s[1], 6, 0, Math.PI * 2); g.stroke();
+      g.beginPath(); g.moveTo(s[0] - 10, s[1]); g.lineTo(s[0] - 3, s[1]); g.moveTo(s[0] + 3, s[1]); g.lineTo(s[0] + 10, s[1]);
+      g.moveTo(s[0], s[1] - 10); g.lineTo(s[0], s[1] - 3); g.moveTo(s[0], s[1] + 3); g.lineTo(s[0], s[1] + 10); g.stroke();
+      g.restore();
+      view.pivotShown = [s[0], s[1]];   // tests read where it was drawn
+    };
+  }
   // a click on a lamp's mark (Select) picks the lamp before the tools see it
   ui.over.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || tools.name !== 'select' || !model.lights.size) return;
@@ -600,6 +740,19 @@ function init(root) {
   const pos = (e) => { const r = ui.over.getBoundingClientRect(); return e.pointerType === 'pen' ? { x: e.clientX - r.left, y: e.clientY - r.top, pen: true, pressure: e.pressure } : { x: e.clientX - r.left, y: e.clientY - r.top }; };   // a pen's pressure: MD.7 sculpting
   const mods = (e) => ({ shift: e.shiftKey, ctrl: e.ctrlKey || e.metaKey, alt: e.altKey, button: e.button, time: e.timeStamp });
   let camDrag = null;
+  let ctxPress = null;   // 0.7.1 MC-RIGHTCLICK-MENU: the menu button is down ({x, y, b}); released in place = the context menu
+  /**
+   * 0.7.1 MC-ORBIT-CURSOR: what a camera drag turns about — the point of the model under (x, y) (the nearest face, as the
+   * wheel zooms toward it), or null = the view centre (nothing there, or Settings › ModelCraft › Orbit about the view centre).
+   */
+  const camPivot = (x, y) => {
+    if (settings.orbitAt !== 'cursor') return null;
+    const r = cam.ray(x, y), t0 = host.scene().hit(r)?.t;
+    return Number.isFinite(t0) ? add(r.o, mul(r.d, t0)) : null;
+  };
+  host.camPivot = camPivot;   // the Orbit and Pan tools (tools.js CamTool) ask for it too
+  /** 0.7.1 FIX-071-ORBIT-SHIFT-PAN: a camera drag pans when its button pans, or Shift is down now on a button where Shift swaps. */
+  const dragPans = (d, e) => (d.base === 'pan') !== (d.flip && e.shiftKey);
   const touches = new Map();
   let pinch = null;
   // S.8 touch: one finger is the tool — a quick tap is a click, a drag is a press–drag; holding still for half a second
@@ -698,7 +851,7 @@ function init(root) {
         const pts = [...touches.values()];
         const c = { x: pts.reduce((a, q) => a + q.x, 0) / pts.length, y: pts.reduce((a, q) => a + q.y, 0) / pts.length };
         if (pinch?.raf) cancelAnimationFrame(pinch.raf);
-        pinch = { n: pts.length, c, d: pts.length === 2 ? Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) : 0, raf: 0 };
+        pinch = { n: pts.length, c, d: pts.length === 2 ? Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) : 0, raf: 0, pivot: camPivot(c.x, c.y) };
         return;
       }
       ui.over.setPointerCapture(e.pointerId);
@@ -727,14 +880,17 @@ function init(root) {
     const altCam = blender() && e.button === 0 && e.altKey && e.pointerType !== 'touch';
     // 0.5 IP.3: what the middle and right buttons do comes from the menu style (null = ModelCraft's own); Shift swaps orbit and pan
     const styled = (e.button === 1 || e.button === 2) && !altCam ? action3d(e.button) : null;
+    // 0.7.1 MC-RIGHTCLICK-MENU: 'menu' (and the right button in ModelCraft's own buttons) opens the context menu on release
+    // without a drag; Shift + middle and the Pan tool pan
+    if (styled === 'menu' || (styled === null && e.button === 2 && !altCam)) { ctxPress = { x: p.x, y: p.y, b: e.button }; e.preventDefault(); return; }
     if (styled === 'none') { e.preventDefault(); return; }
     if (styled) {
-      camDrag = { x: p.x, y: p.y, x0: p.x, y0: p.y, pan: styled === 'pan' ? !e.shiftKey : styled === 'orbit' && e.shiftKey, zoom: styled === 'zoom' || (blender() && e.button === 1 && (e.ctrlKey || e.metaKey)) };
+      camDrag = { x: p.x, y: p.y, x0: p.x, y0: p.y, base: styled === 'pan' ? 'pan' : 'orbit', flip: true, pivot: camPivot(p.x, p.y), zoom: styled === 'zoom' || (blender() && e.button === 1 && (e.ctrlKey || e.metaKey)) };
       e.preventDefault();
       return;
     }
     if (e.button === 1 || e.button === 2 || altCam) {
-      camDrag = { x: p.x, y: p.y, x0: p.x, y0: p.y, pan: e.button === 2 || e.shiftKey, zoom: blender() && e.button === 1 && (e.ctrlKey || e.metaKey) };
+      camDrag = { x: p.x, y: p.y, x0: p.x, y0: p.y, base: e.button === 2 ? 'pan' : 'orbit', flip: e.button !== 2, pivot: camPivot(p.x, p.y), zoom: blender() && e.button === 1 && (e.ctrlKey || e.metaKey) };
       e.preventDefault();
       return;
     }
@@ -759,7 +915,7 @@ function init(root) {
           if (pts.length !== pinch.n) { pinch.n = pts.length; pinch.c = c; pinch.d = d; return; }
           // two fingers pan (or orbit, settings.touch2) and pinch; three do the other
           const move = (pts.length >= 3) === (settings.touch2 === 'orbit') ? 'pan' : 'orbit';
-          if (c.x !== pinch.c.x || c.y !== pinch.c.y) cam[move](c.x - pinch.c.x, c.y - pinch.c.y);
+          if (c.x !== pinch.c.x || c.y !== pinch.c.y) cam[move](c.x - pinch.c.x, c.y - pinch.c.y, pinch.pivot);
           if (pts.length === 2 && d > 10 && pinch.d > 10 && Math.abs(d - pinch.d) > 0.5) cam.zoomAt(pinch.d / d, c.x, c.y);
           pinch.c = c; pinch.d = d;
           view.invalidate();
@@ -790,11 +946,12 @@ function init(root) {
       if (tap?.done) return;
     }
     host.mouse = p;
+    if (ctxPress) return;   // 0.7.1: a right button held for the context menu
     if (camDrag) {
       const dx = p.x - camDrag.x, dy = p.y - camDrag.y;
       camDrag.x = p.x; camDrag.y = p.y;
       if (camDrag.zoom) cam.zoomAt(Math.exp(dy * 0.01), camDrag.x0, camDrag.y0);
-      else if (camDrag.pan) cam.pan(dx, dy); else cam.orbit(dx, dy);
+      else if (dragPans(camDrag, e)) { camDrag.orbiting = false; cam.pan(dx, dy, camDrag.pivot); } else { camDrag.orbiting = true; cam.orbit(dx, dy, camDrag.pivot); }   // Shift can change it mid-drag
       view.invalidate();
       return;
     }
@@ -816,12 +973,18 @@ function init(root) {
       }
       return;
     }
-    if (camDrag) { camDrag = null; return; }
+    if (ctxPress && e.button === ctxPress.b) {   // 0.7.1: a click (no drag) of the menu button opens the context menu
+      const c = ctxPress;
+      ctxPress = null;
+      if (e.type === 'pointerup' && Math.hypot(p.x - c.x, p.y - c.y) < 6) openCtxMenu(p, true);
+      return;
+    }
+    if (camDrag) { const was = camDrag.orbiting; camDrag = null; if (was) view.invalidate(); return; }   // the pivot marker goes
     if (e.button !== 0 && !(e.pointerType === 'pen' && e.button === 5) && e.type === 'pointerup') return;
     tools.up({ ...p, ...mods(e) });
   };
   ui.over.addEventListener('pointerup', endPointer);
-  ui.over.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); pinch = null; loupe.hide(); camDrag = null; if (tap && tap.id === e.pointerId) { clearTimeout(tap.timer); tap = null; } });
+  ui.over.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); pinch = null; loupe.hide(); camDrag = null; ctxPress = null; if (tap && tap.id === e.pointerId) { clearTimeout(tap.timer); tap = null; } });
   // the touch bar (S.8): what the keyboard's Enter, Esc and Ctrl+Z do
   root.querySelector('[data-touchbar]')?.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-touch]');
@@ -835,7 +998,7 @@ function init(root) {
   ui.over.addEventListener('pointerleave', () => { if (!camDrag) { host.mouse = null; view.invalidate(); } });
   // Trackpads: a two-finger swipe orbits (Shift pans) in trackpad mode — or in "auto" when the scrolling looks like a
   // trackpad's (sideways, or fine-grained); a pinch arrives as a wheel event with ctrlKey and always zooms.
-  let padUntil = 0;
+  let padUntil = 0, padPivot = null;
   const looksLikePad = (e) => {
     if (settings.scroll === 'trackpad') return true;
     if (settings.scroll === 'mouse' || e.deltaMode !== 0) return false;
@@ -848,8 +1011,11 @@ function init(root) {
     if (tools.tool.op?.wheel && !e.ctrlKey && Math.abs(e.deltaY) > 0 && tools.tool.op.wheel(e.deltaY < 0 ? 1 : -1)) return;
     if (!e.ctrlKey && looksLikePad(e)) {
       const k = e.deltaMode === 1 ? 16 : 1;
-      if (e.shiftKey) cam.pan(-e.deltaX * k, -e.deltaY * k);
-      else cam.orbit(-e.deltaX * k * 0.6, -e.deltaY * k * 0.6);
+      // one swipe keeps the point it started on (a new one after a pause)
+      if (!padPivot || e.timeStamp - padPivot.at > 300) { const q = pos(e); padPivot = { p: camPivot(q.x, q.y) }; }
+      padPivot.at = e.timeStamp;
+      if (e.shiftKey) cam.pan(-e.deltaX * k, -e.deltaY * k, padPivot.p);
+      else cam.orbit(-e.deltaX * k * 0.6, -e.deltaY * k * 0.6, padPivot.p);
       view.invalidate();
       return;
     }
@@ -865,6 +1031,28 @@ function init(root) {
     cam.zoomAt(k, p.x, p.y, pivot);
     view.invalidate();
   }, { passive: false });
+  // 0.8 Track ID: hand the view to the input-device layer (assets/js/app-devices-ui.js)
+  // the same camera moves as the mouse: orbit/pan keep one turning point per burst (as a trackpad swipe does: the point under the
+  // pointer, else the view centre; Settings › Orbit about the view centre still wins), zoom goes toward the face under (x, y) as the wheel
+  let devPivot = null;
+  const devTurnAt = () => {
+    const now = performance.now();
+    if (!devPivot || now - devPivot.at > 300) { const q = host.mouse || { x: view.w / 2, y: view.h / 2 }; devPivot = { p: camPivot(q.x, q.y) }; }
+    devPivot.at = now;
+    return devPivot.p;
+  };
+  (window.ccViews ||= []).push({
+    el: ui.over, kind: '3d',
+    pan(dx, dy) { cam.pan(dx, dy, devTurnAt()); view.invalidate(); },
+    orbit(dx, dy) { cam.orbit(dx, dy, devTurnAt()); view.invalidate(); },
+    zoom(f, x = view.w / 2, y = view.h / 2) {
+      if (!(f > 0)) return;
+      const r = cam.ray(x, y), t0 = host.scene().hit(r)?.t;
+      cam.zoomAt(1 / f, x, y, Number.isFinite(t0) ? add(r.o, mul(r.d, t0)) : null);
+      view.invalidate();
+    },
+    fit() { act('extents'); },
+  });
 
   // ---- keyboard ----
   const VCB_START = /^[0-9.,\-'"[<*/(]$/;   // ( starts a calculation too (0.7 MC-CALC)
@@ -906,28 +1094,10 @@ function init(root) {
     if (k === 'Alt') { if (tools.key('Alt', e)) e.preventDefault(); return; }
     if (e.shiftKey && l === 'p' && !e.altKey) { e.preventDefault(); setPresentation(!presentation); return; }   // presentation view (both key styles)
     if (k === 'Shift') { tools.key('Shift', e); return; }
-    if (k === 'Escape') {
-      e.preventDefault();
-      stopPlay();
-      if (tools.escape()) return;
-      if (tools.name !== 'select') { setTool('select'); return; }
-      if (host.sel.length) { host.setSel([]); return; }
-      if (host.path.length) host.closeContext();
-      return;
-    }
-    if (k.startsWith('Arrow')) {
-      if (tools.tool.lockable && tools.tool.busy && tools.key(k, e)) {
-        e.preventDefault();
-        sayLock();
-        return;
-      }
-      e.preventDefault();
-      const s = 18;
-      if (e.shiftKey) cam.pan(k === 'ArrowLeft' ? s : k === 'ArrowRight' ? -s : 0, k === 'ArrowUp' ? s : k === 'ArrowDown' ? -s : 0);
-      else cam.orbit(k === 'ArrowLeft' ? -s : k === 'ArrowRight' ? s : 0, k === 'ArrowUp' ? -s : k === 'ArrowDown' ? s : 0);
-      view.invalidate();
-      return;
-    }
+    if (k === 'Escape') { e.preventDefault(); cancelStep(); return; }
+    if (k.startsWith('Arrow')) { e.preventDefault(); arrowStep(k, e.shiftKey, e); return; }
+    // 0.7.1 MC-RIGHTCLICK-MENU: the menu key and Shift+F10 open the context menu for the selection (at the pointer, else the middle)
+    if (k === 'ContextMenu' || (k === 'F10' && e.shiftKey && !e.altKey)) { e.preventDefault(); openCtxMenu(host.mouse || { x: view.w / 2, y: view.h / 2 }, false); return; }
     if (B) {
       // X/Y/Z lock an axis while something is moving, turning or being drawn (as the arrow keys do)
       if (tools.tool.busy && (l === 'x' || l === 'y' || l === 'z') && !e.shiftKey) {
@@ -984,7 +1154,114 @@ function init(root) {
     if (l === 'g') { e.preventDefault(); act(e.shiftKey ? 'group' : 'component'); return; }   // as in SketchUp: G component, Shift+G group
     if (TOOL_KEYS[l] && !e.shiftKey) { e.preventDefault(); setTool(TOOL_KEYS[l]); }
   });
+  /** Esc (0.7.1: also the command edit.cancel, which a style may give another key): one step back — the recording, the
+   *  tool's own step, back to Select, select nothing, then close the open group. */
+  function cancelStep() {
+    if (recording) { recording.stop = true; return; }
+    stopPlay();
+    if (tools.escape()) return;
+    if (tools.name !== 'select') { setTool('select'); return; }
+    if (host.sel.length) { host.setSel([]); return; }
+    if (host.path.length) host.closeContext();
+  }
+  /** An arrow key (0.7.1: also the commands aids.lock-* / camera.nudge-*): while a tool runs, lock its axis (→ red, ← green,
+   *  ↑ blue, ↓ the edge's direction); else orbit that way, or pan with Shift. */
+  function arrowStep(k, pan, ev = {}, orbitOnly = false) {
+    // an arrow key locks with or without Shift, as before; the Pan commands only pan
+    if (!orbitOnly && (!pan || ev.key) && tools.tool.lockable && tools.tool.busy && tools.key(k, ev)) { sayLock(); return; }
+    const s = 18;
+    if (pan) cam.pan(k === 'ArrowLeft' ? s : k === 'ArrowRight' ? -s : 0, k === 'ArrowUp' ? s : k === 'ArrowDown' ? -s : 0);
+    else cam.orbit(k === 'ArrowLeft' ? -s : k === 'ArrowRight' ? s : 0, k === 'ArrowUp' ? -s : k === 'ArrowDown' ? s : 0);
+    view.invalidate();
+  }
+
+  // ---- 0.7.1 MC-RIGHTCLICK-MENU: the context menu for what is under the pointer (a right click; the menu key, Shift+F10) ----
+  // A right click picks as a plain left click would (unless the thing is already selected), then lists what can be done
+  // with the selection; every item runs the same function as its menu or key. Looks like the shell's toolbar menu (.shell-ctx).
+  let ctxMenu = null;
+  function ctxItems() {
+    const sel = host.sel, has = (...ts) => sel.some((x) => ts.includes(x.t)), one = sel.length === 1 ? sel[0] : null;
+    const out = [];
+    const it = (k, icon, label, run, off = false) => out.push({ k, icon, label, run, off });
+    const sep = () => { if (out.length && out[out.length - 1] !== '-') out.push('-'); };
+    if (tools.tool.busy) {
+      if (tools.tool.finish) it('done', 'bi-check-lg', t('ui.touch.done'), () => { if (!tools.tool.finish?.()) tools.escape(); });
+      it('cancel', 'bi-x-lg', t('ui.touch.cancel'), () => tools.escape());
+      sep();
+    }
+    if (one && one.t === 'i') it('edit', 'bi-box-arrow-in-down-right', t('app.ctx.edit'), () => host.openContext([...host.path, one.id]));
+    if (has('i')) it('explode', 'bi-grid-3x3-gap', t('input.cmd.organize.explode'), () => act('explode'));
+    if (has('e', 'f')) { it('group', 'bi-collection', t('input.cmd.organize.group'), () => act('group')); it('component', 'bi-boxes', t('input.cmd.organize.component'), () => act('component')); }
+    if (sel.length) {
+      sep();
+      it('cut', 'bi-scissors', t('input.cmd.edit.cut'), () => act('cut'));
+      it('copy', 'bi-copy', t('input.cmd.edit.copy'), () => act('copy'));
+      it('duplicate', 'bi-files', t('input.cmd.edit.duplicate'), () => act('duplicate'));
+      it('delete', 'bi-trash', t('input.cmd.edit.delete'), () => act('delete'));
+      sep();
+      if (has('e', 'f', 'i')) { it('hide', 'bi-eye-slash', t('input.cmd.edit.hide'), () => act('hide')); it('isolate', 'bi-bullseye', t('input.cmd.edit.isolate'), () => act('isolate')); }
+      it('zoom', 'bi-zoom-in', t('app.ctx.zoom_sel'), () => frameSelection());
+    }
+    sep();
+    it('paste', 'bi-clipboard-plus', t('input.cmd.edit.paste'), () => act('paste'), !window.modelcraft.clip());
+    if (hiddenCount(model)) it('unhide', 'bi-eye', t('input.cmd.edit.unhide-all'), () => act('unhide-all'));
+    if (!sel.length) { it('all', 'bi-check2-all', t('input.cmd.edit.select-all'), () => act('select-all')); it('extents', 'bi-arrows-fullscreen', t('input.cmd.camera.extents'), () => act('extents')); }
+    if (host.path.length) { sep(); it('close', 'bi-box-arrow-up-left', t('ui.outliner.close'), () => host.closeContext()); }
+    if (out[out.length - 1] === '-') out.pop();
+    return out;
+  }
+  function closeCtxMenu(refocus) {
+    if (!ctxMenu || ctxMenu.hidden) return;
+    ctxMenu.hidden = true;
+    if (refocus) ui.over.focus({ preventScroll: true });
+  }
+  /** p: a point in the view (canvas pixels). pick: a right click (pick what is under it first). */
+  function openCtxMenu(p, pick) {
+    hideHint();
+    if (pick && !tools.tool.busy) {
+      const s = tools.pickAt({ x: p.x, y: p.y });
+      if (s && !host.sel.some((x) => x.t === s.t && x.id === s.id)) host.setSel([s]);
+      scheduleInfo(); view.invalidate();
+    }
+    if (!ctxMenu) {
+      ctxMenu = el('div', { className: 'shell-ctx mc-ctx', role: 'menu', 'aria-label': t('app.ctx.aria'), dataset: { mcCtx: '' }, hidden: true });
+      ctxMenu.addEventListener('click', (e) => {
+        const b = e.target.closest('[role="menuitem"]');
+        if (!b || b.getAttribute('aria-disabled') === 'true') return;
+        closeCtxMenu(true);
+        b.__run?.();
+        scheduleInfo(); view.invalidate();
+      });
+      ctxMenu.addEventListener('keydown', (e) => {
+        e.stopPropagation();   // the view takes arrows, letters and Esc on the document
+        const items = [...ctxMenu.querySelectorAll('[role="menuitem"]')], i = items.indexOf(document.activeElement);
+        if (e.key === 'Escape') { e.preventDefault(); closeCtxMenu(true); }
+        else if (e.key === 'Tab') closeCtxMenu(false);
+        else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus(); }
+        else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); items[e.key === 'Home' ? 0 : items.length - 1]?.focus(); }
+      });
+      document.addEventListener('pointerdown', (e) => { if (ctxMenu && !ctxMenu.hidden && !ctxMenu.contains(e.target)) closeCtxMenu(false); }, true);
+      window.addEventListener('blur', () => closeCtxMenu(false));
+      window.addEventListener('resize', () => closeCtxMenu(false));
+      ui.over.addEventListener('wheel', () => closeCtxMenu(false), { passive: true });
+      document.body.append(ctxMenu);
+    }
+    ctxMenu.replaceChildren(...ctxItems().map((x) => {
+      if (x === '-') return el('hr');
+      const b = el('button', { type: 'button', role: 'menuitem', tabIndex: -1, dataset: { ctx: x.k } }, el('i', { className: 'bi ' + x.icon, 'aria-hidden': 'true' }), el('span', {}, x.label));
+      if (x.off) b.setAttribute('aria-disabled', 'true');
+      b.__run = x.run;
+      return b;
+    }));
+    ctxMenu.hidden = false;
+    const r = ui.over.getBoundingClientRect(), m = ctxMenu.getBoundingClientRect();
+    ctxMenu.style.left = Math.max(4, Math.min(r.left + p.x, innerWidth - m.width - 4)) + 'px';
+    ctxMenu.style.top = Math.max(4, Math.min(r.top + p.y, innerHeight - m.height - 4)) + 'px';
+    (ctxMenu.querySelector('[role="menuitem"]:not([aria-disabled="true"])') || ctxMenu.querySelector('[role="menuitem"]'))?.focus();
+  }
   function sayLock() {
+    const own = tools.tool.lockText?.();   // 0.7.1: the Rectangle tool locks a plane, not a line
+    if (own) { print(own); return; }
     print(tools.lock ? t('app.lock.' + ({ 'axis-x': 'red', 'axis-y': 'green', 'axis-z': 'blue', parallel: 'edge' }[tools.lock.kind] || 'edge')) : t('app.lock.off'));
   }
   function finishTransform() {
@@ -1078,6 +1355,43 @@ function init(root) {
       },
     };
   }
+  /**
+   * 0.8 GH.2: what the Modifiers section works through for a group or component (group-mods.js). `id` is the definition shown
+   * (the source before a stack exists, the derived one after), `iid` the placement in the open group. The first item turns the
+   * placement into a derived component of the source, in the same undo step; later changes re-place it.
+   */
+  function groupModCtx(id, iid) {
+    const def = model.def(id), parentId = ctxDef().id;
+    const redraw = () => { view.builtFor = null; afterHistory(); };
+    const bake = () => { model.change(t('app.gmod.bake'), (m) => m.bakeModifiers(id)); redraw(); print(t('app.gmod.baked')); };
+    const actions = isStacked(def) ? [
+      el('button', { type: 'button', className: 'mc-linkbtn', dataset: { modEditSource: '' }, onclick: () => {
+        const first = model.def(id).insts.keys().next().value;
+        if (first === undefined) return;
+        const inner = [...host.path, iid, first];
+        host.path = inner; host.sel = [];
+        print(t('app.ctx.editing', { name: model.def(model.def(id).mods.src).name }));
+        scheduleInfo(); view.invalidate();
+      } }, t('app.gmod.edit_source')),
+      el('button', { type: 'button', className: 'mc-linkbtn', dataset: { modBake: '' }, title: t('app.gmod.bake.title'), onclick: bake }, t('app.gmod.bake')),
+    ] : [];
+    return {
+      def, model, el, t, units: model.units, formatLength, parseLength, print,
+      group: { types: GROUP_TYPES, list: (d) => d._ops ?? (isStacked(d) ? d.mods.ops : []), write: (d, next) => { d._ops = next; }, actions },
+      change(label, fn) {
+        try {
+          model.change(label, (m) => {
+            const cur = m.def(id), proxy = { _ops: undefined };
+            proxy._ops = isStacked(cur) ? structuredClone(cur.mods.ops) : [];
+            fn(proxy);
+            if (isStacked(cur)) setModifiers(m, cur, proxy._ops);
+            else m.def(parentId).insts.get(iid).def = modifierDef(m, cur, proxy._ops).id;
+          });
+          redraw();
+        } catch (err) { print(err.message); }
+      },
+    };
+  }
   /** What the Modifiers section of a mesh's panel works through (mesh/mod-panel.js), for definition id. */
   function modCtx(id) {
     const def = model.def(id);
@@ -1167,12 +1481,17 @@ function init(root) {
       case 'open': if (await confirmDiscard()) { const [f] = await fileHost.openFile({ types: OPEN_TYPES }).catch((err) => { print(t('app.open.failed', { error: err.message })); return []; }); await openFromHost(f, { asked: true }); } break;
       case 'save': saveModel(); break;
       case 'saveas': saveAs(); break;   // 0.7 XF.9: .modelcraft or USD
+      case 'import-sketch': await importSketchPhoto(); break;   // 0.8 EG.36
+      case 'furnish': await furnishSelected(); break;   // 0.8 EG.60
       case 'import': { const [f] = await fileHost.openFile({ types: IMPORT_TYPES }).catch((err) => { print(t('app.open.failed', { error: err.message })); return []; }); if (f) await importFile(f); break; }
       case 'undo': tools.escape(); { const l = model.undo(); print(l ? t('app.undid', { what: l }) : t('app.undo.nothing')); } afterHistory(); break;
       case 'redo': tools.escape(); { const l = model.redo(); print(l ? t('app.redid', { what: l }) : t('app.redo.nothing')); } afterHistory(); break;
       case 'group': makeGroup('group'); break;
       case 'text3d': text3dDialog(); break;
+      case 'scale-by': scaleByDialog(); break;   // 0.8 SU.934
       case 'storeys': closeMenus(); storeysDialog(); break;
+      case 'model-info': openModelInfoDialog(); break;   // 0.7.1 71.13
+      case 'preferences': openPreferences(); break;
       case 'component': makeGroup('component'); break;
       case 'explode': explodeSel(); break;
       case 'extents': zoomExtents(); break;
@@ -1199,14 +1518,34 @@ function init(root) {
       case 'solid-subtract': solidTool('subtract'); break;
       case 'solid-intersect': solidTool('intersect'); break;
       case 'select-none': host.setSel([]); break;
+      // 0.7.1 MC-KEYS-META / MC-KEYS-COMMANDS: Esc and the arrow keys as commands, and Delete guides
+      case 'cancel': cancelStep(); break;
+      case 'lock-red': arrowStep('ArrowRight', false); break;
+      case 'lock-green': arrowStep('ArrowLeft', false); break;
+      case 'lock-blue': arrowStep('ArrowUp', false); break;
+      case 'lock-edge': arrowStep('ArrowDown', false); break;
+      // 0.8 D8.4: orbit that never locks
+      case 'orbit-left': arrowStep('ArrowLeft', false, {}, true); break;
+      case 'orbit-right': arrowStep('ArrowRight', false, {}, true); break;
+      case 'orbit-up': arrowStep('ArrowUp', false, {}, true); break;
+      case 'orbit-down': arrowStep('ArrowDown', false, {}, true); break;
+      case 'nudge-left': arrowStep('ArrowLeft', true); break;
+      case 'nudge-right': arrowStep('ArrowRight', true); break;
+      case 'nudge-up': arrowStep('ArrowUp', true); break;
+      case 'nudge-down': arrowStep('ArrowDown', true); break;
+      case 'del-guides': deleteGuides(); break;
       case 'keys-sketchup': setKeys('sketchup'); break;
       case 'keys-blender': setKeys('blender'); break;
       default: break;
     }
     scheduleInfo();
   }
+  /** 0.8 P.6: a print check of an older model is no longer true: take it out of Problems. */
+  function stalePrint() { if (printSrc && printAt >= 0 && printAt !== model.version) { printSrc.clear(); printAt = -1; } }
   function afterHistory() {
+    stalePrint();
     if (!model.context(host.path)) host.path = [];
+    while (isStacked(model.context(host.path)?.def)) host.path.pop();   // 0.8 GH.2: undo or a Bake can leave you inside a level that is read-only
     const def = model.context(host.path).def;
     host.sel = host.sel.filter((s) => (s.t === 'e' ? def.edges.has(s.id) : s.t === 'f' ? def.faces.has(s.id) : s.t === 'i' ? def.insts.has(s.id) : s.t === 'd' ? model.dims.has(s.id) : s.t === 's' ? model.sections.has(s.id) : model.guides.has(s.id)));
     sceneIndex = Math.min(sceneIndex, model.scenes.length - 1);
@@ -1297,6 +1636,15 @@ function init(root) {
     print(t(host.path.length ? 'app.isolate.done.group' : 'app.isolate.done', { n }));
     scheduleInfo(); view.invalidate();
   }
+  /** 0.7.1 MC-KEYS-COMMANDS: every guide line and point goes, one undo step (Entity info's "Delete all guides" too). */
+  function deleteGuides() {
+    const n = model.guides.size;
+    if (!n) { print(t('app.guides.none')); return; }
+    model.change(t('app.undo.del_guides'), (m) => { m.guides = new Map(); }, []);
+    host.setSel(host.sel.filter((s) => s.t !== 'g'));
+    print(t('app.guides.deleted', { n }));
+    scheduleInfo(); view.invalidate();
+  }
   function unhideEverything() {
     if (!hiddenCount(model)) { print(t('app.unhide.none')); return; }
     const n = model.change(t('ui.editmenu.unhide_all'), (m) => unhideAll(m), model.holding(null));
@@ -1378,6 +1726,7 @@ function init(root) {
   function explodeSel() {
     const insts = host.sel.filter((s) => s.t === 'i');
     if (!insts.length) { print(t('app.explode.none')); return; }
+    if (insts.some((s) => isStacked(model.def(ctxDef().insts.get(s.id)?.def)))) { print(t('m3d.model.mods_bake_first')); return; }   // 0.8 GH.2
     const out = model.change(t('app.undo.explode'), (m) => {
       const def = m.context(host.path).def;
       const all = [];
@@ -1481,13 +1830,40 @@ function init(root) {
   }
   secPlanesBtn.addEventListener('click', () => { closeMenus(); setSectionView('planes', !model.sectionView.planes); });
   secCutsBtn.addEventListener('click', () => { closeMenus(); setSectionView('cuts', !model.sectionView.cuts); });
+  // 0.7.1 MC-KEYS-COMMANDS: X-ray (the Faces style, back to the one you had), Hide rest of model (while a group or component
+  // is open, only it is drawn) and Hidden objects (hidden groups and components drawn faded; still not picked or exported).
+  // The last two are how you look at the model now, not part of the file (like the presentation view).
+  const xrayBtn = $('[data-xray]'), restBtn = $('[data-hide-rest]'), hiddenBtn = $('[data-show-hidden]');
+  let faceModeBefore = 'shaded';
+  function syncViewMenu() {   // looked up each time: styleToUi may run before this part of the setup
+    root.querySelector('[data-xray]')?.setAttribute('aria-checked', String(view.style.mode === 'xray'));
+    root.querySelector('[data-hide-rest]')?.setAttribute('aria-checked', String(hideRest));
+    root.querySelector('[data-show-hidden]')?.setAttribute('aria-checked', String(showHidden));
+  }
+  function toggleXray() {
+    const on = view.style.mode !== 'xray';
+    if (on) faceModeBefore = view.style.mode;
+    ui.mode.value = on ? 'xray' : (faceModeBefore === 'xray' ? 'shaded' : faceModeBefore);
+    ui.mode.dispatchEvent(new Event('change'));   // the Style panel's own path (and its X-ray message)
+    if (!on) print(t('app.view.xray.off'));
+  }
+  xrayBtn?.addEventListener('click', () => { closeMenus(); toggleXray(); });
+  restBtn?.addEventListener('click', () => { closeMenus(); hideRest = !hideRest; syncViewMenu(); print(t(hideRest ? 'app.view.rest.on' : 'app.view.rest.off')); view.invalidate(); });
+  hiddenBtn?.addEventListener('click', () => { closeMenus(); showHidden = !showHidden; syncViewMenu(); print(t(showHidden ? 'app.view.hidden.on' : 'app.view.hidden.off')); view.invalidate(); });
+  ui.mode.addEventListener('change', () => queueMicrotask(syncViewMenu));   // after the Style panel's own handler set view.style
   function closeMenus() { for (const d of root.querySelectorAll('details.mc-menu[open]')) d.open = false; }
   document.addEventListener('click', (e) => { for (const d of root.querySelectorAll('details.mc-menu[open]')) if (!d.contains(e.target)) d.open = false; });
 
   // ---- style ----
+  /** A new model's display and location: Preferences › New models (0.7.1 71.13), else the built-in start. */
+  function startStyle() {
+    const tpl = readTemplate(MC_UNITS);
+    view.style = { ...view.style, mode: 'shaded', edges: true, shadows: false, ...(tpl?.style || {}), ...(tpl?.sun ? { sun: { ...view.style.sun, ...tpl.sun } } : {}) };
+  }
   function styleToUi() {
     const st = view.style;
     ui.mode.value = st.mode; ui.edges.checked = st.edges; ui.shadows.checked = st.shadows;
+    syncViewMenu();   // 0.7.1: Views › X-ray follows a scene's style
     ui.sun.disabled = !st.shadows;
     ui.sunMonth.value = String(st.sun.month); ui.sunDay.value = String(st.sun.day); ui.sunHour.value = String(st.sun.hour);
     ui.sunLat.value = String(st.sun.lat); ui.sunLon.value = String(st.sun.lon); ui.sunTz.value = String(st.sun.tz);
@@ -1519,6 +1895,17 @@ function init(root) {
     c.addEventListener('input', uiToStyle);
     c.addEventListener('change', uiToStyle);
   }
+  // 0.7.1 FIX-071-XRAY: Faces picked with the mouse hands the keys back to the view. Left focused, the select took the
+  // next arrow key or "x" (orbiting by keys stepped Wire → X-ray, "x" jumped to it) and the model went see-through.
+  // A keyboard user arrowing through the list keeps the focus. Turning X-ray on says how to turn it off.
+  let modeByPointer = false;
+  ui.mode.addEventListener('pointerdown', () => { modeByPointer = true; });
+  ui.mode.addEventListener('keydown', () => { modeByPointer = false; });
+  ui.mode.addEventListener('change', () => {
+    if (ui.mode.value === 'xray') print(t('app.style.xray_on'));
+    if (modeByPointer) { modeByPointer = false; ui.over.focus({ preventScroll: true }); }
+  });
+  if (readTemplate(MC_UNITS)) startStyle();   // 0.7.1 71.13: Preferences › New models
   styleToUi();
 
   // ---- scenes ----
@@ -1743,6 +2130,7 @@ function init(root) {
       else if (a === 'paste' || a === 'paste-in-place') b.disabled = !window.modelcraft.clip();
       else if (a === 'extents' || a === 'select-all' || a === 'intersect-model' || a === 'storeys') b.disabled = empty;
       else if (a === 'explode') b.disabled = !has('i');
+      else if (a === 'del-guides') b.disabled = !model.guides.size;   // 0.7.1
       else if (a === 'axes-face') b.disabled = !(sel.length === 1 && sel[0].t === 'f');
       else if (NEEDS_SEL.has(a)) b.disabled = !sel.length;
     }
@@ -1758,7 +2146,8 @@ function init(root) {
   }
   window.addEventListener('storage', (e) => { if (e.key === 'modelcraft.clipboard') scheduleInfo(); });
   // the panels wait while a tool previews (a drag): they show the model once it is put down, not on every frame
-  function scheduleInfo() { if (!infoTimer) infoTimer = requestAnimationFrame(() => { infoTimer = 0; if (model.previewing) return; renderToolbar(); renderInfo(); renderTree(); renderComps(); renderTags(); renderScenesIfChanged(); renderLights(); layouts?.refresh(); }); }
+  function scheduleInfo() { if (!infoTimer) infoTimer = requestAnimationFrame(() => { infoTimer = 0; if (model.previewing) return; renderToolbar(); renderInfo(); renderTree(); renderComps(); renderTags(); renderScenesIfChanged(); renderLights(); layouts?.refresh(); fireSel(); }); }
+  function fireSel() { const k = host.sel.map((x) => x.t + x.id).join(','); if (k === selKey) return; selKey = k; for (const fn of [...selListeners]) { try { fn(); } catch (e) { console.warn(e); } } }
   let scenesSeen = '';
   function renderScenesIfChanged() { const k = JSON.stringify(model.scenes.map((s) => [s.name, !!s.lock])) + sceneIndex; if (k !== scenesSeen) { scenesSeen = k; renderScenes(); } }
 
@@ -1902,7 +2291,7 @@ function init(root) {
           onclick: () => { model.change(t(inst.hidden ? 'app.undo.unhide' : 'app.undo.hide'), (m) => hideSel(m.context(path).def, [{ t: 'i', id: iid }], !inst.hidden), [model.context(path).def.id]); host.setSel(host.sel.filter((s) => s.id !== iid)); afterHistory(); } },
           el('i', { className: inst.hidden ? 'bi bi-eye-slash' : 'bi bi-eye', 'aria-hidden': 'true' }));
         const li = el('li', { dataset: { iid: String(iid) } }, el('div', { className: 'mc-node-row' }, btn, eye));
-        if (d.insts.size) { const sub = el('ul'); walk(d, p, sub, depth + 1); if (sub.children.length) li.append(sub); }
+        if (d.insts.size && !isStacked(d)) { const sub = el('ul'); walk(d, p, sub, depth + 1); if (sub.children.length) li.append(sub); }
         ul.append(li);
       }
     };
@@ -2161,19 +2550,21 @@ function init(root) {
         const sc = [0, 1, 2].map((q) => Math.hypot(inst.m[q * 4], inst.m[q * 4 + 1], inst.m[q * 4 + 2]));
         if (bb) [t('app.info.width'), t('app.info.depth'), t('app.info.height')].forEach((lb, q) => {
           const own = bb.max[q] - bb.min[q], placed = own * sc[q];
-          if (placed > 1e-6) lenBox(lb, 'mc-size' + q, placed, (L) => model.change(t(d.kind === 'component' ? 'app.undo.resize_component' : 'app.undo.resize_group'), (m) => m.setDefSize(d.id, q, L / sc[q]), [d.id]));
+          if (isStacked(d)) row(lb, formatLength(placed, u));   // 0.8 GH.2: the stack decides the size (change a factor)
+          else if (placed > 1e-6) lenBox(lb, 'mc-size' + q, placed, (L) => model.change(t(d.kind === 'component' ? 'app.undo.resize_component' : 'app.undo.resize_group'), (m) => m.setDefSize(d.id, q, L / sc[q]), [d.id]));
           else row(lb, formatLength(0, u));
         });
-        if (!(s.closed && !d.insts.size)) solidCheck(d, sel[0].id, notes);
-        softenRow(props, () => ({ defId: d.id, eids: [...d.edges.keys()] }));
+        const stacked = isStacked(d);   // 0.8 GH.2
+        if (!stacked && !(s.closed && !d.insts.size)) solidCheck(d, sel[0].id, notes);
+        if (!stacked) softenRow(props, () => ({ defId: d.id, eids: [...d.edges.keys()] }));
         // 0.4 M26: a component made of parts stretches its parts by their rules, for this copy only
-        if (d.kind === 'component' && (d.insts.size || d.dyn)) btn(t('app.dyn.stretch'), () => stretchDialog(sel[0].id));
+        if (!stacked && d.kind === 'component' && (d.insts.size || d.dyn)) btn(t('app.dyn.stretch'), () => stretchDialog(sel[0].id));
         if (d.dyn) notes.push(el('p', { className: 'mc-note' }, t('app.dyn.is', { name: model.def(d.dyn.src)?.name || '' })));
-        btn(t('app.info.edit'), () => host.openContext([...host.path, sel[0].id]));
-        btn(t('app.info.explode'), explodeSel);
+        if (!stacked) { btn(t('app.info.edit'), () => host.openContext([...host.path, sel[0].id])); btn(t('app.info.explode'), explodeSel); }
+        if (stacked || canModify(d)) notes.push(modPanel(groupModCtx(d.id, sel[0].id)));   // 0.8 GH.2
         if (d.kind === 'component' && (counts.get(d.id) || 0) > 1) btn(t('app.info.make_unique'), () => { model.change(t('app.info.make_unique'), (m) => m.makeUnique(m.context(host.path).def, sel[0].id), [model.context(host.path).def.id]); scheduleInfo(); });
-        if (d.kind === 'group') btn(t('app.undo.make_component'), () => { model.change(t('app.undo.make_component'), (m) => { const dd = m.def(d.id); dd.kind = 'component'; dd.name = m.uniqueName(t('app.info.component')); }, [d.id]); scheduleInfo(); });
-        btn(t('app.info.mesh.convert'), () => convertToMesh(sel[0].id));
+        if (d.kind === 'group' && !stacked) btn(t('app.undo.make_component'), () => { model.change(t('app.undo.make_component'), (m) => { const dd = m.def(d.id); dd.kind = 'component'; dd.name = m.uniqueName(t('app.info.component')); }, [d.id]); scheduleInfo(); });
+        if (!stacked) btn(t('app.info.mesh.convert'), () => convertToMesh(sel[0].id));
         }
       }
     } else if (sel.length === 1 && nD === 1) {
@@ -2290,8 +2681,14 @@ function init(root) {
     saveTarget = null;
     adoc.clean();
     sceneIndex = -1;
-    view.style = { ...view.style, mode: 'shaded', edges: true, shadows: false };
+    startStyle();
+    sayState = null;
     renderSettings = null;
+    modelInfo = null;   // 0.7.1 71.13
+    modelSite = null;   // 0.8 EG.63
+    modelFormat = null; applyFormat();   // 0.8 D8.6
+    docData.clear();   // 0.8: add-on data
+    shell?.load(null); shell?.opened();   // 0.8 round 3
     scatterSets = [];
     videoSettings = null;
     timeline.reset();
@@ -2311,9 +2708,30 @@ function init(root) {
   const MODEL_TYPES = [{ description: t('app.file.type.model'), extensions: ['.modelcraft'] }];
   // 0.7 XF.9: USD opens as the model too (Open) and is a choice in Save as — never the default (owner, 2026-10-20)
   const OPEN_TYPES = [...MODEL_TYPES, { description: t('usd.file.type'), extensions: ['.usd', '.usda', '.usdc', '.usdz'] }];
-  const IMPORT_TYPES = [{ description: t('app.file.type.import'), extensions: ['.skp', '.dae', '.obj', '.glb', '.gltf', '.dwg', '.dxf', '.ply', '.stl', '.abc', '.fbx', '.usd', '.usda', '.usdc', '.usdz', '.step', '.stp', '.3dm'] }];
+  const IMPORT_TYPES = [{ description: t('app.file.type.import'), extensions: ['.skp', '.dae', '.obj', '.glb', '.gltf', '.dwg', '.dxf', '.ccbundle', '.ply', '.stl', '.abc', '.fbx', '.usd', '.usda', '.usdc', '.usdz', '.step', '.stp', '.3dm'] }];
   const download = (bytes, name, type) => fileHost.download(bytes instanceof Blob || typeof bytes === 'string' ? bytes : new Blob([bytes], { type }), name, type);
   const base = () => fileName.replace(/\.(modelcraft|json|usd|usda|usdc|usdz)$/i, '') || t('app.file.untitled');
+  /** 0.8 DC.27 H1: one property per line (indent 1), lists of plain numbers kept on one line, so a version-control diff and merge read the file. Same JSON. */
+  const prettyJson = (obj) => JSON.stringify(obj, null, 1).replace(/\[\n\s*(-?\d[^,\[\]{}"\n]*(?:,\n\s*-?\d[^,\[\]{}"\n]*)*)\n\s*\]/g, (m, body) => '[' + body.replace(/,\n\s*/g, ', ') + ']');
+  // 0.8 AL.6 "This file uses …": before a save the shell records which add-ons the file's data came from ({ id: version } under `usesAddons`);
+  // after an open it offers the ones this computer lacks, in a bar above the stage. The file's `addons` stay each add-on's own data.
+  let usedRecord = null;
+  function stampAddons(data) {
+    const f = window.ccAddonsFile;
+    const tmp = { addons: { ...(usedRecord || {}) } };
+    try {
+      const known = new Set([...(window.ccAddons?.list?.() || []).map((a) => (a.manifest && a.manifest.id) || a.id), ...((window.ccAddonsAccount?.items) || []).map((i) => i.id)]);
+      f?.stamp(tmp, Object.keys(data || {}).filter((id) => known.has(id)));
+    } catch (e) { console.warn('add-on record not stamped', e); }
+    return Object.keys(tmp.addons).length ? tmp.addons : null;
+  }
+  function offerAddons(raw) {
+    usedRecord = raw && typeof raw === 'object' && !Array.isArray(raw) ? Object.fromEntries(Object.entries(raw).slice(0, 200).filter(([k]) => /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(k)).map(([k, v]) => [k, String(v ?? '').replace(/[^\x20-\x7e]/g, '').slice(0, 40)])) : null;
+    let el = document.querySelector('[data-addons-banner]');
+    if (!el) { el = document.createElement('div'); el.dataset.addonsBanner = ''; el.className = 'mc-note'; el.hidden = true; ui.stage.parentElement?.insertBefore(el, ui.stage); }
+    el.hidden = true; el.textContent = '';
+    try { window.ccAddonsFile?.offer({ addons: usedRecord || {} }, el); el.hidden = !el.childNodes.length; } catch (e) { console.warn('add-on offer failed', e); }
+  }
   const modelText = () => {
     // the file keeps the current camera and style for next time, outside the undo history
     const j = model.toJSON();
@@ -2323,14 +2741,24 @@ function init(root) {
     if (imgs.length) j.images = imgs;   // 0.5 RC.11 (b): imported textures, beside the model (outside undo)
     const mats = fileMaterials.toJSON();
     if (mats) j.materials = mats;   // 0.7 MT.1: the file's node materials, beside the model (outside undo, like images)
+    if (sayState) j.view.say = sayState;   // 0.8 EG.61 (an optional key: no new file version)
     if (renderSettings) j.view.render = renderSettings;   // 0.5 RC.11: the Render dialog's settings and looks
+    { const ad = docData.toJSON(); if (ad) j.addons = ad; }   // 0.8: add-on data, whether or not the add-on is loaded
+    if (modelFormat) j.numberFormat = modelFormat;   // 0.8 D8.6: precision + text sizes (an optional key, outside undo)
+    { const u = stampAddons(docData.toJSON()); if (u) j.usesAddons = u; }   // 0.8 AL.6 "This file uses …": which add-ons the file's data came from (an optional key)
+    if (modelSite) j.site = modelSite;   // 0.8 EG.63 (an optional key with its own v: no new file version)
+    if (modelInfo) j.info = modelInfo;   // 0.7.1 71.13: Model info › About (an optional key: no new file version)
+    shell?.save(j);   // 0.8 round 3: calc sheets + design reasons (`calcs`, `reasons`: optional keys, outside undo)
     if (scatterSets.length) j.view.scatter = scatterSets;   // 0.7 RT.5: scatter sets (cleaned by rt/rt-scatter.js cleanScatter on use)
     if (videoSettings) j.view.video = videoSettings;   // 0.6 LC.10: the Render video dialog's choices
     const an = timeline && timeline.toJSON();
     if (an) j.anim = an;   // 0.6 LC.10: the animation (render/anim.js; checked again on open)
     const iss = xrmc && xrmc.toJSON();
     if (iss) j.issues = iss;   // 0.6 LC.19: issues (placed in VR), pictures as base64 PNG; checked again on open
-    return JSON.stringify(j);
+    const arA = xrmc && xrmc.arJSON();
+    if (arA) j.arAlignment = arA;   // 0.8 EG.21: where the model sits on the site (an optional key: no new file version)
+    const { view: lastView, ...restOfFile } = j;   // 0.8 DC.27 H3: the camera changes on every save, so it goes last
+    return prettyJson({ ...restOfFile, view: lastView });
   };
   let usdOpenNote = '';
   /** Save as (0.7 XF.9): .modelcraft (what Save writes), or USD as text, binary or a package — nothing lost either way. */
@@ -2371,6 +2799,47 @@ function init(root) {
     print(r.how === 'written' ? t('app.save.written', { file: r.path || r.name || name }) : t('app.save.downloaded', { file: name }));
     return true;
   }
+  // ---- 0.8 SU.747b (round 3, model_PART_3): NURBS curves and surfaces — the shared Surfaces panel (nurbs-ui/) over cc-nurbs (nurbs/),
+  // ModelCraft's adapter surfaces-mc.js. Loaded on first use, or at once when an opened file carries a patch set (addons.nurbs). ----
+  let surfaces = null, surfacesLoading = null;
+  const surfBox = root.querySelector('[data-nurbs]');
+  function openSurfaces() {
+    surfacesLoading ??= import('./surfaces-mc.js').then(({ mountSurfacesMc }) => {
+      surfaces = mountSurfacesMc({ box: surfBox, model, view, cam, tools, docData, t, print, base, afterDraw, over: ui.over,
+        save: (name, text, type) => download(new Blob([text], { type }), name, type),
+        open: async (exts) => { const [f] = await fileHost.openFile({ types: [{ description: t('nurbs.ui.title'), extensions: exts }] }).catch(() => []); return f ? { name: f.name, text: await f.text() } : null; } });
+      window.modelcraft.surfaces = surfaces;
+      return surfaces;
+    });
+    return surfacesLoading;
+  }
+  root.querySelector('[data-nurbs-open]')?.addEventListener('click', () => openSurfaces());
+  { const nd = docData.forAddon('nurbs'); nd.onOpen(() => { if (!surfaces && nd.data('doc')) openSurfaces(); }); }
+  // ---- 0.8 DC.54 (round 3, nodes_PART_3): the node editor — wire numbers into points, curves and surfaces; every node is also a line of script.
+  // The shared window (assets/js/app-nodes.js) over cc-nodes (nodes/), ModelCraft's adapter nodes-mc.js. Loaded on first use, or at once when an
+  // opened file carries a graph (addons.nodes). ----
+  let nodesEd = null, nodesLoading = null;
+  /** Bake to model (the node window's button): each mesh (mm, Z up) becomes a mesh group in the open context, all in ONE undo step. */
+  function bakeNodeMeshes(meshes) {
+    const ctxId = model.context(host.path).def.id;
+    return model.change(t('nodes.bake.undo'), (m) => {
+      const made = [];
+      for (const me of meshes) {
+        const P = me.positions, polys = [];
+        for (let i = 0; i + 2 < me.indices.length; i += 3) polys.push([0, 1, 2].map((k) => { const v = me.indices[i + k] * 3; return [P[v] / 1000, P[v + 1] / 1000, P[v + 2] / 1000]; }));
+        const def = meshDef(m, polys, me.name);
+        m.place(m.context(host.path).def, def.id, ident());
+        made.push(def);
+      }
+      return made;
+    }, [ctxId]);
+  }
+  function openNodes() {
+    nodesLoading ??= import('./nodes-mc.js').then(({ mountNodesMc }) => mountNodesMc({ parent: root, view, docData, t, bake: bakeNodeMeshes, status: print })).then((n) => { nodesEd = n; window.modelcraft.nodes = n; return n; });
+    return nodesLoading.then((n) => { n.show(); return n; });
+  }
+  root.querySelector('[data-nodes-open]')?.addEventListener('click', () => openNodes());
+  { const nd = docData.forAddon('nodes'); nd.onOpen(() => { if (!nodesEd && nd.data('graph')) openNodes().then((n) => n.hide()); }); }
   // spikes (0.5): menu items that show only with ?spike=<name> in the address (lab experiments, never on by default)
   { const sp = new URLSearchParams(location.search).get('spike'); root.querySelectorAll('[data-spike]').forEach((b) => { b.hidden = b.dataset.spike !== sp; }); }
   let liveView = null;   // 0.7 RT.3 (session realtime): the live view, one at a time
@@ -2406,6 +2875,8 @@ function init(root) {
           download: (blob, name) => download(blob, name, blob.type || 'application/octet-stream'),   // 0.7 RN.9: PNG, 16-bit PNG, JPEG, WebP, EXR, .ccrender
           appName: 'ModelCraft',
           fileBase: base,
+          // 0.8 RE.2/RE.6 (engines' hand-over, mounted by model_PART_3): the package another engine renders (USD, + glTF for "Open in …")
+          handoff: async (s, z) => { const { mcHandoff } = await import('./handoff-mc.js'); return mcHandoff({ model, cam, style: view.style, file: JSON.parse(modelText()), name: base() })(s, z); },
           onClose: () => { view.invalidate(); ui.over.focus({ preventScroll: true }); },
           parent: root,
         });
@@ -2483,6 +2954,51 @@ function init(root) {
    * printer bed from Settings. The modules load on first use.
    */
   let printReady = -1;   // model.version of the last check that said ready (the guided first model's last step)
+  // 0.8 P.6 (round 3, model_PART_3): the print check as a source of the shell's Problems (problems-modelcraft.js; docs/0.8-PROBLEMS-SPEC.md).
+  // The check is the person's own action (it can be heavy), so print3d() pushes each result; a model change clears it; markers sit at the
+  // first place the check found each problem (mm → the model's meters, drawn over the view).
+  {
+    const go = () => {
+      const P = window.ccProblems;
+      if (!P) return;
+      printSrc = P.source({ id: 'modelcraft.print', kind: 'check', label: t('problems.src.print'),
+        fix: async (p, f) => {
+          if (f.action !== 'repair' || !printRep || printAt !== model.version) return false;
+          const PP = await import('./printprep.js');
+          const r = PP.fixParts(model, PP.partsToFix(model, printChoice, printRep).filter((x) => x.fixable), t('app.undo.prep_fix'));
+          afterHistory();
+          await checkForPrint();   // check again, so the panel shows what is left
+          return !!(r.stray || r.inner || r.flipped || r.holes);
+        } });
+      P.adapter({ t, file: () => base(), select: () => {}, focus: () => {} });
+      P.markers({
+        stage: ui.gl.parentElement,
+        anchor: (p) => {   // mm (the print check's first place, a surface edge's worst point) → the model's metres
+          const a = printAnchors.get(p.id);
+          if (a) return printAt === model.version ? a.map((v) => v / 1000) : null;
+          return p.where?.space === '3d' && Array.isArray(p.where.at) ? p.where.at.map((v) => v / 1000) : null;
+        },
+        toScreen: (pt) => {
+          const q = cam.project(pt);
+          if (!q || q[2] > 1) return { x: 0, y: 0, behind: true };
+          const r = ui.gl.getBoundingClientRect(), s = ui.gl.parentElement.getBoundingClientRect();
+          return { x: q[0] * (r.width / cam.w) + (r.left - s.left), y: q[1] * (r.height / cam.h) + (r.top - s.top) };
+        },
+        onView: (fn) => { afterDraw.add(fn); return () => afterDraw.delete(fn); },
+      });
+    };
+    if (document.getElementById('cc-problems')) { if (window.ccProblems) go(); else document.addEventListener('cc-problems-ready', go, { once: true }); }
+  }
+  /** The print check on what print3d() would check, pushed to Problems; returns what the dialog needs. */
+  async function checkForPrint() {
+    const [P, { printTriangles }, PP] = await Promise.all([import('./print3d.js'), import('./print-mc.js'), import('./printprep.js')]);
+    const choice = { path: host.path, sel: host.sel };
+    const { tris, what } = printTriangles(model, choice);
+    const bed = PP.bedSize(settings.bed);
+    const rep = P.printCheck(P.meshFromTriangles(tris), { bed });
+    if (printSrc) { const r = printProblems(rep, { t, bed }); printAnchors = r.anchors; printRep = rep; printChoice = choice; printAt = model.version; printSrc.set(r.problems); }
+    return { P, PP, choice, what, bed, rep };
+  }
   // 0.7 LC.21 (session print-07): Supports preview, Wall thickness, Hollow, Repair — a card over the view (print-ui.js, loaded on first use)
   let printTools = null;
   async function openPrintTool(name) {
@@ -2496,13 +3012,9 @@ function init(root) {
     await beginner.run(b.dataset.beginner);
   }));
   async function print3d() {
-    const [P, { printTriangles }, PP] = await Promise.all([import('./print3d.js'), import('./print-mc.js'), import('./printprep.js')]);
-    const choice = { path: host.path, sel: host.sel };
-    const { tris, what } = printTriangles(model, choice);
     print(t('app.print3d.checking'));
     await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
-    const bed = PP.bedSize(settings.bed);
-    const rep = P.printCheck(P.meshFromTriangles(tris), { bed });
+    const { P, PP, choice, what, bed, rep } = await checkForPrint();
     const plain = PP.plainReport(rep);
     const parts = plain.fix ? PP.partsToFix(model, choice, rep) : [];
     if (rep.ok) printReady = model.version;
@@ -2537,7 +3049,7 @@ function init(root) {
       lookRows.length ? el('ul', { className: 'mc-print-warnings', dataset: { printWarnings: '' } }, ...lookRows.map(row)) : null,
       facts,
       plain.fix && !parts.length && plain.verdict !== 'empty' ? el('p', { className: 'mc-note' }, t('app.print3d.fixhint')) : null,
-      rep.triangles ? el('p', { className: 'mc-prep-tools', dataset: { prepTools: '' } }, el('span', {}, t('app.ptool.lead')), ...['supports', 'walls', 'hollow', 'repair'].map((k) => el('button', { type: 'button', className: 'mc-linkbtn', dataset: { key: 'tool:' + k } }, t('app.ptool.' + k + '.open')))) : null);   // 0.7 LC.21 print-07
+      rep.triangles ? el('p', { className: 'mc-prep-tools', dataset: { prepTools: '' } }, el('span', {}, t('app.ptool.lead')), ...['supports', 'walls', 'hollow', 'repair', 'split'].map((k) => el('button', { type: 'button', className: 'mc-linkbtn', dataset: { key: 'tool:' + k } }, t(k === 'split' ? 'sx.split.open' : 'app.ptool.' + k + '.open')))) : null);   // 0.7 LC.21 print-07; 'split' 0.8 SU.929 sx-split
     print(plain.verdict === 'fix' ? t('app.prep.verdict.fix', { n: plain.fix }) : t(rep.ok ? 'app.print3d.ready' : 'app.print3d.notready'));
     const buttons = !rep.triangles ? [['cancel', t('app.btn.close'), 'btn-plot']]
       : [['cancel', t('app.btn.cancel'), 'btn-line'], ...(fixable ? [['fix', t('app.prep.fixall'), 'btn-line']] : []), ['stl', t('app.print3d.stl'), 'btn-line'], ['3mf', t('app.print3d.3mf'), rep.ok ? 'btn-plot' : 'btn-line']];
@@ -2647,8 +3159,15 @@ function init(root) {
   const isUsdFile = (f) => /\.(usd|usda|usdc|usdz)$/i.test(f.name);
   const bytesOf = async (f) => (typeof f.bytes === 'function' ? new Uint8Array(await f.bytes()) : new Uint8Array(await f.arrayBuffer()));
   /** A file from the host (picker, double-click, recent list, drop): a model opens, anything else is imported. */
+  let siteCtx = null;
   async function openFromHost(hf, { asked = false, others = [] } = {}) {
     if (!hf) return;
+    // 0.8 EG.63: CivilCraft's address-to-site file is taken as suggestions, never opened as a model
+    if (/\.ccsite\.json$/i.test(hf.name || '')) {
+      const { mountSiteContext } = await import('./site-ctx-mc.js');
+      siteCtx = siteCtx || mountSiteContext({ model, t, print, afterHistory, keepSite: (site) => { modelSite = site; model.dirty = true; } });
+      if (await siteCtx.receive({ name: hf.name, text: async () => new TextDecoder().decode(await bytesOf(hf)) })) return;
+    }
     if (!isModelFile(hf)) { await importFile(hf, others); return; }
     if (!asked && !(await confirmDiscard())) return;
     if (await openFile(hf)) saveTarget = hf.writable ? hf : null;
@@ -2682,11 +3201,19 @@ function init(root) {
       sceneIndex = -1;
       const v = j.view && cleanScene({ name: 'v', cam: j.view.cam, style: j.view.style });
       if (v) { cam.set(v.cam); view.style = v.style; perspBtn.setAttribute('aria-checked', String(cam.persp)); } else zoomExtents();
+      sayState = cleanSay(j.view && j.view.say);   // 0.8 EG.61 (untrusted: checked)
       renderSettings = j.view && j.view.render && typeof j.view.render === 'object' ? j.view.render : null;   // cleaned when the dialog opens
+      modelInfo = cleanInfo(j.info);   // 0.7.1 71.13 (untrusted: checked)
+      { const r = j.site === undefined ? null : cleanSite(j.site); modelSite = r?.ok ? r.site : null; if (r && !r.ok) print(t(r.why === 'newer' ? 'model.sitectx.filenewer' : 'model.sitectx.filebad')); }   // 0.8 EG.63 (untrusted; a newer site block is left out, said so)
+      modelFormat = cleanFormat(j.numberFormat); applyFormat();   // 0.8 D8.6 (untrusted: checked)
       scatterSets = j.view && Array.isArray(j.view.scatter) ? j.view.scatter.slice(0, 64) : [];   // 0.7 RT.5: cleaned on use
       videoSettings = j.view && j.view.video && typeof j.view.video === 'object' ? j.view.video : null;   // 0.6 LC.10, cleaned when the dialog opens
       timeline.load(j.anim);   // 0.6 LC.10 (untrusted: checked)
       xrmc.load(j.issues);   // 0.6 LC.19 (untrusted: checked)
+      xrmc.loadAr(j.arAlignment);   // 0.8 EG.21 (untrusted: checked)
+      docData.load(j.addons);   // 0.8 (untrusted: checked; add-ons hear onOpen)
+      offerAddons(j.usesAddons);   // 0.8 AL.6: offer the add-ons this file used that this computer lacks
+      shell?.load(j); shell?.opened();   // 0.8 round 3: the file's calc sheets and reasons; Suggest drops what was pending
       showUnits();
       styleToUi(); renderScenes(); setTool('select'); hideHint();
       scheduleInfo(); view.invalidate();
@@ -2699,10 +3226,118 @@ function init(root) {
       return false;
     }
   }
+  /** 0.8 EG.60 (round 3): Organize › Furnish a room… — the selected floor face furnished by the shared planner (furnish-mc.js over lib/furnish)
+   *  with the starter library's furniture, one group on the Furniture tag, one undo step; what did not fit goes to Problems as notes. */
+  let furnishSrc = null;
+  async function furnishSelected() {
+    const s = host.sel.length === 1 && host.sel[0].t === 'f' ? host.sel[0] : null;
+    const F = await import('./furnish-mc.js');
+    const room = s && F.roomOfFace(model, host.path, s.id);
+    if (!room) { print(t('eg60.mc.pick')); return; }
+    const open = F.openingsNear(model, room);
+    const kind = el('select', { className: 'select-cc', dataset: { furnishKind: '' } }, el('option', { value: '' }, t('eg60.kind.guess')), ...F.KINDS.map((k) => el('option', { value: k }, t('eg60.kind.' + k))));
+    const body = el('div', { className: 'mc-props' },
+      el('p', { className: 'mc-note span' }, t('eg60.intro')),
+      el('p', { className: 'mc-note span', dataset: { furnishRoom: '' } }, t('eg60.mc.room', { area: (Math.round(room.area * 10) / 10).toLocaleString(), doors: open.doors.length, windows: open.windows.length })),
+      el('label', {}, t('eg60.kind')), kind);
+    if (await ask({ title: t('eg60.title'), body, buttons: [['cancel', t('app.btn.cancel'), 'btn-line'], ['go', t('eg60.go'), 'btn-plot']] }) !== 'go') return;
+    const planned = F.planRoom(model, { path: host.path, fid: s.id, kind: kind.value || null });
+    const kindWord = t('eg60.kind.' + planned.kind);
+    if (!planned.plan.placements.length) { print(t('eg60.mc.none', { kind: kindWord })); return; }
+    const [{ buildStarter }, { footprint }] = await Promise.all([import('./starter.js'), import('./furnish.js')]);
+    tools.escape();
+    const group = t('eg60.mc.group', { kind: kindWord });
+    const out = model.change(t('eg60.mc.undo'), (m) => F.furnishRoom(m, planned, { path: host.path, names: { group, tag: t('eg60.mc.tag') }, buildStarter, starterName: (id) => t('app.starter.' + id), footprint }));
+    host.setSel([{ t: 'i', id: out.instance }]);
+    tagsDrawn = ''; afterHistory();
+    const skipped = planned.plan.skipped.map((x) => t('app.starter.' + (F.STARTER_OF[x.family] || 'table')));
+    print(t('eg60.mc.done', { kind: kindWord, n: out.placed.length, group }) + (planned.guessed ? ' ' + t('eg60.guessed') : '') + (skipped.length ? ' ' + t('eg60.skipped', { list: skipped.join(', ') }) : ''));
+    // what did not fit: shared Problems notes (rule 29), about this room's group
+    const P = window.ccProblems;
+    if (P && document.getElementById('cc-problems')) {
+      furnishSrc ??= P.source({ id: 'modelcraft.furnish', kind: 'check', label: t('problems.src.furnish') });
+      const { furnishProblems } = await import('./furnish.js');
+      furnishSrc.set(furnishProblems({}, planned.plan, { id: 'i:' + out.instance, label: group, t }).map((p) => ({ ...p, source: { name: 'modelcraft.furnish' }, text: t(p.msg.key, { ...p.msg.vars, piece: t('app.starter.' + (F.STARTER_OF[p.msg.vars.piece] || 'table')) }) })));
+    }
+  }
+  // ---- 0.8 DC.117 (session `cabinetcraft_hosts`): the model host add-ons reach through api.model (assets/js/addons.js, API 1.4): read the model, put display bodies in it (one undo
+  // step, a tagged group of real faces: addon-bodies-mc.js), and the room the selected floor face makes (furnish-mc.js roomOfFace / openingsNear, as Furnish a room uses them).
+  {
+    window.ccAddonModel = {
+      current: () => ({ name: fileName }),
+      read: (fn) => fn(model),
+      async addBodies(owner, group, bodies, opts = {}) {
+        const AB = await import('./addon-bodies-mc.js');
+        const r = AB.placeBodies(model, { owner, ownerName: opts.ownerName, group, bodies, name: opts.name, label: opts.label || (opts.ownerName || owner), at: opts.at || [0, 0, 0] });
+        tagsDrawn = ''; afterHistory();
+        return r.count;
+      },
+      async removeBodies(owner, group, opts = {}) {
+        const AB = await import('./addon-bodies-mc.js');
+        const was = AB.removeBodies(model, { ownerName: opts.ownerName, group, label: opts.label || (opts.ownerName || owner) });
+        if (was) { tagsDrawn = ''; afterHistory(); }
+        return was;
+      },
+      bodies: (owner) => { const AB = addonBodiesLoaded; return AB ? AB.listBodies(model, owner, window.ccAddons?.list?.().find((a) => (a.manifest && a.manifest.id) === owner)?.manifest?.name) : []; },
+      async rooms() {
+        const s = host.sel.length === 1 && host.sel[0].t === 'f' ? host.sel[0] : null;
+        const F = await import('./furnish-mc.js');
+        const room = s && F.roomOfFace(model, host.path, s.id);
+        if (!room) return [];
+        const open = F.openingsNear(model, room);
+        return [{ name: fileName, poly: room.poly, holes: room.holes, z: Math.round(room.z * 1000), area: room.area * 1e6, doors: open.doors, windows: open.windows }];
+      },
+    };
+    let addonBodiesLoaded = null;
+    import('./addon-bodies-mc.js').then((m) => { addonBodiesLoaded = m; }).catch(() => {});
+  }
+  /** 0.8 EG.36 (round 3): File › Import a sketch photo… — a photo of a hand sketch becomes edges on the ground (sketch-photo-mc.js over the
+   *  shared cc-photosketch): the paper is found and straightened, each pen colour is a group with its own tag, one undo step. */
+  async function importSketchPhoto() {
+    const [f] = await fileHost.openFile({ types: [{ description: t('mc.sketch.file'), extensions: ['.jpg', '.jpeg', '.png', '.tif', '.tiff'] }] }).catch((err) => { print(t('app.open.failed', { error: err.message })); return []; });
+    if (!f) return;
+    const SK = await import('./sketch-photo-mc.js');
+    const paper = el('select', { className: 'select-cc', dataset: { sketchPaper: '' } }, el('option', { value: 'auto' }, t('mc.sketch.paper.auto')), ...SK.PAPERS.map((p) => el('option', { value: p.key }, t('mc.sketch.paper.' + p.key))));
+    const scale = el('input', { className: 'mc-input mc-num', type: 'number', min: '1', max: '100000', step: '1', value: String(model.units === 'ft-in' || model.units === 'in' ? 48 : 100), dataset: { sketchScale: '' } });
+    const colours = el('input', { type: 'checkbox', checked: true, dataset: { sketchColours: '' } });
+    const body = el('div', { className: 'mc-props' },
+      el('label', {}, t('mc.sketch.paper')), paper,
+      el('label', {}, t('mc.sketch.scale')), el('span', { className: 'mc-inline' }, '1 : ', scale),
+      el('label', {}, t('mc.sketch.colours')), colours,
+      el('p', { className: 'mc-note span' }, t('mc.sketch.note')));
+    if (await ask({ title: t('mc.sketch.h', { file: f.name }), body, buttons: [['cancel', t('app.btn.cancel'), 'btn-line'], ['go', t('mc.sketch.go'), 'btn-plot']] }) !== 'go') return;
+    const n = Math.round(Number(scale.value));
+    if (!(n >= 1 && n <= 100000)) { print(t('mc.sketch.bad_scale')); return; }
+    print(t('mc.sketch.reading', { file: f.name }));
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    let res;
+    try {
+      res = await SK.sketchPhoto(await bytesOf(f), { paper: paper.value, scale: n, colours: colours.checked, decodeJpeg: async (b) => {
+        const bmp = await createImageBitmap(new Blob([b])), c = new OffscreenCanvas(bmp.width, bmp.height), g = c.getContext('2d');
+        g.drawImage(bmp, 0, 0); const rgba = g.getImageData(0, 0, bmp.width, bmp.height).data, data = new Uint8Array(bmp.width * bmp.height * 3);
+        for (let i = 0, j = 0; i < rgba.length; i += 4, j += 3) { data[j] = rgba[i]; data[j + 1] = rgba[i + 1]; data[j + 2] = rgba[i + 2]; }
+        return { w: bmp.width, h: bmp.height, channels: 3, data };
+      } });
+    } catch (err) { print(t('mc.sketch.failed', { error: String(err?.message || err) })); return; }
+    if (!res.entities.length) { print(t('mc.sketch.empty', { file: f.name })); return; }
+    tools.escape();
+    const names = Object.fromEntries(['black', 'red', 'blue', 'green'].map((k) => [k, t('mc.sketch.tag.' + k)]));
+    const out = model.change(t('mc.sketch.undo'), (m) => SK.addSketch(m, res, { name: t('mc.sketch.group', { file: f.name.replace(/\.[^.]+$/, '').slice(0, 60) }), into: m.context(host.path).def, names }));
+    tagsDrawn = ''; afterHistory();   // the Tags panel lists the new colour tags
+    print(t('mc.sketch.done', { edges: out.edges, n: out.groups.length, scale: n }) + ' ' + t(res.found ? 'mc.sketch.found' : 'mc.sketch.whole'));
+  }
   async function importFile(file, companions = []) {
+    if (/\.ccbundle$|ccbundle\.zip$/i.test(file.name)) {   // 0.8 BIM-BUNDLE-OPEN: a project bundle imports its first drawing (no IFC reader here; shared reader and plan, ./bundle/plan.js)
+      const r = await (await import('./bundle/plan.js')).expandBundles([file], 'modelcraft', { prefer: ['dwg'], limit: 1 });
+      const n = r.notes[0];
+      if (!n || n.code === 'failed') { print(t('bundle.failed', { file: file.name, why: n ? n.why : '' })); return; }
+      if (n.code === 'empty' || !r.files.length) { print(t('bundle.nodrawing', { file: file.name })); return; }
+      print(t('bundle.drawing', { file: file.name }));
+      return importFile(r.files[0], companions);
+    }
     const ext = (file.name.match(/\.([a-z0-9]+)$/i)?.[1] || '').toLowerCase();
     const name = file.name.replace(/\.[^.]+$/, '').slice(0, 80) || t('app.import.default');
-    if (!['skp', 'dae', 'obj', 'glb', 'gltf', 'dwg', 'dxf', 'ply', 'stl', 'abc', 'fbx', 'usd', 'usda', 'usdc', 'usdz', 'step', 'stp', '3dm'].includes(ext)) { print(t('app.import.kind', { file: file.name })); return; }
+    if (!['skp', 'dae', 'obj', 'glb', 'gltf', 'dwg', 'dxf', 'ccbundle', 'ply', 'stl', 'abc', 'fbx', 'usd', 'usda', 'usdc', 'usdz', 'step', 'stp', '3dm'].includes(ext)) { print(t('app.import.kind', { file: file.name })); return; }
     try {
       if ((file.size || 0) > 300 * 1048576) throw new Error(t('app.import.toobig'));
       tools.escape();
@@ -2978,6 +3613,14 @@ function init(root) {
       ...cats.map((c) => el('section', { className: 'mc-starter' }, el('h3', { className: 'mc-h' }, t('app.starter.cat.' + c)),
         el('div', { className: 'mc-starter-grid' }, ...STARTER.filter((s) => s.cat === c).map((s) => el('button', { type: 'submit', className: 'btn-line btn-sm-cc', value: s.id, dataset: { starter: s.id } }, t('app.starter.' + s.id)))))),
       el('div', { className: 'mc-dialog-foot' }, el('button', { type: 'button', className: 'btn-line btn-sm-cc', dataset: { key: 'cancel' } }, t('app.btn.cancel'))));
+    // 0.8 LD.1: the shared plant list (about 420 species) — search by any name; the first 48 matches are buttons
+    const plantGrid = el('div', { className: 'mc-starter-grid', dataset: { plants: '' } }), plantQ = el('input', { type: 'search', className: 'mc-input', dataset: { plantSearch: '' }, 'aria-label': t('app.starter.plants.search'), placeholder: t('app.starter.plants.search') });
+    form.insertBefore(el('section', { className: 'mc-starter' }, el('h3', { className: 'mc-h' }, t('app.starter.cat.plants')), el('p', { className: 'mc-note' }, t('app.starter.plants.note')), plantQ, plantGrid), form.lastElementChild);
+    import('./starter.js').then(async ({ plantList }) => {
+      const [{ search, displayName }, all] = [await import('./plants/plants.js'), await plantList()];
+      const draw = () => plantGrid.replaceChildren(...search(all, plantQ.value).slice(0, 48).map((sp) => el('button', { type: 'submit', className: 'btn-line btn-sm-cc', value: 'plant:' + sp.key, dataset: { starter: 'plant:' + sp.key }, title: sp.botanical }, displayName(sp, i18n.locale()))));
+      plantQ.addEventListener('input', draw); draw();
+    }).catch(() => plantGrid.append(el('p', { className: 'mc-note' }, t('app.starter.plants.err'))));
     const dlg = el('dialog', { className: 'mc-dialog mc-dialog-wide', 'aria-labelledby': 'mc-sl-h' }, form);
     dlg.addEventListener('click', (e) => { if (e.target.closest('button[data-key="cancel"]')) dlg.close(); });
     dlg.addEventListener('close', () => { const id = dlg.returnValue; dlg.remove(); focusView(); if (id && id !== 'cancel') placeStarter(id); });
@@ -2985,13 +3628,15 @@ function init(root) {
     dlg.showModal();
   });
   async function placeStarter(id) {
-    const { STARTER, buildStarter } = await import('./starter.js');
-    const it = STARTER.find((s) => s.id === id);
+    const { STARTER, buildStarter, buildPlant, plantList } = await import('./starter.js');
+    let plant = null;
+    if (id.startsWith('plant:')) { plant = (await plantList()).find((s) => 'plant:' + s.key === id); if (!plant) return; }
+    const it = plant ? { id } : STARTER.find((s) => s.id === id);
     if (!it) return;
-    const name = t('app.starter.' + id);
+    const name = plant ? (await import('./plants/plants.js')).displayName(plant, i18n.locale()) : t('app.starter.' + id);
     // one definition per starter thing: picking it again places another copy of the same component
     let def = [...model.defs.values()].find((d) => d.kind === 'component' && d.starter === id);
-    if (!def) def = model.change(t('app.undo.starter'), (m) => { const d = buildStarter(m, id, name); d.starter = id; return d; }, []);
+    if (!def) def = model.change(t('app.undo.starter'), (m) => { const d = plant ? buildPlant(m, plant, name) : buildStarter(m, id, name); d.starter = id; return d; }, []);
     afterHistory();
     const hint = () => t(it.wall ? 'app.starter.where_wall' : 'app.starter.where', { name });
     setTool('place', { defId: def.id, align: true, hint });
@@ -3100,13 +3745,22 @@ function init(root) {
     root.append(dlg);
     dlg.showModal();
   }
+  // ---- 0.8 SU.934: Scale by factors… (scale-nu.js, scale-dialog.js) ----
+  async function scaleByDialog() {
+    closeMenus(); tools.escape();
+    const sel = host.sel.filter((s) => s.t === 'e' || s.t === 'f' || s.t === 'i');
+    if (!sel.length) { print(t('sx.scale.none')); return; }
+    const { openScaleDialog } = await import('./scale-dialog.js');
+    openScaleDialog({ root, t, model, path: host.path, sel, formatLength, label: t('sx.scale.undo'), say: print,
+      done: (r) => { focusView(); if (r) { host.setSel(sel); scheduleInfo(); view.invalidate(); print(t('sx.scale.done', { n: r.n })); } } });
+  }
   // ---- 3D text (0.4 M11): a dialog, then the text as a component that lies on the face you click ----
   let textLast = { text: '', height: null, depth: 0 };
   function text3dDialog() {
     const u = model.units;
     const field = (id, label, inp) => [el('label', { for: id }, label), inp];
     const txt = el('textarea', { id: 'mc-t3-text', className: 'mc-input', rows: 3, maxLength: 400, spellcheck: false }, textLast.text);
-    const h = el('input', { type: 'text', id: 'mc-t3-h', className: 'mc-input', value: formatLength(textLast.height ?? (u === 'ft-in' || u === 'in' ? 0.3048 : 0.3), u), autocomplete: 'off' });
+    const h = el('input', { type: 'text', id: 'mc-t3-h', className: 'mc-input', value: formatLength(textLast.height ?? modelFormat?.textHeight ?? (u === 'ft-in' || u === 'in' ? 0.3048 : 0.3), u), autocomplete: 'off' });
     const dpt = el('input', { type: 'text', id: 'mc-t3-d', className: 'mc-input', value: formatLength(textLast.depth, u), autocomplete: 'off' });
     const err = el('p', { className: 'mc-note', role: 'alert' });
     const form = el('form', { method: 'dialog' },
@@ -3143,6 +3797,44 @@ function init(root) {
     setTool('place', { defId, align: true, hint: () => t('app.text3d.where') });
     print(t('app.text3d.where'));
   }
+  // ---- 0.7.1 71.13: Model info… (per model, in the file) and Preferences… (this browser: Settings › ModelCraft) ----
+  async function openModelInfoDialog() {
+    closeMenus(); tools.escape();
+    const { openModelInfo } = await import('./model-info-ui.js');
+    openModelInfo({ root, t, model, ui, view, getInfo: () => modelInfo,
+      getFormat: () => modelFormat,
+      setFormat: (v) => { if (JSON.stringify(v) === JSON.stringify(modelFormat)) return; modelFormat = v; applyFormat(); model.dirty = true; },   // outside undo, like info
+      setInfo: (v) => { if (JSON.stringify(v) === JSON.stringify(modelInfo)) return; modelInfo = v; model.dirty = true; },   // outside undo, like images
+      fileName: () => fileName, fileText: () => modelText(), renderSettings: () => renderSettings, materials: () => fileMaterials.mats.size,
+      openRender: () => root.querySelector('[data-export="render"]')?.click(), focusView });
+  }
+  /** Preferences = the Settings dialog on ModelCraft's tab (app-wide settings live there; nothing kept twice). */
+  function openPreferences() {
+    closeMenus();
+    document.querySelector('[data-settings-open]')?.click();
+    settingsDlg?.querySelector('[data-settings-tab="app"]')?.click();
+    templateState();
+  }
+  /** Settings › ModelCraft › New models: what the stored start holds, in words. */
+  function templateState() {
+    const out = settingsDlg?.querySelector('[data-mc-template-state]');
+    if (!out) return;
+    const tpl = readTemplate(MC_UNITS);
+    out.textContent = tpl ? t('mi.tpl.state', { unit: unitWords(tpl.units || model.units), mode: t('ui.style.mode.' + (tpl.style?.mode || 'shaded')), lat: tpl.sun?.lat ?? '—', lon: tpl.sun?.lon ?? '—' }) : t('mi.tpl.none');
+    const clr = settingsDlg.querySelector('[data-mc-template-clear]');
+    if (clr) clr.disabled = !tpl;
+  }
+  if (settingsDlg) {
+    settingsDlg.addEventListener('click', (e) => {
+      if (e.target.closest('[data-mc-template-save]')) { writeTemplate(templateOf(model.units, view.style)); templateState(); print(t('mi.tpl.saved')); }
+      else if (e.target.closest('[data-mc-template-clear]')) { writeTemplate(null); templateState(); print(t('mi.tpl.cleared')); }
+      else if (e.target.closest('[data-settings-tab="app"]')) templateState();
+    });
+    settingsDlg.addEventListener('cc-settings-reset', () => { writeTemplate(null); templateState(); });
+    document.querySelector('[data-settings-open]')?.addEventListener('click', () => templateState());
+  }
+  window.modelcraft.fileText = () => modelText();   // tests: what Save writes
+
   async function confirmDiscard() {
     if (!model.dirty) return true;
     const c = await ask({ title: t('app.unsaved.h'), text: t('app.unsaved.text'), buttons: [['cancel', t('app.btn.cancel'), 'btn-line'], ['discard', t('app.unsaved.discard'), 'btn-line'], ['save', t('app.unsaved.save'), 'btn-plot']] });
@@ -3216,6 +3908,38 @@ function init(root) {
       () => print(t('app.handoff.failed')),
     );
   }
+  // 0.8 EG.78 (studio_PART_2): a mesh dragged here from another app (PartCraft's part as an OBJ, in metres) through Studio's drag
+  // module (window.cadcraftStudio.drag, hub/drag.js): it comes in as a group at the model's origin, one undo step, like a dropped file
+  window.cadcraftStudio?.drag?.accept({ mesh: async ({ file, name }) => { await importFile(file); return t('app.drop.mesh', { name }); } });
+  // 0.8 round 3 (model_PART_3): the shell's calc sheets, design reasons, running totals, lessons, Suggest, activity log and Ask box
+  // (docs/apps/shell-modules.md § Mounting; shell-mount.js). They ride on host.control (agents.js) and keep nothing of their own in the model.
+  const describeSel = (s) => {
+    if (s.t === 'i') { const inst = model.context(host.path)?.def.insts.get(s.id), d = inst && model.defs.get(inst.def); return inst?.name || d?.name || t('mc.shell.sel.group'); }
+    return t('mc.shell.sel.' + ({ f: 'face', e: 'edge', d: 'dimension', s: 'section', g: 'guide' }[s.t] || 'item'), { id: s.id });
+  };
+  shell = mountModelShell({
+    model, control: getHost({ app: 'modelcraft' }).control,
+    selection: () => host.sel, setSel: (s) => host.setSel(s), name: () => fileName, path: () => saveTarget?.path || '',
+    changed: () => { afterHistory(); },
+    onSelection: (fn) => { selListeners.add(fn); return () => selListeners.delete(fn); },
+    describe: (s) => describeSel(s),
+    guideFacts: () => guideFacts(model, { ready: printReady === model.version }),
+  });
+  // ---- drafting without sight (0.8 round 3, EG.52; assets/js/app-access.js): the groups and components of the open context in order, each said with its name and size; D counts what is there ----
+  {
+    const ctxDef2 = () => model.context(host.path)?.def;
+    const label = (iid, inst) => { const d = model.defs.get(inst.def); return t('mc.access.inst', { name: inst.name || d?.name || t('mc.shell.sel.group'), faces: d ? d.faces.size : 0 }); };
+    const goAccess = () => window.ccAccess.mount({
+      stage: ui.over, label: () => t('mc.access.stage'),
+      walk: () => { const d = ctxDef2(); return d ? [...d.insts].filter(([, i]) => !i.hidden).map(([id, i]) => ({ id, label: label(id, i) })) : []; },
+      describe: () => { const d = ctxDef2(); if (!d) return t('mc.access.empty'); const n = [...d.insts].filter(([, i]) => !i.hidden).length; return d.faces.size + n + d.edges.size === 0 ? t('mc.access.empty') : t('mc.access.context', { name: d.name || fileName || '', faces: d.faces.size, edges: d.edges.size, n, sel: host.sel.length }); },
+      selection: () => host.sel.length ? t('mc.access.selected', { n: host.sel.length, what: host.sel.slice(0, 5).map((s) => describeSel(s)).join('; ') }) : t('mc.access.nosel'),
+      pick: (p, item) => { if (item) { host.setSel([{ t: 'i', id: item.id }]); window.ccAccess.say(t('mc.access.selected', { n: 1, what: item.label })); } else window.ccAccess.say(t('mc.access.nosel')); },
+    });
+    const goStatus = () => { window.ccAccess.follow(ui.msg, { max: 240 }); window.ccAccess.follow(ui.tip, { max: 160 }); };
+    for (const f of [goAccess, goStatus]) { if (window.ccAccess) f(); else document.addEventListener('cc-access-ready', f, { once: true }); }
+  }
+  window.modelcraft.shell = shell;
 }
 
 export { TOOL_NAMES, VIEWS, connected };

@@ -29,7 +29,7 @@
  * wearing their material.
  */
 import * as THREE from 'three';
-import { faceTris, faceNormal, smoothNormals, isMaterialPaint, isImagePaint, imageId, imageUV } from './model.js';
+import { faceTris, faceNormal, faceArea, smoothNormals, isMaterialPaint, isImagePaint, imageId, imageUV } from './model.js';
 import { Camera } from './camera.js';
 import { sunPosition } from './sun.js';
 import { invert, dot, mmul, IDENT } from './vec.js';
@@ -185,6 +185,30 @@ export function mcColors(model) {
     for (const f of def.faces.values()) if (!f.hidden) { const k = keyOf(f, paint); if (!k.startsWith('mat:') && !k.startsWith('img:')) n.set(k, (n.get(k) || 0) + 1); }   // materials and textures bring their own look
   });
   return [...n].sort((a, b) => b[1] - a[1]).map(([key, faces]) => ({ key, faces }));
+}
+
+/**
+ * The colours of the flat, upward-facing faces on screen (floors, paving, flat roofs, the ground) with their area in m², largest
+ * first, as the looks table keys them (0.8 EG.61: rain makes these shine). Library materials and pictures carry their own look and are left out.
+ */
+export function mcFlatColors(model, { minArea = 1 } = {}) {
+  const n = new Map();
+  model.walkShown((def, m, path, paint) => {
+    if (path.length && /^Scene /.test(model.root.insts.get(path[0])?.tag || '')) return false;   // the scene's own trees and people are not ground
+    for (const f of def.faces.values()) {
+      if (f.hidden) continue;
+      const nn = faceNormal(def, f);
+      const nz = m[2] * nn[0] + m[6] * nn[1] + m[10] * nn[2];   // the normal's z after the placement (rotation and uniform scale)
+      const len = Math.hypot(m[2] * nn[0] + m[6] * nn[1] + m[10] * nn[2], m[0] * nn[0] + m[4] * nn[1] + m[8] * nn[2], m[1] * nn[0] + m[5] * nn[1] + m[9] * nn[2]) || 1;
+      if (nz / len < 0.98) continue;
+      const k = keyOf(f, paint);
+      if (k.startsWith('mat:') || k.startsWith('img:')) continue;
+      const s = Math.cbrt(Math.abs(m[0] * (m[5] * m[10] - m[6] * m[9])));   // a uniform scale, enough for an area
+      const a = faceArea(def, f) * s * s;
+      n.set(k, (n.get(k) || 0) + a);
+    }
+  });
+  return [...n].filter(([, a]) => a >= minArea).sort((a, b) => b[1] - a[1]).map(([key, area]) => ({ key, area: Math.round(area * 100) / 100 }));
 }
 
 /** walkShown with some placements at other matrices (0.6 LC.10): poses = Map('id/id/…' → the placement's own matrix). */

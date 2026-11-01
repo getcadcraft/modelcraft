@@ -15,6 +15,7 @@ import { addPolygon, pushPull, rectPts, ngonPts, paintFaces, meshDef, softenEdge
 import { entourage } from './entourage.js';   // 0.5 RC.11 (e): a byte-identical copy of lib/entourage/entourage.js
 import { ident } from './vec.js';
 import { t } from './i18n.js';
+import { modelOf } from './plants/plants.js';   // 0.8 LD.1: the shared plant list
 
 const WOOD = '#b98552', WHITE = '#f4f4f1', LIGHT = '#c9c9c5', GRAY = '#8a8a86', DARK = '#3b3b3b', GLASS = '#7fb8e6';
 const FABRIC = '#2b5fbd', GREEN = '#2e9d57', BROWN = '#7a5236', SAND = '#d8c8a2', RED = '#c0392b', LEAF = '#17703a';
@@ -92,19 +93,79 @@ const MAKE = {
 // colour (a car's see-through glass painted with the library's tinted glass), organic parts softened so they read as
 // surfaces, not wireframes. Millimetres in the generator → meters here. ----
 const ENTOURAGE = entourage();
-for (const e of ENTOURAGE) {
-  MAKE['ent-' + e.slug] = (m, c) => {
-    for (const p of e.parts) {
-      const polys = [], color = p.alpha < 1 ? 'mat:glass-tinted' : p.color;
-      for (let i = 0; i < p.I.length; i += 3) {
-        const v = (k) => [p.P[p.I[i + k] * 3] / 1000, p.P[p.I[i + k] * 3 + 1] / 1000, p.P[p.I[i + k] * 3 + 2] / 1000];
-        polys.push({ loops: [[v(0), v(1), v(2)]], color });
-      }
-      const d = meshDef(m, polys, part(p.name), 'group');
-      softenEdges(d, [...d.edges.keys()], e.cat === 'site/vehicles' ? 25 : 75);
-      m.place(c, d.id, ident());
+/** One entourage item's parts into component c; `recolor` {part name: '#rrggbb'} and `omit` [part names] are how a scene changes the season (0.8 EG.61). */
+function entourageParts(m, c, e, recolor = {}, omit = [], scale = null) {
+  for (const p of e.parts) {
+    if (omit.includes(p.name)) continue;
+    const polys = [], color = p.alpha < 1 ? 'mat:glass-tinted' : (recolor[p.name] || p.color);
+    for (let i = 0; i < p.I.length; i += 3) {
+      const v = (k) => [p.P[p.I[i + k] * 3] / 1000, p.P[p.I[i + k] * 3 + 1] / 1000, p.P[p.I[i + k] * 3 + 2] / 1000];
+      polys.push({ loops: [[v(0), v(1), v(2)]], color });
     }
-  };
+    const d = meshDef(m, polys, part(p.name), 'group');
+    softenEdges(d, [...d.edges.keys()], e.cat === 'site/vehicles' ? 25 : 75);
+    m.place(c, d.id, scale ? [scale[0], 0, 0, 0, 0, scale[1], 0, 0, 0, 0, scale[2], 0, 0, 0, 0, 1] : ident());
+  }
+}
+for (const e of ENTOURAGE) MAKE['ent-' + e.slug] = (m, c) => entourageParts(m, c, e);
+
+/**
+ * An entourage item (slug from entourage.js) as a new component, in other colours or without some parts (call inside model.change).
+ * `key` goes in the component's `starter` field ('scene:<slug>:<key>'), so a scene finds the one it built before.
+ */
+export function buildEntourage(model, slug, name, { recolor = {}, omit = [], key = '' } = {}) {
+  const e = ENTOURAGE.find((x) => x.slug === slug);
+  if (!e) return null;
+  const c = model.newDef('component', model.uniqueName(name || slug));
+  entourageParts(model, c, e, recolor, omit);
+  c.starter = 'scene:' + slug + ':' + key;
+  return c;
+}
+/** A person's umbrella, standing to the side of a 1.75 m figure at the origin: a shaft and a shallow dome (0.8 EG.61, in the rain). */
+export function buildUmbrella(model, color, name = 'Umbrella') {
+  const c = model.newDef('component', model.uniqueName(name));
+  cyl(model, c, 'Stem', [0.14, 0, 1.2], 0.012, 0.95, DARK, 6);
+  cone(model, c, 'Top', [0.14, 0, 1.95], 0.5, 0.2, color, 12);
+  c.starter = 'scene:umbrella:' + color.slice(1);
+  return c;
+}
+
+/**
+ * A plant of the shared plant list (plants/plants.js, 0.8 LD.1) as a new component: the entourage model nearest its form
+ * (`modelOf`), scaled to the species' size at maturity (or at planting with which 'plant'); turf is a thin green slab.
+ * Call inside model.change. `starter` = 'plant:<key>' so picking the same plant again places another copy.
+ */
+export function buildPlant(model, sp, name, { which = 'mature' } = {}) {
+  const sz = (which === 'plant' && sp.size.plant) || sp.size.mature;
+  const c = model.newDef('component', model.uniqueName(name || sp.botanical));
+  const e = ENTOURAGE.find((x) => 'entourage:' + x.slug === modelOf(sp));
+  if (e) {
+    // the parts' own extent (e.size is the nominal one), so the plant ends up the size the list says
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, z1 = 0;
+    for (const p of e.parts) for (let i = 0; i < p.P.length; i += 3) { x0 = Math.min(x0, p.P[i]); x1 = Math.max(x1, p.P[i]); y0 = Math.min(y0, p.P[i + 1]); y1 = Math.max(y1, p.P[i + 1]); z1 = Math.max(z1, p.P[i + 2]); }
+    const sxy = (sz.s * 1000) / Math.max(x1 - x0, y1 - y0, 1);
+    entourageParts(model, c, e, {}, [], [sxy, sxy, (sz.h * 1000) / Math.max(z1, 1)]);
+  } else {
+    const d = model.newDef('group', part('Turf'));
+    addPolygon(d, rectPts([-sz.s / 2, -sz.s / 2, 0], [1, 0, 0], [0, 1, 0], sz.s, sz.s));
+    pushPull(d, [...d.faces.keys()][0], Math.max(0.02, sz.h));
+    paintFaces(d, [...d.faces.keys()], GREEN);
+    model.place(c, d.id, ident());
+  }
+  c.starter = 'plant:' + sp.key;
+  return c;
+}
+/** The shared plant list (bundled seed, CC0) → the species array; cached. */
+let PLANT_LIST = null;
+export async function plantList() {
+  if (PLANT_LIST) return PLANT_LIST;
+  const P = await import('./plants/plants.js');
+  const raw = await (await fetch(new URL('./plants/plants-seed.json', import.meta.url))).json();
+  const bundled = P.readPlants(raw).library.species;
+  // 0.8 LD.1: the Library's plants when reachable, the bundled list on any failure
+  try { const { loadPlants } = await import('./plants/plants-live.js'); PLANT_LIST = (await loadPlants({ seed: bundled })).species; }
+  catch { PLANT_LIST = bundled; }
+  return PLANT_LIST;
 }
 
 export const STARTER = [

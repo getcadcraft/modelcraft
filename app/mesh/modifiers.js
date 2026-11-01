@@ -10,7 +10,7 @@
  *   applyMod(mesh, mod, {render, ref, manifold}) → Mesh         (a new mesh; `ref` = the resolved data for the modifier)
  *   evaluate(mesh, mods, {render, refs, manifold, upTo, budget}) → {mesh, notes, info[i] ({level}: a lowered view level)}
  *
- * Modifiers (params): mirror {x, y, z, merge, dist} · array {count, mode linear|radial|curve, rel [x,y,z], abs [x,y,z],
+ * Modifiers (params): scale {factors [x, y, z], each 0.0001…10000, about the origin} · mirror {x, y, z, merge, dist} · array {count, mode linear|radial|curve, rel [x,y,z], abs [x,y,z],
  * axis, angle (degrees), merge, dist, curve (ref)} · subsurf {levels, renderLevels, adaptive (the view level comes down past `budget` faces),
  * limit (renders on the limit surface)} · bevel {width, segments, profile,
  * angle} · solidify {thickness, offset −1…1, rim} · boolean {op union|difference|intersect, target (ref)} · displace
@@ -32,7 +32,12 @@ const vec3 = (x, d) => (Array.isArray(x) && x.length === 3 && x.every((y) => typ
 const REF_RE = /^(d\d{1,9}|root)(\/(arc|circle|polygon|curve):\d{1,9})?$/;
 const ref = (x) => (typeof x === 'string' && REF_RE.test(x) ? x : '');
 
+const facs = (x, d) => (Array.isArray(x) && x.length === 3 && x.every((y) => typeof y === 'number' && Number.isFinite(y) && y >= 1e-4 && y <= 1e4) ? x.slice() : d.slice());
+
 export const MODS = {
+  // 0.8 GH.2: scale about the object's own origin, a factor for each of its red, green and blue axes. The same item sits on a
+  // group or component stack (group-mods.js), where only scale and linear array are offered.
+  scale: { defaults: { factors: [1, 1, 1] }, clean: (p) => ({ factors: facs(p.factors, [1, 1, 1]) }) },
   mirror: { defaults: { x: true, y: false, z: false, merge: true, dist: 0.001 }, clean: (p) => ({ x: bool(p.x, true), y: bool(p.y, false), z: bool(p.z, false), merge: bool(p.merge, true), dist: num(p.dist, 0, 10, 0.001) }) },
   array: { defaults: { count: 3, mode: 'linear', rel: [1, 0, 0], abs: [0, 0, 0], axis: 'z', angle: 360, merge: false, dist: 0.001, curve: '' },
     clean: (p) => ({ count: int(p.count, 1, 1000, 3), mode: one(p.mode, ['linear', 'radial', 'curve'], 'linear'), rel: vec3(p.rel, [1, 0, 0]), abs: vec3(p.abs, [0, 0, 0]), axis: one(p.axis, ['x', 'y', 'z'], 'z'), angle: num(p.angle, -3600, 3600, 360), merge: bool(p.merge, false), dist: num(p.dist, 0, 10, 0.001), curve: ref(p.curve) }) },
@@ -349,6 +354,10 @@ export function subdividedFaces(mesh, levels) {
 export function applyMod(mesh, mod, { render = false, ref = null, manifold = null, notes = [], budget = 0, info = {} } = {}) {
   const p = mod.params;
   switch (mod.type) {
+    case 'scale': {
+      const f = p.factors;
+      return combine([{ mesh, map: (q) => [q[0] * f[0], q[1] * f[1], q[2] * f[2]] }]);
+    }
     case 'mirror': {
       let cur = mesh;
       for (const ax of ['x', 'y', 'z']) {

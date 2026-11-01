@@ -49,6 +49,10 @@ Collisions are checked for moves and push/pull. {{ui:Rotate}} and {{ui:Scale}} d
 
 The size of your printer's bed: {{ui:Not set}} (the start), 180 × 180 × 180, 220 × 220 × 250, 256 × 256 × 256 or 300 × 300 × 400 mm. Pick the size closest to your printer's build volume. [Check for 3D printing](topic:print-3d) then says when a model is larger than the bed; with {{ui:Not set}}, the size is not checked.
 
+## Orbit and pan
+
+**Orbit about what is under the cursor** (on at the start): orbit turns around the part of the model under the pointer, and pan keeps that point under the pointer; over empty space both use the center of the view. Turn it off to always orbit around the center of the view. **Orbit speed** and **Pan speed** go from 0.25× to 3× (1× is the start) and apply to the mouse, the trackpad, touch and the arrow keys. See [Orbit, pan and zoom](topic:orbit-pan-zoom).
+
 ## Corner indicator
 
 What shows in the corner of the 3D view: **View cube** (the start; top right — click a face, edge or corner to look from there, drag it to orbit, drag its compass ring to turn the model), **Axis icon** (a small X, Y, Z marker at the bottom left that turns with the view: X red, Y green, Z blue) or **None**. See [The view cube](topic:view-cube).

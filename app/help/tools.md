@@ -43,7 +43,7 @@ The status bar's tip always says what the current tool wants next. {{key:Esc}} c
 
 | Tool | Key | Drag to |
 |---|---|---|
-| {{ui:Orbit}} | {{key:O}} | Turn around the center of the view |
+| {{ui:Orbit}} | {{key:O}} | Turn around the part of the model under the pointer ({{key:Shift}} pans) |
 | {{ui:Pan}} | {{key:H}} | Slide the view |
 | {{ui:Zoom}} | {{key:Z}} | Zoom: up is in, down is out |
 | {{ui:Extents}} | {{key:Shift+Z}} | (a button, not a tool) Fit the whole model |

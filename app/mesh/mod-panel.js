@@ -6,8 +6,15 @@
  * `ctx.apply(index)`. Shown in the Mesh workspace's panel and in Model's Entity info for a mesh.
  *
  *   modPanel(ctx) → element      ctx = {def, model, el, t, units, formatLength, parseLength, change(label, fn), apply(i), addLattice(i), print}
+ *
+ * The same panel serves a group's or component's stack (0.8 GH.2, group-mods.js): ctx.group = {types (what can be added), list(def)
+ * (the items), write(def, next) (put them back), apply() (Bake), actions [elements] (Edit source, Bake)}. There the per-item
+ * view / render / Apply buttons are left out (the stack is one thing, not a mesh with passes), and the add list is `types`.
  */
 import { MOD_TYPES, newMod } from './modifiers.js';
+
+// 0.8 GH.2 scale: a factor for each axis, written like the other vectors
+const SCALE = [['factors', 'vec']];
 
 /**
  * Renders read a mesh's `rendered` (render levels, the limit surface, modifiers shown only in renders) once `render`'s
@@ -18,6 +25,7 @@ export const RENDER_READS_MODS = true;   // render-mc.js reads def.rendered sinc
 
 // each type's settings: [param, kind, extra]; kinds: bool, int [min, max], num [min, max], len, select [options], vec, lenvec, object, curve, lattice
 const FIELDS = {
+  scale: SCALE,
   mirror: [['x', 'bool'], ['y', 'bool'], ['z', 'bool'], ['merge', 'bool'], ['dist', 'len']],
   array: [['mode', 'select', ['linear', 'radial', 'curve']], ['count', 'int', [1, 1000]], ['rel', 'vec'], ['abs', 'lenvec'], ['axis', 'select', ['x', 'y', 'z']], ['angle', 'num', [-3600, 3600]], ['curve', 'curve'], ['merge', 'bool'], ['dist', 'len']],
   subsurf: [['levels', 'int', [0, 6]], ['renderLevels', 'int', [0, 6]], ['adaptive', 'bool'], ['limit', 'bool']],
@@ -57,20 +65,21 @@ function candidates(model, def, t) {
 
 export function modPanel(ctx) {
   const { def, el, t } = ctx;
-  const mods = def.mods;
+  const G = ctx.group || null;
+  const mods = G ? G.list(def) : def.mods;
   const box = el('section', { className: 'mc-mods', dataset: { mods: def.id } }, el('h3', { className: 'mc-h' }, t('app.mod.h')));
-  const set = (label, fn) => ctx.change(label, (d) => { const next = structuredClone(d.mods); fn(next); d.mods = next; });
+  const set = (label, fn) => ctx.change(label, (d) => { const next = structuredClone(G ? G.list(d) : d.mods); fn(next); if (G) G.write(d, next); else d.mods = next; });
   const cand = candidates(ctx.model, def, t);
   mods.forEach((m, i) => {
     const id = 'mc-mod-' + i;
     const head = el('div', { className: 'mc-mod-head' },
       el('input', { type: 'checkbox', id: id + '-on', checked: m.on, title: t('app.mod.on'), onchange: (e) => set(t('app.mod.undo.toggle'), (L) => { L[i].on = e.target.checked; }) }),
       el('label', { for: id + '-on', className: 'mc-mod-name' }, m.name || t('app.mod.type.' + m.type)),
-      el('button', { type: 'button', className: 'mc-linkbtn', title: t('app.mod.view'), 'aria-pressed': String(m.view), onclick: () => set(t('app.mod.undo.toggle'), (L) => { L[i].view = !L[i].view; }) }, el('i', { className: 'bi bi-display', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.view'))),
-      RENDER_READS_MODS ? el('button', { type: 'button', className: 'mc-linkbtn', title: t('app.mod.render'), 'aria-pressed': String(m.render), onclick: () => set(t('app.mod.undo.toggle'), (L) => { L[i].render = !L[i].render; }) }, el('i', { className: 'bi bi-camera', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.render'))) : null,
+      G ? null : el('button', { type: 'button', className: 'mc-linkbtn', title: t('app.mod.view'), 'aria-pressed': String(m.view), onclick: () => set(t('app.mod.undo.toggle'), (L) => { L[i].view = !L[i].view; }) }, el('i', { className: 'bi bi-display', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.view'))),
+      RENDER_READS_MODS && !G ? el('button', { type: 'button', className: 'mc-linkbtn', title: t('app.mod.render'), 'aria-pressed': String(m.render), onclick: () => set(t('app.mod.undo.toggle'), (L) => { L[i].render = !L[i].render; }) }, el('i', { className: 'bi bi-camera', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.render'))) : null,
       el('button', { type: 'button', className: 'mc-linkbtn', title: t('app.mod.up'), disabled: i === 0, onclick: () => set(t('app.mod.undo.move'), (L) => { [L[i - 1], L[i]] = [L[i], L[i - 1]]; }) }, el('i', { className: 'bi bi-arrow-up', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.up'))),
       el('button', { type: 'button', className: 'mc-linkbtn', title: t('app.mod.down'), disabled: i === mods.length - 1, onclick: () => set(t('app.mod.undo.move'), (L) => { [L[i + 1], L[i]] = [L[i], L[i + 1]]; }) }, el('i', { className: 'bi bi-arrow-down', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.down'))),
-      el('button', { type: 'button', className: 'mc-linkbtn', dataset: { modApply: String(i) }, title: t('app.mod.apply.title'), onclick: () => ctx.apply(i) }, t('app.mod.apply')),
+      G ? null : el('button', { type: 'button', className: 'mc-linkbtn', dataset: { modApply: String(i) }, title: t('app.mod.apply.title'), onclick: () => ctx.apply(i) }, t('app.mod.apply')),
       el('button', { type: 'button', className: 'mc-linkbtn', dataset: { modRemove: String(i) }, title: t('app.mod.remove'), onclick: () => set(t('app.mod.undo.remove'), (L) => { L.splice(i, 1); }) }, el('i', { className: 'bi bi-x-lg', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden' }, t('app.mod.remove'))));
     const props = el('div', { className: 'mc-props mc-mod-props' });
     for (const [k, kind, extra] of FIELDS[m.type]) {
@@ -109,10 +118,12 @@ export function modPanel(ctx) {
     box.append(el('div', { className: 'mc-mod', dataset: { modType: m.type } }, head, props, extraRow));
   });
   const add = el('select', { className: 'mc-select', id: 'mc-mod-add', dataset: { modAdd: '' }, 'aria-label': t('app.mod.add') },
-    el('option', { value: '' }, t('app.mod.add')), ...MOD_TYPES.map((k) => el('option', { value: k }, t('app.mod.type.' + k))));
+    el('option', { value: '' }, t('app.mod.add')), ...(G ? G.types : MOD_TYPES).map((k) => el('option', { value: k }, t('app.mod.type.' + k))));
   add.addEventListener('change', () => { const k = add.value; if (!k) return; set(t('app.mod.undo.add'), (L) => { L.push(newMod(k)); }); });
   if (mods.length >= 32) add.disabled = true;
   box.append(add);
+  if (G?.actions?.length) box.append(el('div', { className: 'mc-actions' }, ...G.actions));
   if (!mods.length) box.append(el('p', { className: 'mc-note' }, t('app.mod.none')));
+  else if (G) box.append(el('p', { className: 'mc-note' }, t('app.gmod.note')));
   return box;
 }
