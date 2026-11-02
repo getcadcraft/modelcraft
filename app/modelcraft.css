@@ -257,8 +257,9 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
   .mc-left, .mc-right { border: 0; border-top: var(--pen-2) solid var(--ink); }
   .mc-status { flex-wrap: wrap; gap: .4rem .75rem; }
   .mc-tip { max-width: 100%; flex-basis: 100%; }
+  .mc-msg { flex: 1 1 5rem; }   /* shrinks (ellipsis) instead of pushing the controls onto another line */
   .mc-vcb { margin-left: 0; }
-  .mc-vcb-input { width: 8rem; }
+  .mc-vcb-input { width: 6rem; }
   .mc-hint { font-size: .8125rem; top: .5rem; left: .5rem; max-width: calc(100% - 1rem); padding: .5rem .75rem; }
   .mc-hint li:nth-child(n+3) { display: none; }
 }
