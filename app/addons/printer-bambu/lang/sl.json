@@ -1,0 +1,21 @@
+{
+  "@locale": "sl",
+  "@name": "Slovenščina",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (prek Bambu Connect)",
+  "step.orca": "Namestite OrcaSlicer na ta računalnik.",
+  "step.orca.link": "Prenesite OrcaSlicer",
+  "step.connect": "Namestite Bambu Connect na ta računalnik.",
+  "step.connect.link": "Prenesite Bambu Connect",
+  "step.bind": "V Bambu Connect dodajte svoj P2S. To storite enkrat.",
+  "step.send": "Pritisnite Pošlji na 3D-tiskalnik. Datoteka se odpre v Bambu Connect: tam jo preverite in zaženite tiskanje.",
+  "note": "Bambu Connect je lastni program podjetja Bambu Lab za tiskanje iz drugih programov, tiskanje se zažene prav iz njega.",
+  "confirm": "OrcaSlicer je to pripravil s prednastavitvami za P2S: {grams} g, slojev: {layers}.",
+  "confirm.next": "Odpri v Bambu Connect? Dokler ga tam ne zaženete, se nič ne natisne.",
+  "done": "Poslano v Bambu Connect. Tam preverite in zaženite tiskanje.",
+  "fail.orca": "OrcaSlicer ni bil najden na tem računalniku. Namestite ga in poskusite znova.",
+  "fail.slice": "OrcaSlicer ni mogel pripraviti tega tiskanja. {why}",
+  "fail.nogcode": "Datoteka iz OrcaSlicer ne vsebuje nobenega tiskanja.",
+  "fail.bed": "To ne sodi na tiskalno ploščo P2S.",
+  "fail.connect": "Bambu Connect se ni odprl. Namestite ga in poskusite znova."
+}

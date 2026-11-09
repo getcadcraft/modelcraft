@@ -1,0 +1,21 @@
+{
+  "@locale": "ka",
+  "@name": "ქართული",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (Bambu Connect-ის საშუალებით)",
+  "step.orca": "დააინსტალირეთ OrcaSlicer ამ კომპიუტერზე.",
+  "step.orca.link": "OrcaSlicer-ის მიღება",
+  "step.connect": "დააინსტალირეთ Bambu Connect ამ კომპიუტერზე.",
+  "step.connect.link": "Bambu Connect-ის მიღება",
+  "step.bind": "Bambu Connect-ში დაამატეთ თქვენი P2S. ეს ერთხელ კეთდება.",
+  "step.send": "დააჭირეთ „3D პრინტერზე გაგზავნა“. ფაილი Bambu Connect-ში გაიხსნება: შეამოწმეთ იქ და დაიწყეთ ბეჭდვა.",
+  "note": "Bambu Connect არის Bambu Lab-ის საკუთარი პროგრამა სხვა პროგრამებიდან ასაბეჭდად, და ბეჭდვა იქიდან იწყება.",
+  "confirm": "OrcaSlicer-მა ეს მოამზადა თავისი P2S პრესეტებით: {grams} g, {layers} ფენა.",
+  "confirm.next": "გავხსნათ Bambu Connect-ში? იქ არაფერი იბეჭდება, სანამ იქ არ დაიწყებთ.",
+  "done": "გაიგზავნა Bambu Connect-ში. შეამოწმეთ იქ და დაიწყეთ ბეჭდვა.",
+  "fail.orca": "OrcaSlicer ამ კომპიუტერზე ვერ მოიძებნა. დააინსტალირეთ, შემდეგ სცადეთ თავიდან.",
+  "fail.slice": "OrcaSlicer ვერ მოამზადა ეს ბეჭდვა. {why}",
+  "fail.nogcode": "OrcaSlicer-ის ფაილი ბეჭდვას არ შეიცავს.",
+  "fail.bed": "ეს არ ეტევა P2S-ის სამაგიდეზე.",
+  "fail.connect": "Bambu Connect ვერ გაიხსნა. დააინსტალირეთ, შემდეგ სცადეთ თავიდან."
+}

@@ -424,6 +424,7 @@ export function mountTimeline(o) {
     playBtn.setAttribute('aria-pressed', 'true');
     playBtn.querySelector('i').className = 'bi bi-pause-fill';
     playBtn.querySelector('span').textContent = t('app.tl.pause');
+    o.playState?.(true);
     const step = (now) => {
       if (!playing) return;
       if (o.busy() || model._pv) { stop(); return; }
@@ -441,6 +442,7 @@ export function mountTimeline(o) {
     playBtn.setAttribute('aria-pressed', 'false');
     playBtn.querySelector('i').className = 'bi bi-play-fill';
     playBtn.querySelector('span').textContent = t('app.tl.play');
+    o.playState?.(false);
   }
 
   // ---- actions ----
@@ -622,6 +624,9 @@ export function mountTimeline(o) {
   active = {
     open, close, toggle: () => (isOpen ? close() : open()),
     get isOpen() { return isOpen; },
+    /** 0.9 FX.31: is the animation playing; play-or-pause is what Space, the command camera.play and the Animate toolbar's Play do. */
+    get playing() { return !!playing; },
+    togglePlay() { if (playing) stop(); else play(); },
     get anim() { return anim; },
     set anim(a) { anim = a || emptyAnim(); refresh(); },
     get time() { return time; },

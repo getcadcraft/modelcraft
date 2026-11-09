@@ -143,8 +143,12 @@ try {
     ok(/camera locked/.test(msg1), `the status bar says so (${msg1})`);
     // orbit away, change the style, Update: the style goes in, the camera stays
     await look([-6, -10, 4], [2, 1.5, 1]);
+    // 2026-11-09: the right panel folds (Settings > Auto-focus panel, on by default): one section open at a time. The Style section is opened by its
+    // heading (what a person does), then the Scenes section again for the row's buttons; adding a scene opens Scenes by itself (modelcraft.js).
+    await page.locator('aside.mc-right .mc-sec-head h2, aside.mc-right > section > h2').filter({ hasText: /^Style$/ }).first().click();
     await page.uncheck('[data-style-edges]');
     ok(await camNow() !== saved, 'orbited away from the scene');
+    await page.locator('aside.mc-right .mc-sec-head h2').filter({ hasText: /^Scenes$/ }).first().click();
     await page.locator('[data-scenes] li').first().locator('.mc-scene-acts button').first().click();
     ok(await sceneCam() === saved, 'Update on a locked scene keeps its camera');
     ok(await page.evaluate(() => window.modelcraft.model.scenes[0].style.edges === false), '…and saves the new style (edges off)');

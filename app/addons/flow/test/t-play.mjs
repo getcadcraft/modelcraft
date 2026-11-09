@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 // Playback (lib/playback.js) and the report / CSV (lib/report.js).
 const { ok, section, near, mine } = globalThis.__flowTest;
-const LY = await mine('lib/layout.js');
-const C = await mine('lib/catalog.js');
-const EX = await mine('lib/examples.js');
-const { simulate } = await mine('lib/sim.js');
-const { makePlayer } = await mine('lib/playback.js');
-const RP = await mine('lib/report.js');
+const LY = await mine('../../flow/layout.js');
+const C = await mine('../../flow/catalog.js');
+const EX = await mine('../../flow/examples.js');
+const { simulate } = await mine('../../flow/sim.js');
+const { makePlayer } = await mine('../../flow/playback.js');
+const RP = await mine('../../flow/report.js');
 const t = (k, v) => k + (v ? JSON.stringify(v) : '');
 
 section('playback: loads where the simulation says');

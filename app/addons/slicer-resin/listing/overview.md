@@ -1,0 +1,1 @@
+Slice for resin printers, free: no locked features and no upgrade pop-ups. Put things on the print stage, choose **Resin** under Printing with, and save the file your printer reads. It cuts the layers at your printer's screen resolution with smooth edges, can hollow a shape with vent holes, adds supports and a raft, shows every layer, and tells you the time and the resin.

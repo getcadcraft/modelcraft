@@ -1,0 +1,1 @@
+Our own code, written from a specification and read back by CadCraft only: not loaded on a printer. Open choices (mirroring, edge smoothing, the file version) are options you can switch. Newer Anycubic files (version 517 and 518, for the M5 and M7 families) are not written.

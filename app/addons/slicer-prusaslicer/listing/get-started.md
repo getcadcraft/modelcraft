@@ -1,0 +1,3 @@
+- Install PrusaSlicer from its maker's site
+- Add this add-on
+- Open the print stage in Studio and choose PrusaSlicer in the Slicer list. If it is not found, press Find it on this computer

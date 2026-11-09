@@ -68,11 +68,15 @@ try {
   const section = await page.evaluate(() => [...document.querySelectorAll('main aside *')].some((e) => e.textContent.trim() === 'Material flow'));
   ok(section, 'its section is in the right panel');
 
+  // the shell folds add-on panel sections to one open at a time (app-settings.js af-*): open the one a step needs
+  const openSec = (title) => page.evaluate((tt) => { const h = [...document.querySelectorAll('main aside .shell-addon-section-h')].find((x) => x.textContent.trim().startsWith(tt)); if (!h) return false; if (h.nextElementSibling.classList.contains('af-collapsed')) h.click(); return true; }, title);
+
   // example line: draws, runs, results, playback
   await page.evaluate(() => window.ccFlow.example('line'));
   await page.waitForTimeout(300);
   const drawn = await page.evaluate(() => window.modelcraft.view.scene.children.some((o) => o.name === 'flow-layout' && o.children.length > 20));
   ok(drawn, 'the example line is drawn in the 3D view');
+  await openSec('Material flow');
   await page.click('.flow-p button.primary:has-text("Run")');
   await page.waitForFunction(() => window.ccFlow.result() && window.ccFlow.result().elements, null, { timeout: 60000 });
   const r = await page.evaluate(() => { const r = window.ccFlow.result(); return { ok: r.ok, done: r.done, perHour: r.perHour }; });
@@ -207,6 +211,60 @@ try {
   await page.waitForFunction(() => window.ccFlow.result() && window.ccFlow.result().elements, null, { timeout: 60000 });
   const st = await page.evaluate(() => window.ccFlow.result().elements['station-1']);
   ok(st.calendarOpen > 0.2 && st.calendarOpen < 0.4 && st.availability < 1 && st.failures > 0, 'a station on a shift calendar with breakdowns reports both', JSON.stringify([st.calendarOpen, st.availability, st.failures]));
+
+  // robot cell (0.9 SU.1128): add a SCARA to the AGV/line example, check reach, run the sample program, export, use the cycle time
+  await page.evaluate(() => window.ccFlow.example('line'));
+  await page.waitForTimeout(300);
+  ok(await page.evaluate(() => [...document.querySelectorAll('main aside *')].some((e) => e.textContent.trim() === 'Robot cell')), 'the Robot cell section is in the right panel');
+  await openSec('Robot cell');
+  await page.click('.flow-robot button.primary:has-text("Add robot cell")');
+  await page.waitForSelector('.flow-robot textarea');
+  ok((await page.inputValue('.flow-robot textarea')).startsWith('CCROBOT 1'), 'a sample program is written');
+  await page.click('.flow-robot button:has-text("Run program")');
+  await page.waitForSelector('.flow-robot legend:has-text("Result")');
+  const rtxt = await page.evaluate(() => [...document.querySelectorAll('.flow-robot .msg')].map((e) => e.textContent).join(' | '));
+  ok(/Not reachable|Reachable/.test(await page.evaluate(() => document.querySelector('.flow-robot').textContent)), 'the reach list shows stations', rtxt);
+  // move the robot next to the first station so the program can run
+  const st1 = await page.evaluate(() => { const i = window.ccFlow.layout().items.find((x) => x.kind === 'station'); return { x: i.x, y: i.y }; });
+  await page.fill('.flow-robot label:has-text("(m)") input >> nth=0', String(st1.x + 0.1));
+  await page.dispatchEvent('.flow-robot label:has-text("(m)") input >> nth=0', 'change');
+  await page.fill('.flow-robot label:has-text("(m)") input >> nth=1', String(st1.y + 0.1));
+  await page.dispatchEvent('.flow-robot label:has-text("(m)") input >> nth=1', 'change');
+  await page.click('.flow-robot button:has-text("Run program")');
+  await page.waitForTimeout(300);
+  const rres = await page.evaluate(() => document.querySelector('.flow-robot').textContent);
+  ok(/Cycle time: [\d.]+ s|Stopped after/.test(rres), 'Run program reports a cycle time or says why it stopped', rres.slice(0, 300));
+  const [dlr] = await Promise.all([page.waitForEvent('download'), page.click('.flow-robot button:has-text("Save program text")')]);
+  ok(fs.readFileSync(await dlr.path(), 'utf8').startsWith('CCROBOT 1'), 'Save program text writes the neutral program');
+
+  // robot formats (0.9 SU.1128, owner 2026-11-06): URScript is not offered for a SCARA; pick the 6-axis model, tick formats, save them
+  ok(await page.evaluate(() => document.querySelector('.flow-robot [data-format="urscript"]').disabled), 'SCARA: URScript is greyed out');
+  ok(await page.evaluate(() => document.querySelector('.flow-robot [data-format="csv"]').disabled && document.querySelector('.flow-robot [data-format="csv"]').checked), 'the path list is always ticked');
+  await page.selectOption('.flow-robot select[aria-label="Robot model"]', 'generic-arm6');
+  await page.click('.flow-robot button:has-text("Use this model")');
+  await page.waitForSelector('.flow-robot [data-format="urscript"]:not([disabled])');
+  ok(true, '6-axis model: URScript can be ticked');
+  await page.fill('.flow-robot label:has-text("(m)") input >> nth=0', '0'); await page.dispatchEvent('.flow-robot label:has-text("(m)") input >> nth=0', 'change');
+  await page.fill('.flow-robot label:has-text("(m)") input >> nth=1', '0'); await page.dispatchEvent('.flow-robot label:has-text("(m)") input >> nth=1', 'change');
+  await page.fill('.flow-robot label:has-text("(m)") input >> nth=2', '0'); await page.dispatchEvent('.flow-robot label:has-text("(m)") input >> nth=2', 'change');
+  await page.fill('.flow-robot textarea', 'CCROBOT 1\npoint A 0.4 0.2 0.1\npoint B 0.4 -0.2 0.1\nhome\npick A\nplace B\nhome\n');
+  await page.dispatchEvent('.flow-robot textarea', 'input');
+  for (const id of ['urdf', 'trajectory', 'urscript']) await page.check(`.flow-robot [data-format="${id}"]`);
+  ok(await page.evaluate(() => document.querySelector('.flow-robot details summary + p, .flow-robot details') !== null), 'joint table and sources are in the panel');
+  const files = {};
+  page.on('download', async (d) => { files[d.suggestedFilename()] = fs.readFileSync(await d.path(), 'utf8'); });
+  await page.click('.flow-robot button[data-action="save-formats"]');
+  await page.waitForTimeout(1500);
+  const names = Object.keys(files);
+  ok(names.length === 5, 'five files saved (path list x2, URDF, trajectory, URScript)', names.join(', '));
+  const fx = (ext) => files[names.find((n) => n.endsWith(ext))] || '';
+  ok(fx('.urdf').startsWith('<?xml') && fx('.urdf').includes('<robot name="R1">') && fx('.urdf').trim().endsWith('</robot>'), 'URDF file is XML with the robot');
+  ok(fx('.script').includes('def cadcraft_cell():') && fx('.script').includes('Generated by CadCraft; simulate and verify on your robot controller before running; not endorsed by the vendor'), 'URScript file has the program and the not-verified line');
+  ok(JSON.parse(fx('.trajectory.json')).joint_names.length === 6, 'trajectory file has six joint names');
+  ok(JSON.parse(files[names.find((n) => n.endsWith('.json') && !n.endsWith('.trajectory.json'))] || '{}').steps.length > 5, 'path list JSON has the steps');
+  ok(await page.evaluate(() => ['urdf', 'trajectory', 'urscript'].every((id) => document.querySelector(`.flow-robot [data-format="${id}"]`).checked)), 'the ticked formats stay ticked');
+  ok(/Saved/.test(await page.evaluate(() => document.querySelector('.flow-robot-formats').textContent)), 'the panel says what was saved');
+  ok(await page.evaluate(() => /ABB RAPID/.test(document.querySelector('.flow-robot-formats').textContent) && /Sources and formats left out/.test(document.querySelector('.flow-robot-formats').textContent)), 'sources and the languages left out are listed');
 
   ok(errors.length === 0, 'no console errors', errors.slice(0, 3).join(' | '));
 

@@ -1,0 +1,21 @@
+{
+  "@locale": "lt",
+  "@name": "Lietuvių",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (per Bambu Connect)",
+  "step.orca": "Įdiegti OrcaSlicer šiame kompiuteryje.",
+  "step.orca.link": "Gauti OrcaSlicer",
+  "step.connect": "Įdiegti Bambu Connect šiame kompiuteryje.",
+  "step.connect.link": "Gauti Bambu Connect",
+  "step.bind": "Bambu Connect programoje pridėkite savo P2S. Tai atlikite vieną kartą.",
+  "step.send": "Spauskite Siųsti į 3D spausdintuvą. Failas atsidaro Bambu Connect: patikrinkite jį ten ir pradėkite spausdinimą.",
+  "note": "Bambu Connect – tai Bambu Lab programa spausdinimui iš kitos programinės įrangos; spausdinimas pradedamas būtent joje.",
+  "confirm": "OrcaSlicer paruošė šį spausdinimą pagal savo P2S profilius: {grams} g, sluoksnių: {layers}.",
+  "confirm.next": "Atidaryti jį Bambu Connect? Kol nepradėsite ten, nieko nespausdinama.",
+  "done": "Išsiųsta į Bambu Connect. Patikrinkite ten ir pradėkite spausdinimą.",
+  "fail.orca": "OrcaSlicer šiame kompiuteryje nerastas. Įdiegkite jį ir bandykite dar kartą.",
+  "fail.slice": "OrcaSlicer nepavyko paruošti šio spausdinimo. {why}",
+  "fail.nogcode": "OrcaSlicer faile nėra spausdinimo.",
+  "fail.bed": "Tai netelpa į P2S spausdinimo platformą.",
+  "fail.connect": "Bambu Connect neatsidarė. Įdiegkite jį ir bandykite dar kartą."
+}

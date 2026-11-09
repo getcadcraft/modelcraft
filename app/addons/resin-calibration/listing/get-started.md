@@ -1,0 +1,3 @@
+- Add it with Resin printing
+- Press Put the test part on the bed, then Save the exposure ladder
+- Print each file and keep the sharpest

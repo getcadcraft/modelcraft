@@ -129,6 +129,17 @@ export const COMMANDS = [
   C('draw.polygon', 'draw', 'bi-hexagon', TL('polygon'), { defKeys: ['N'] }),
   C('draw.arc', 'draw', 'bi-bezier2', TL('arc'), { defKeys: ['A'] }),
   C('draw.arcc', 'draw', 'bi-pie-chart', TL('arcc')),
+  // 0.9 FX.137: the ten arc methods (lib/arcs), each its own tool, chosen from the Draw group's Arc methods menu
+  C('draw.arc-3p', 'draw', 'bi-bezier2', TL('arc3p')),
+  C('draw.arc-sce', 'draw', 'bi-bezier2', TL('arcsce')),
+  C('draw.arc-sca', 'draw', 'bi-bezier2', TL('arcsca')),
+  C('draw.arc-scl', 'draw', 'bi-bezier2', TL('arcscl')),
+  C('draw.arc-sea', 'draw', 'bi-bezier2', TL('arcsea')),
+  C('draw.arc-sed', 'draw', 'bi-bezier2', TL('arcsed')),
+  C('draw.arc-ser', 'draw', 'bi-bezier2', TL('arcser')),
+  C('draw.arc-cse', 'draw', 'bi-bezier2', TL('arccse')),
+  C('draw.arc-csa', 'draw', 'bi-bezier2', TL('arccsa')),
+  C('draw.arc-csl', 'draw', 'bi-bezier2', TL('arccsl')),
   C('draw.curve', 'draw', 'bi-bezier', TL('curve')),
   C('draw.text3d', 'draw', 'bi-fonts', A('text3d')),
 
@@ -207,6 +218,8 @@ export const COMMANDS = [
   C('camera.vr', 'camera', 'bi-headset-vr', '.mc-tools [data-xr-enter]'),   // 0.6 LC.19
   C('camera.ar', 'camera', 'bi-phone', '[data-ar-enter]'),   // 0.8 EG.21: the model at full size on site, through a phone   // i18n-ignore (a selector)
   C('camera.guide', 'camera', 'bi-signpost-2', '.mc-tools [data-guide-open]'),   // 0.6 LC.21
+  // 0.9 FX.31: play or pause the animation (the timeline's own button); Space does it by itself while the timeline is open
+  C('camera.play', 'camera', 'bi-play-fill', '[data-tl-play]', { keyOnly: true }),
   // 0.7.1 MC-KEYS-COMMANDS: view toggles (the Views menu)
   C('camera.xray', 'camera', 'bi-transparency', '.mc-tools [data-xray]'),
   C('camera.hide-rest', 'camera', 'bi-box', '.mc-tools [data-hide-rest]'),
@@ -315,7 +328,7 @@ export const STYLES = {
       m('edit', ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.paste-in-place', 'edit.duplicate', 'edit.delete', '-', 'edit.select-all', 'edit.select-none', '-', 'edit.hide', 'edit.isolate', 'edit.unhide-all', 'edit.delete-guides', '-', 'organize.component', 'organize.group', 'organize.explode', 'organize.furnish', '-', 'edit.intersect-model', 'edit.intersect-sel']),
       m('view', ['camera.present', '-', 'camera.xray', 'camera.hide-rest', 'camera.hidden-objects', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.ar', 'camera.guide', '-', 'export.live', 'export.live-window']),
       m('camera', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp']),
-      m('draw', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.curve', '-', 'draw.rect', 'draw.circle', 'draw.polygon']),
+      m('draw', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.arc-3p', 'draw.arc-sce', 'draw.arc-sca', 'draw.arc-scl', 'draw.arc-sea', 'draw.arc-sed', 'draw.arc-ser', 'draw.arc-cse', 'draw.arc-csa', 'draw.arc-csl', 'draw.curve', '-', 'draw.rect', 'draw.circle', 'draw.polygon']),
       m('tools', ['modify.select', 'modify.erase', 'modify.paint', '-', 'modify.move', 'modify.push', 'modify.rotate', 'modify.follow', 'modify.scale', 'modify.scale-by', 'modify.offset', 'modify.divide', '-', 'organize.union', 'organize.subtract', 'organize.intersect', '-', ...FLIPS, '-', 'modify.tape', 'modify.dim', 'modify.protractor', 'draw.text3d', 'edit.axes-place', 'edit.axes-face', 'edit.axes-reset', '-', 'camera.section', '-', 'edit.terrain-contours', 'edit.terrain-grid', 'edit.sculpt']),
       ...WS_MENUS,   // 0.7.1
       m('window', ['aids.snap', 'aids.collide', '-', 'edit.keys-pushpull', 'edit.keys-modeler']),
@@ -331,7 +344,7 @@ export const STYLES = {
       m('edit', ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.paste-in-place', '-', 'aids.snap', 'aids.collide', '-', 'edit.keys-pushpull', 'edit.keys-modeler']),
       m('view', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp', 'camera.present', '-', 'camera.xray', 'camera.hide-rest', 'camera.hidden-objects', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.ar', 'camera.guide', '-', 'export.live', 'export.live-window']),
       m('select', ['modify.select', 'edit.select-all', 'edit.select-none', '-', 'edit.hide', 'edit.isolate', 'edit.unhide-all', '-', 'edit.delete-guides']),
-      m('add', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.curve', 'draw.rect', 'draw.circle', 'draw.polygon', 'draw.text3d', '-', 'modify.tape', 'modify.protractor', 'modify.dim', 'camera.section']),
+      m('add', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.arc-3p', 'draw.arc-sce', 'draw.arc-sca', 'draw.arc-scl', 'draw.arc-sea', 'draw.arc-sed', 'draw.arc-ser', 'draw.arc-cse', 'draw.arc-csa', 'draw.arc-csl', 'draw.curve', 'draw.rect', 'draw.circle', 'draw.polygon', 'draw.text3d', '-', 'modify.tape', 'modify.protractor', 'modify.dim', 'camera.section']),
       m('object', ['modify.move', 'modify.rotate', 'modify.scale', 'modify.scale-by', '-', 'edit.duplicate', 'edit.delete', '-', ...FLIPS, '-', 'organize.group', 'organize.component', 'organize.explode', 'organize.furnish', '-', 'organize.union', 'organize.subtract', 'organize.intersect', '-', 'edit.axes-place', 'edit.axes-face', 'edit.axes-reset']),
       m('mesh', ['modify.push', 'modify.follow', 'modify.offset', 'modify.divide', 'modify.erase', 'modify.paint', '-', 'edit.intersect-model', 'edit.intersect-sel', '-', 'edit.terrain-contours', 'edit.terrain-grid', 'edit.sculpt']),
       ...WS_MENUS,   // 0.7.1

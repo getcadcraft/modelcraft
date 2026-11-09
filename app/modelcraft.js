@@ -99,6 +99,8 @@ const lx = (key, nodes) => {
 };
 
 const root = document.querySelector('[data-modelcraft]');
+// root plus any toolbar torn off into its own window (app-toolbar-tear.js), so pressed states reach the bar there too (0.9 fix 2026-11-02)
+const tearAll = (s) => (window.ccToolbarTear?.all ? window.ccToolbarTear.all(root, s) : [...root.querySelectorAll(s)]);
 if (root) init(root);
 
 function init(root) {
@@ -193,7 +195,7 @@ function init(root) {
     scene() { if (!sc || sc.version !== model.version) sc = sceneOf(model); return sc; },
     setSel(s) { host.sel = s.filter(Boolean); scheduleInfo(); view.invalidate(); announcePick(); },
     toolSet(name) {
-      for (const b of root.querySelectorAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === name));
+      for (const b of tearAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === name));
       ui.over.classList.toggle('is-select', name === 'select' || name === 'erase');
       ui.over.classList.toggle('is-orbit', name === 'orbit' || name === 'pan');
     },
@@ -267,6 +269,7 @@ function init(root) {
     // 0.7 AS.5 (session assistants): scenes as the Scenes panel saves and shows them
     scene: () => ({ cam: cam.toJSON(), style: view.style, vis: model.captureVis() }), goScene: (i) => goScene(i, false, { quiet: true }), scenesChanged: () => renderScenes(),
     file: () => JSON.parse(modelText()), base: () => base(),   // 0.7 AS.6: usd_export
+    say: (s) => print(s), frame: () => zoomExtents(),   // 0.9 SU.810b: a live link's update in the status bar; the first one comes into view
     // 0.7 AS.6 (assistants-gaps): render_still / render_queue get the Render dialog's own hooks (as kind === 'render' opens it)
     render: async () => { const { mcScene } = await import('./render-mc.js'); return { scene: (s) => mcScene(model, cam, view.style, s), viewSize: () => ({ w: ui.gl.clientWidth, h: ui.gl.clientHeight }), settings: () => renderSettings, fileBase: base, download: (blob, name) => download(blob, name, blob.type || 'application/octet-stream'), appName: 'ModelCraft' }; } });
 
@@ -427,7 +430,7 @@ function init(root) {
   };
   function keyTexts() {
     const style = blender() ? 'blender' : 'sketchup';
-    for (const b of root.querySelectorAll('[data-tool], [data-act]')) {
+    for (const b of tearAll('[data-tool], [data-act]')) {
       const k = b.dataset.tool || b.dataset.act;
       if (b.dataset.titleSketchup === undefined) b.dataset.titleSketchup = b.title;
       b.title = style === 'blender' && BLENDER_TITLES[k] ? BLENDER_TITLES[k] : b.dataset.titleSketchup;
@@ -461,7 +464,7 @@ function init(root) {
     if (wsId !== 'model' && name !== 'select') { print(t('app.ws.model_tool', { ws: t(getWorkspace(wsId).labelKey) })); return; }
     tools.set(name, arg);
     shell?.tool(name);   // 0.8 EG.23: lessons hear which tool ran
-    for (const b of root.querySelectorAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === name));
+    for (const b of tearAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === name));
     ui.over.classList.toggle('is-select', name === 'select' || name === 'erase');
     ui.over.classList.toggle('is-orbit', name === 'orbit' || name === 'pan');
     if (name !== 'select') hideHint();
@@ -577,14 +580,15 @@ function init(root) {
   }
   // the textures' swatches are drawn when the page is idle, a few at a time (each is a small texture drawn by code)
   const drawSwatches = (deadline) => {
-    while (pending.length && (!deadline || deadline.timeRemaining() > 4)) {
+    let n = 0;   // at most three per slice (~9 ms each): 50 ms slices were long tasks that held up the first clicks
+    while (pending.length && n++ < 3 && (!deadline || deadline.timeRemaining() > 4)) {
       const [b, id] = pending.shift(), px = swatchPixels(id, 40);
       if (!px || !libMat(id).tex) continue;
       const c = document.createElement('canvas'); c.width = px.w; c.height = px.h;
       c.getContext('2d').putImageData(new ImageData(px.data, px.w, px.h), 0, 0);
       b.style.backgroundImage = 'url(' + c.toDataURL() + ')';
     }
-    if (pending.length) (window.requestIdleCallback || ((f) => setTimeout(f, 50)))(drawSwatches);
+    if (pending.length) setTimeout(() => (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(drawSwatches), 30);
   };
   (window.requestIdleCallback || ((f) => setTimeout(f, 200)))(drawSwatches);
   markPaint(tools.paintColor);
@@ -1074,6 +1078,11 @@ function init(root) {
     const B = blender();
     // 0.7: the open workspace's own keys come first (the Mesh workspace: 1/2/3, G/R/S, E, Ctrl+B …)
     if (wsId !== 'model') { const w = getWorkspace(wsId); if (w?.keydown?.(e, wsHost)) { e.preventDefault(); scheduleInfo(); view.invalidate(); return; } }
+    // 0.9 FX.31: Space plays and pauses the animation while the timeline is open (not when a button has the focus: Space presses it;
+    // not while a tool runs: it is the tool's). With the timeline closed Space is Select, as before.
+    if (k === ' ' && !ctrl && !e.altKey && !e.shiftKey && timeline?.isOpen && !tools.tool.busy && !(tgt?.closest && tgt.closest('button, a, select, summary, [role="button"]'))) {
+      e.preventDefault(); timeline.togglePlay(); scheduleInfo(); return;
+    }
     if (ctrl) {
       if (l === 'z' && !e.shiftKey) { e.preventDefault(); act('undo'); return; }
       if (l === 'y' || (l === 'z' && e.shiftKey)) { e.preventDefault(); act('redo'); return; }
@@ -1273,7 +1282,7 @@ function init(root) {
   }
   /** The tool buttons show what tools.grab/turn/resize switched to. */
   function syncTool() {
-    for (const b of root.querySelectorAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === tools.name));
+    for (const b of tearAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === tools.name));
     ui.over.classList.toggle('is-select', tools.name === 'select' || tools.name === 'erase');
     ui.over.classList.remove('is-orbit');
   }
@@ -1469,7 +1478,7 @@ function init(root) {
     }
     wsSelect.value = id;
     if (to.enter && to.enter(wsHost) === false) { wsId = 'model'; return setWorkspace('model') && false; }
-    if (id === 'model') { tools.set('select'); for (const b of root.querySelectorAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === 'select')); }
+    if (id === 'model') { tools.set('select'); for (const b of tearAll('[data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === 'select')); }
     scheduleInfo(); view.invalidate(); layouts?.refresh();
     return true;
   }
@@ -1915,6 +1924,8 @@ function init(root) {
     model.change(t('ui.scenes.add'), (m) => { m.scenes = [...m.scenes, s]; }, []);
     sceneIndex = model.scenes.length - 1;
     renderScenes();
+    // 2026-11-09: with Auto-focus panel on, the Scenes section may be folded: adding a scene opens it so the new row (its Update / Lock / Rename buttons) is seen.
+    try { const af = window.ccAutoFocus && window.ccAutoFocus.get('auto-modelcraft-right'); if (af) af.reveal('scenes', true); } catch { /* the fold is a convenience */ }
     print(t('app.scene.saved', { name }));
   });
   $('[data-scene-prev]').addEventListener('click', () => stepScene(-1));
@@ -2040,6 +2051,7 @@ function init(root) {
     changed: () => model.bumpSafe(),   // the autosave copy follows timeline edits too
     openVideo: () => openVideo(),
     onToggle: (on) => tlToggle.setAttribute('aria-checked', String(on)),
+    playState: () => scheduleInfo(),   // 0.9 FX.31: the Animate toolbar's Play shows Pause while it plays
   });
   tlToggle.addEventListener('click', () => { closeMenus(); timeline.toggle(); });
   // ---- review in a headset (0.6 LC.19, session lc-model): xr-mc.js (Views › Review in VR, the Issues list) on xr/xr-session.js ----
@@ -2142,6 +2154,13 @@ function init(root) {
       b.disabled = !st.ok;
       b.dataset.why = st.ok ? '' : st.why || '';
       if (st.pressed !== undefined) b.setAttribute('aria-pressed', String(!!st.pressed)); else b.removeAttribute('aria-pressed');
+      // 0.9 FX.31: a button may show another icon and word while it is on (Play shows Pause while playing); back when it is off
+      const ic = b.querySelector('i'), sp = b.querySelector('span');
+      if (ic && sp) {
+        if (b.dataset.idleIcon === undefined) { b.dataset.idleIcon = ic.className; b.dataset.idleLabel = sp.textContent; b.dataset.idleTitle = b.title; }
+        if (st.icon) { ic.className = 'bi bi-' + st.icon; sp.textContent = st.label || sp.textContent; if (st.title) b.title = st.title; }
+        else if (b.dataset.idleIcon !== ic.className) { ic.className = b.dataset.idleIcon; sp.textContent = b.dataset.idleLabel; b.title = b.dataset.idleTitle; }
+      }
     }
   }
   window.addEventListener('storage', (e) => { if (e.key === 'modelcraft.clipboard') scheduleInfo(); });
@@ -2447,7 +2466,7 @@ function init(root) {
       if (wsId !== 'model' && w.renderPanel) {
         const box = el('div', { className: 'mc-ws-panel', dataset: { wsPanel: w.id } });
         const h = w.renderPanel(wsHost, box);
-        ui.infoH.textContent = h || t(w.labelKey);
+        setInfoTitle(h || t(w.labelKey));
         ui.info.replaceChildren(box);
         return;
       }
@@ -2475,7 +2494,7 @@ function init(root) {
       props.append(inp);
     };
     if (!sel.length) {
-      ui.infoH.textContent = t('app.info.model');
+      setInfoTitle(t('app.info.model'));
       let faces = 0, edges = 0;
       model.walk((d) => { faces += d.faces.size; edges += [...d.edges.values()].filter((e) => !e.soft).length; });
       const counts = model.instanceCounts();
@@ -2499,7 +2518,7 @@ function init(root) {
     const cid = nE === sel.length ? def.edges.get(sel[0].id)?.curve : null;
     const ci = cid && sel.every((s) => def.edges.get(s.id)?.curve === cid) ? curveInfo(def, cid) : null;
     if (ci && ci.edges.length === sel.length) {
-      ui.infoH.textContent = t('app.info.curve.' + (['arc', 'circle', 'polygon'].includes(ci.kind) ? ci.kind : 'curve'));
+      setInfoTitle(t('app.info.curve.' + (['arc', 'circle', 'polygon'].includes(ci.kind) ? ci.kind : 'curve')));
       if (ci.round && ci.flat) lenBox(t('app.info.radius'), 'mc-radius', ci.radius, (L) => model.change(t('app.info.radius'), (m) => setCurveRadius(m.context(host.path).def, cid, L), [model.context(host.path).def.id]));
       else if (ci.round) row(t('app.info.radius'), formatLength(ci.radius, u));
       row(ci.kind === 'polygon' ? t('app.info.sides') : t('app.info.segments'), String(ci.segs));
@@ -2514,12 +2533,12 @@ function init(root) {
     }
     if (sel.length === 1 && nF === 1) {
       const f = def.faces.get(sel[0].id);
-      ui.infoH.textContent = t('app.info.face');
+      setInfoTitle(t('app.info.face'));
       if (f) { row(t('app.info.area'), formatArea(faceArea(def, f), u)); row(t('app.info.holes'), String(f.loops.length - 1)); row(t('app.info.color'), colorLabel(f.color)); }
       btn(t('app.info.reverse'), () => { model.change(t('app.info.reverse'), (m) => reverseFaces(m.context(host.path).def, [sel[0].id]), [model.context(host.path).def.id]); });
     } else if (sel.length === 1 && nE === 1) {
       const e = def.edges.get(sel[0].id);
-      ui.infoH.textContent = t('app.info.edge');
+      setInfoTitle(t('app.info.edge'));
       if (e) lenBox(t('app.info.length'), 'mc-edgelen', dist(def.verts.get(e.a), def.verts.get(e.b)), (L) => model.change(t('app.undo.edge_length'), (m) => m.setEdgeLength(host.path, sel[0].id, L), [model.context(host.path).def.id]));
       if (e) notes.push(el('p', { className: 'mc-note' }, t('app.info.edge.note')));
       if (e) btn(t('app.info.divide'), divideAsk);   // 0.7 MC-DIVIDE
@@ -2527,7 +2546,7 @@ function init(root) {
       const inst = def.insts.get(sel[0].id), d = inst && model.def(inst.def);
       if (d) {
         const counts = model.instanceCounts();
-        ui.infoH.textContent = d.mesh ? t('app.info.mesh') : d.kind === 'component' ? t('app.info.component') : t('app.info.group');
+        setInfoTitle(d.mesh ? t('app.info.mesh') : d.kind === 'component' ? t('app.info.component') : t('app.info.group'));
         // a part inside an open component: how it follows when the component is stretched (0.4 M26)
         if (host.path.length && def.kind === 'component') partRules(props, def, sel[0].id);
         row(t('app.info.color'), colorLabel(inst.color));
@@ -2569,7 +2588,7 @@ function init(root) {
       }
     } else if (sel.length === 1 && nD === 1) {
       const dm = model.dims.get(sel[0].id), id = sel[0].id;
-      ui.infoH.textContent = t({ rad: 'app.info.dim.rad', dia: 'app.info.dim.dia', ang: 'app.info.dim.ang' }[dm?.kind] || 'app.info.dim');
+      setInfoTitle(t({ rad: 'app.info.dim.rad', dia: 'app.info.dim.dia', ang: 'app.info.dim.ang' }[dm?.kind] || 'app.info.dim'));
       if (dm && (dm.kind === 'rad' || dm.kind === 'dia')) {
         // 0.4 M5: a radius or diameter; retyping it gives the curve a new size about its centre
         const g = model.radialAt(dm.c), dia = dm.kind === 'dia';
@@ -2602,7 +2621,7 @@ function init(root) {
     } else if (sel.length === 1 && nS === 1) {
       // a section plane (0.4 M7): active or not, its name, where it sits along its arrows, reverse, delete
       const id = sel[0].id, sp = model.sections.get(id);
-      ui.infoH.textContent = t('app.info.section');
+      setInfoTitle(t('app.info.section'));
       if (sp) {
         props.append(el('label', { for: 'mc-secname' }, t('app.info.name')));
         const nm = el('input', { type: 'text', id: 'mc-secname', className: 'mc-input', value: sp.name, maxLength: 80 });
@@ -2631,10 +2650,10 @@ function init(root) {
       btn(t('app.info.delete'), eraseSelection);
     } else if (sel.length === 1 && nG === 1) {
       const g = model.guides.get(sel[0].id);
-      ui.infoH.textContent = g?.kind === 'point' ? t('app.info.guide_point') : t('app.info.guide_line');
+      setInfoTitle(g?.kind === 'point' ? t('app.info.guide_point') : t('app.info.guide_line'));
       btn(t('app.info.delete'), eraseSelection);
     } else {
-      ui.infoH.textContent = t('app.info.selected', { n: sel.length });
+      setInfoTitle(t('app.info.selected', { n: sel.length }));
       if (nF) row(t('app.info.faces'), String(nF));
       if (nE) row(t('app.info.edges'), String(nE));
       if (nI) row(t('app.info.groups_components'), String(nI));
@@ -2804,8 +2823,10 @@ function init(root) {
   let surfaces = null, surfacesLoading = null;
   const surfBox = root.querySelector('[data-nurbs]');
   function openSurfaces() {
-    surfacesLoading ??= import('./surfaces-mc.js').then(({ mountSurfacesMc }) => {
-      surfaces = mountSurfacesMc({ box: surfBox, model, view, cam, tools, docData, t, print, base, afterDraw, over: ui.over,
+    surfacesLoading ??= Promise.all([import('./surfaces-mc.js'), import('./print-mc.js')]).then(([{ mountSurfacesMc }, PM]) => {
+      surfaces = mountSurfacesMc({ box: surfBox, model, view, cam, tools, docData, t, print, base, afterDraw, over: ui.over, bake: bakeNodeMeshes,   // 0.9 DC.54: solids → model groups
+        scan: () => { const tr = PM.printTriangles(model, { path: host.path, sel: host.sel }).tris; return tr.length ? { positions: Float64Array.from(tr.flatMap((q) => q.p.flat())), indices: Uint32Array.from({ length: tr.length * 3 }, (_, i) => i) } : null; },   // 0.9 SU.1082: the selection (or everything shown) is the scan, in mm
+        cage: () => PM.cageQuads(model, { path: host.path, sel: host.sel }),   // 0.9 D9.8: the selected mesh's quads, for SubD cage to exact surfaces
         save: (name, text, type) => download(new Blob([text], { type }), name, type),
         open: async (exts) => { const [f] = await fileHost.openFile({ types: [{ description: t('nurbs.ui.title'), extensions: exts }] }).catch(() => []); return f ? { name: f.name, text: await f.text() } : null; } });
       window.modelcraft.surfaces = surfaces;
@@ -2814,6 +2835,7 @@ function init(root) {
     return surfacesLoading;
   }
   root.querySelector('[data-nurbs-open]')?.addEventListener('click', () => openSurfaces());
+  window.modelcraft.openSurfaces = openSurfaces;   // 0.9 DC.54: SuperCad Studio's Surfaces panel sends its patch set into this session (surfaces.session.importDoc: one undo step there)
   { const nd = docData.forAddon('nurbs'); nd.onOpen(() => { if (!surfaces && nd.data('doc')) openSurfaces(); }); }
   // ---- 0.8 DC.54 (round 3, nodes_PART_3): the node editor — wire numbers into points, curves and surfaces; every node is also a line of script.
   // The shared window (assets/js/app-nodes.js) over cc-nodes (nodes/), ModelCraft's adapter nodes-mc.js. Loaded on first use, or at once when an
@@ -3943,3 +3965,6 @@ function init(root) {
 }
 
 export { TOOL_NAMES, VIEWS, connected };
+
+/** 2026-11-09: the Model panel's heading text, written to its text node only, so the Auto-focus lock button inside the heading stays. */
+function setInfoTitle(txt) { const h = document.querySelector('[data-info-h]'); if (!h) return; const tn = [...h.childNodes].find((x) => x.nodeType === 3); if (tn) tn.textContent = txt; else h.prepend(txt); }

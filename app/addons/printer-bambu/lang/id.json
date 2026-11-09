@@ -1,0 +1,21 @@
+{
+  "@locale": "id",
+  "@name": "Bahasa Indonesia",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (melalui Bambu Connect)",
+  "step.orca": "Pasang OrcaSlicer di komputer ini.",
+  "step.orca.link": "Unduh OrcaSlicer",
+  "step.connect": "Pasang Bambu Connect di komputer ini.",
+  "step.connect.link": "Unduh Bambu Connect",
+  "step.bind": "Di Bambu Connect, tambahkan P2S Anda. Lakukan ini sekali saja.",
+  "step.send": "Tekan Kirim ke printer 3D. File dibuka di Bambu Connect: periksa di sana lalu mulai cetak.",
+  "note": "Bambu Connect adalah program resmi Bambu Lab untuk mencetak dari perangkat lunak lain, dan pencetakan dimulai dari sana.",
+  "confirm": "OrcaSlicer menyiapkan ini dengan preset P2S-nya: {grams} g, {layers} lapisan.",
+  "confirm.next": "Buka di Bambu Connect? Tidak ada yang dicetak sampai Anda memulainya di sana.",
+  "done": "Terkirim ke Bambu Connect. Periksa di sana lalu mulai cetak.",
+  "fail.orca": "OrcaSlicer tidak ditemukan di komputer ini. Pasang, lalu coba lagi.",
+  "fail.slice": "OrcaSlicer tidak dapat menyiapkan cetakan ini. {why}",
+  "fail.nogcode": "File OrcaSlicer tidak berisi cetakan.",
+  "fail.bed": "Ini tidak muat di meja cetak P2S.",
+  "fail.connect": "Bambu Connect tidak terbuka. Pasang, lalu coba lagi."
+}

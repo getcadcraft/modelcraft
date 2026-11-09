@@ -14,8 +14,8 @@
  *   fv.dispose()
  */
 import * as THREE from 'three';
-import { footprint, CONVEYOR_KINDS } from './lib/catalog.js';
-import { freePorts } from './lib/layout.js';
+import { footprint, CONVEYOR_KINDS } from '../../flow/catalog.js';
+import { freePorts } from '../../flow/layout.js';
 
 const COL = {
   belt: 0x5d6b7a, beltSel: 0xd17a22, box: { process: 0x3f7cac, conveyors: 0x6c8a3a, agv: 0x8a5a9c }, sel: 0xd17a22,

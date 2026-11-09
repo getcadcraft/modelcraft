@@ -1,0 +1,21 @@
+{
+  "@locale": "dv",
+  "@name": "ދިވެހި",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (Bambu Connect později)",
+  "step.orca": "މި ކޮމްޕިއުޓަރުގައި OrcaSlicer އިންސްޓޯލްކުރޭ.",
+  "step.orca.link": "OrcaSlicer ހޯދާ",
+  "step.connect": "މި ކޮމްޕިއުޓަރުގައި Bambu Connect އިންސްޓޯލްކުރޭ.",
+  "step.connect.link": "Bambu Connect ހޯދާ",
+  "step.bind": "Bambu Connect ގައި ތިބާގެ P2S އިތުރުކުރޭ. މިއެއް ފަހަރު ކުރޭ.",
+  "step.send": "3D ޕްރިންޓަރަށް ފޮނުއްވާ ފިޔަވާ. ފައިލް Bambu Connect ގައި ހުޅުވޭ: އެތަނގައި ބަލައި ޕްރިންޓް ފަށާ.",
+  "note": "Bambu Connect އަކީ Bambu Lab ގެ ޚާއްޞަ ޕްރޮގްރާމެވެ، އެހެން ސޮފްޓްވެއަރުންނާ ޕްރިންޓް ކުރުމަށް. ޕްރިންޓް ފަށަނީ އެތަނުންނެވެ.",
+  "confirm": "OrcaSlicer ތިބާގެ P2S ޕްރީސެޓްތަކާއެކު މިއެއް ތައްޔާރުކުރިއެވެ: {grams} g، {layers} ލޭޔަރ.",
+  "confirm.next": "Bambu Connect ގައި ހުޅުވާނެ ހެއްޔެ؟ އޭގައި ފަށާ ހިނދަކު އެއްވެސް ޕްރިންޓެއް ފަށާކަށް ނޫން.",
+  "done": "Bambu Connect އަށް ފޮނުވިއްޖެ. އެތަނގައި ބަލައި ޕްރިންޓް ފަށާ.",
+  "fail.orca": "މި ކޮމްޕިއުޓަރުގައި OrcaSlicer ނުފެނުނެވެ. އެ އިންސްޓޯލްކުރޭ، ދެން އަލުން މަސައްކަތް ކުރޭ.",
+  "fail.slice": "OrcaSlicer ން މި ޕްރިންޓް ތައްޔާރުކުރެވިއްޖެ ނުވެއެވެ. {why}",
+  "fail.nogcode": "OrcaSlicer ގެ ފައިލްގައި ޕްރިންޓެއް ނެތެވެ.",
+  "fail.bed": "މިއަކަށް P2S ގެ ބެޑުގައި ޖާގަ ނެތެވެ.",
+  "fail.connect": "Bambu Connect ނުހުޅުވުނެވެ. އެ އިންސްޓޯލްކުރޭ، ދެން އަލުން މަސައްކަތް ކުރޭ."
+}

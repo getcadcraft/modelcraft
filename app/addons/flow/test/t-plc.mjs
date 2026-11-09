@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // 0.8 SU.858 step 5 (session dec-su_PART_3): PLC emulation — a Modbus TCP frame in, the plant's answer out; a gate that the PLC opens; the clock of the wall.
 const { ok, section, near, mine } = globalThis.__flowTest;
-const { Sim, checkGraph } = await mine('lib/sim.js');
+const { Sim, checkGraph } = await mine('../../flow/sim.js');
 const P = await mine('lib/plc.js');
-const RT = await mine('lib/realtime.js');
-const C = await mine('lib/catalog.js');
+const RT = await mine('../../flow/realtime.js');
+const C = await mine('../../flow/catalog.js');
 
 const L = (from, out, to, inn = 'in') => ({ from, out, to, in: inn });
 const cst = (v) => ({ kind: 'const', v });

@@ -1,0 +1,21 @@
+{
+  "@locale": "so",
+  "@name": "Soomaali",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (iyada oo loo marayo Bambu Connect)",
+  "step.orca": "Ku rakib OrcaSlicer kombiyuutarkan.",
+  "step.orca.link": "Hel OrcaSlicer",
+  "step.connect": "Ku rakib Bambu Connect kombiyuutarkan.",
+  "step.connect.link": "Hel Bambu Connect",
+  "step.bind": "Bambu Connect gudahaaga, ku dar P2S-kaaga. Taas mar keliya samee.",
+  "step.send": "Riix U dir abaabulaha 3D. Faylku wuxuu ku furmaa Bambu Connect: halkaas ku hubi oo bilow daabacaadda.",
+  "note": "Bambu Connect waa barnaamijka Bambu Lab u gaar ah ee daabacaadda softiweerada kale, daabacaaduna halkaas ayay ka bilaabmaysaa.",
+  "confirm": "OrcaSlicer wuxuu diyaariyay tan isagoo adeegsanaya habayntiisa P2S: {grams} g, {layers} lakab.",
+  "confirm.next": "Ma rabtaa in lagu furo Bambu Connect? Waxba ma daabacmayo ilaa aad halkaas ka bilowdo.",
+  "done": "Waa loo diray Bambu Connect. Halkaas ku hubi oo bilow daabacaadda.",
+  "fail.orca": "Kombiyuutarkan lama helin OrcaSlicer. Ku rakib, kadibna isku day mar kale.",
+  "fail.slice": "OrcaSlicer ma diyaarin karin daabacaadan. {why}",
+  "fail.nogcode": "Faylka OrcaSlicer ma lahayn daabacaad.",
+  "fail.bed": "Tan ma ku habboona saldhigga P2S.",
+  "fail.connect": "Bambu Connect ma furmin. Ku rakib, kadibna isku day mar kale."
+}

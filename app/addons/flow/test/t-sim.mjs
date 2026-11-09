@@ -2,8 +2,8 @@
 // Known answers for the simulation core (lib/sim.js): queueing theory, conveyor kinematics and accumulation, merge rules,
 // divert rules, gates, AGVs with reservation, determinism. Run by test.mjs.
 const { ok, section, near, mine } = globalThis.__flowTest;
-const { simulate, checkGraph, Sim } = await mine('lib/sim.js');
-const R = await mine('lib/rng.js');
+const { simulate, checkGraph, Sim } = await mine('../../flow/sim.js');
+const R = await mine('../../flow/rng.js');
 
 const L = (from, out, to, inp = 'in') => ({ from, out, to, in: inp });
 const exp = (mean) => ({ kind: 'exp', mean });

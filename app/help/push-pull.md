@@ -71,4 +71,5 @@ ModelCraft remembers the distance until you switch to another tool.
 
 - Push/pull works on one face at a time. If you click something that is not a face, the status bar says "Push/pull works on a face. Click a face."
 - To push/pull a face inside a group or component, open it first (double-click it).
+- With **Collide** on, a push or pull that runs into another solid stops where it touches, and the tip says what it touches (the object's name, or "loose geometry in this group") and highlights the faces it met. A pocket you push into its own solid (for example an offset face pushed back down) is part of that solid and is never stopped by its walls.
 - Two solids pushed into each other do not cut or join each other: their faces just pass through. See [Not built yet](topic:not-built-yet).

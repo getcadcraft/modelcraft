@@ -1,110 +1,63 @@
 ---
-title: Có gì mới trong 0.7
-summary: Lưới với bộ điều chỉnh, điêu khắc, UV và đối tượng đường cong, path tracing trên card đồ họa và không gian làm việc Kết xuất, xem trực tiếp theo thời gian thực với phân tán và toàn cảnh, vật liệu dạng nút, không gian làm việc Hoạt ảnh với xương và vật lý, các tệp USD, FBX, STEP và .3dm, và công cụ in với kiểu Người mới.
-keywords: có gì mới, what's new, ghi chú phát hành, nhật ký thay đổi, thay đổi, 0.7, phiên bản, tính năng mới, lưới, lưới, không gian làm việc lưới, bộ điều chỉnh, chia mặt, nếp gấp, uv, trải phẳng, đường nối, đường cong, đối tượng đường cong, nurbs, bezier, điêu khắc, tạo lại lưới, dựng lại topology, chia đều, phép tính, path tracing, webgpu, không gian làm việc kết xuất, hàng đợi kết xuất, mp4, exr, khử nhiễu, bầu trời vật lý, hdri, ies, độ sâu trường ảnh, trộn ánh sáng, sương mù, caustics, xem trực tiếp, thời gian thực, đi bộ, phân tán, toàn cảnh, tour, trình xem, đổ bóng, nút, vật liệu dạng nút, thư viện vật liệu, materialx, decal, vẽ kết cấu, nướng, hoạt ảnh, trình chỉnh đồ thị, clip, khóa hình dạng, driver, armature, xương, skinning, ik, ràng buộc, vật lý, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, khối đặc 3D, giá đỡ, độ dày thành, làm rỗng, sửa chữa, người mới, trợ lý, máy của bạn, đơn vị, tiếng Bồ Đào Nha
-from: b9fc43e2
+title: Có gì mới trong 0.8 và 0.8.1
+summary: Lựa chọn công cụ kết xuất với tệp cho chương trình khác, bề mặt tự do NURBS với độ liên tục đo được, cảnh bạn mô tả cho trợ lý, vật liệu tạo từ một ảnh, ảnh phác thảo lên mặt đất, phòng được bày đồ đạc, cắt nghiêng để in 3D, và kiểm tra in trong bảng Vấn đề.
+keywords: có gì mới, what's new, ghi chú phát hành, nhật ký thay đổi, thay đổi, 0.8, 0.8.1, phiên bản, tính năng mới, công cụ kết xuất, engine, mở trong, usd, gltf, unreal, công cụ bổ sung, nurbs, bề mặt, loft, sweep, liên tục, g0, g1, g2, zebra, step, iges, mô tả cảnh, cảnh, thời tiết, thời gian trong ngày, mùa, trợ lý, vật liệu từ ảnh, ảnh, ảnh phác thảo, bày đồ đạc, phòng, nghiêng, tách, kiểm tra in, vấn đề, bảng thuộc tính, đèn, ngôn ngữ, thiết bị nhập, hàng thanh công cụ, dwg, live
+from: e4989b17
 ---
 
-Đây là những thay đổi trong ModelCraft 0.7 so với 0.6. ModelCraft giờ mô hình hóa lưới cũng như hình học đẩy/kéo, kết xuất trên card đồ họa, và có một không gian làm việc cho mỗi loại công việc: chọn trong danh sách {{ui:Không gian làm việc}} ở bên trái thanh công cụ.
+Đây là những thay đổi trong ModelCraft 0.8 (2026-11-01) và 0.8.1 (2026-11-02), so với 0.7. Hộp thoại {{ui:Kết xuất ảnh…}} giờ có thể gửi cảnh sang chương trình khác, bảng Bề mặt tạo các bề mặt tự do mượt, và trợ lý bạn kết nối có thể thiết lập cả một cảnh chỉ từ một câu.
 
 ## Mới
 
-### Lưới
-
-- **Lưới.** Chọn một nhóm hoặc cấu kiện rồi nhấn {{ui:Chuyển thành lưới}} trong {{ui:Thông tin đối tượng}}: nó trở thành lưới, với các mặt có số góc bất kỳ, có thể mang tọa độ kết cấu, pháp tuyến, màu và trọng số. {{ui:Chuyển thành hình học}} đưa nó trở lại. Hoàn tác trên lưới chỉ giữ lại những gì mỗi bước đã thay đổi. Tệp có chứa lưới cần ModelCraft 0.7 để mở. Xem [Lưới](topic:meshes).
-- **Không gian làm việc Lưới.** Nhấp đúp vào một lưới, hoặc chọn {{ui:Lưới (mesh)}} trong danh sách {{ui:Không gian làm việc}}, để sửa đỉnh, cạnh và mặt: vòng lặp và vòng, chỉnh sửa theo tỷ lệ, đùn, inset, vát mép (bevel), cắt vòng, dao cắt, chia đôi, quay, gộp, hòa tan, lấp đầy, lấp đầy lưới, cầu nối và trượt, và cài đặt của thao tác cuối được thay đổi sau đó trong bảng. Bắt đầu từ mặt phẳng, khối lập phương, hình cầu, xuyến và nhiều hơn nữa. Phím đẩy/kéo và phím của trình tạo mô hình đều dùng được. Xem [Chỉnh sửa lưới trong Không gian làm việc Lưới](topic:mesh-edit).
-- **Bộ điều chỉnh.** Gương (mirror), mảng (array), bề mặt chia (subdivision surface), vát mép (bevel), solidify, boolean, displace, weld, decimate, smooth, lattice, curve deform và shrinkwrap thay đổi cách lưới hiển thị mà không thay đổi chính nó. Xếp chồng chúng, bật hoặc tắt từng cái cho khung nhìn và cho kết xuất, và nhấn {{ui:Áp dụng}} khi bạn muốn giữ lại vĩnh viễn. Xem [Bộ điều chỉnh trên lưới](topic:modifiers).
-- **Chia mặt với nếp gấp.** {{ui:Nếp gấp}} trong Không gian làm việc Lưới giữ các cạnh đã chọn sắc dưới bề mặt chia. Kết xuất có thể dùng nhiều cấp hơn khung nhìn, và với lưới lớn khung nhìn hiển thị cấp thấp hơn và nói rõ điều đó. Xem [Bề mặt chia](topic:modifiers#subdivision-surface).
-- **Đối tượng đường cong.** Đường cong Bézier, NURBS và đoạn thẳng để tạo ống, dải, phần thu hẹp hoặc tấm đặc, và chữ dưới dạng đường cong. Chỉnh sửa điểm trong không gian làm việc {{ui:Đường cong}}; nhấn {{ui:Thành lưới}} khi hình dạng đã đúng. Xem [Đối tượng đường cong](topic:curves).
-- **Không gian làm việc UV.** Đánh dấu đường nối (hoặc để ModelCraft đánh dấu tại các cạnh sắc), {{ui:Trải phẳng}} và {{ui:Xếp}}, hoặc chiếu theo hộp, trụ, cầu hoặc khung nhìn. Trình chỉnh sửa UV bên cạnh khung nhìn 3D di chuyển, xoay và co giãn các mảnh, và màu kiểm tra cùng màu kéo giãn cho thấy kết quả. Xem [Dàn trang UV của lưới](topic:uv).
-- **Điêu khắc.** Không gian làm việc {{ui:Điêu khắc}} có các cọ vẽ, đất sét, làm mịn, nắm, thổi phồng, nếp gấp, bóp, làm phẳng và cọ mặt nạ, đối xứng qua trục X, và {{ui:Chi tiết}} thêm tam giác ở nơi bạn điêu khắc. Áp lực bút quyết định kích thước và độ mạnh của cọ. Mỗi nét là một bước hoàn tác. Xem [Điêu khắc lưới](topic:sculpt).
-- **Tạo lại lưới và dựng lại topology.** {{ui:Tạo lại lưới}} làm lại toàn bộ lưới thành các tam giác đều, lấp lỗ và nối các mảnh chồng lên nhau. Để dựng một lưới sạch trên lưới chi tiết, chọn nó dưới {{ui:Dựng lại topology}}: các điểm bạn di chuyển sẽ nằm trên bề mặt của nó. Xem [Tạo lại lưới](topic:mesh-edit#remesh).
-
-### Bản vẽ
-
-- **Chia đều một cạnh hoặc đường cong.** Công cụ {{ui:Chia đều}} đánh dấu các điểm cắt khi bạn di chuyển dọc theo cạnh và chia đều bằng một cú nhấp hoặc số bạn nhập; với một cạnh, cung hoặc vòng tròn đã chọn, nhập `/5`; {{ui:Thông tin đối tượng}} › {{ui:Chia đều…}} hỏi số lượng, dành cho máy tính bảng. Cung hoặc vòng tròn được chia theo góc bằng nhau trên cung thật. Xem [Chia đều cạnh hoặc đường cong thành các phần bằng nhau](topic:divide).
-- **Phép tính trong ô giá trị.** Nhập `2.5/3`, `12'6"+3/4"`, `(24'-0")/3` hoặc `2*450mm` cho bất kỳ độ dài nào, và `90/2` cho một góc. Phép tính không thực hiện được sẽ nói rõ sai ở đâu và ở chỗ nào. Xem [Phép tính](topic:value-box#calculations).
-
 ### Kết xuất
 
-- **Path tracing trên card đồ họa.** {{ui:Kết xuất ảnh…}} › {{ui:Chất lượng cao (path tracing)}} chạy bộ path tracer riêng của CadCraft trên card đồ họa ở nơi trình duyệt có WebGPU; dòng dưới ảnh cho biết công cụ nào đã tạo ra nó. {{ui:Dừng}} giữ lại ảnh và {{ui:Tiếp tục}} chạy tiếp từ đó. Không có WebGPU, ảnh vẫn được path tracing bằng WebGL như trước. Xem [Chất lượng cao](topic:render#high-quality).
-- **Kết xuất trong khung nhìn.** Không gian làm việc {{ui:Kết xuất}} path tracing chính khung nhìn và bắt đầu lại khi bạn xoay hoặc chỉnh sửa: kết xuất một {{ui:Vùng}}, nhấp để {{ui:Lấy nét}}, đặt {{ui:Chi tiết}}. Cần WebGPU. Xem [Kết xuất trong khung nhìn](topic:render#render-in-the-view).
-- **Vật liệu, ánh sáng và bầu trời.** Ảnh chất lượng cao tô bóng mọi bề mặt bằng mô hình vật liệu OpenPBR (lớp phủ, lông tơ, màng mỏng, kính màu, phát sáng). Với WebGPU còn có {{ui:Bầu trời vật lý}} với {{ui:Độ mờ}}, {{ui:Ảnh bầu trời (HDRI)}}, và các profile ánh sáng IES của nhà sản xuất cho đèn. Xem [Bầu trời và profile ánh sáng](topic:render#skies-and-light-profiles-on-the-graphics-card).
-- **Máy ảnh như máy ảnh chụp ảnh.** Độ phơi sáng từ f-stop, tốc độ màn trập và ISO ở mọi chế độ; với WebGPU còn có độ sâu trường ảnh, phối cảnh hai điểm, cân bằng trắng, toàn cảnh 360° (cả nổi) và cube map. Xem [Máy ảnh](topic:render#the-camera).
-- **Hoàn thiện ảnh sau khi kết xuất.** Chỉnh màu ({{ui:ACES filmic}}, {{ui:AgX}}, {{ui:Filmic}} hoặc {{ui:Tiêu chuẩn}}, độ tương phản, bloom, chói, vignette, một bảng màu `.cube`), trộn bầu trời, mặt trời và từng nhóm đèn, và xem từng phần tử kết xuất, tất cả mà không cần kết xuất lại. Phần hạt còn lại được loại bỏ bằng bộ khử nhiễu trên máy tính của bạn. Xem [Hoàn thiện ảnh](topic:render#finish-the-picture) và [Trộn ánh sáng sau khi kết xuất](topic:render#mix-the-lights-after-the-render).
-- **Thêm cách lưu ảnh kết xuất.** PNG 16-bit, EXR nhiều lớp với mọi phần tử kết xuất và nhóm đèn, và tệp kết xuất (`.ccrender`) mở lại được cùng phần trộn và chỉnh màu. Xem [Lưu ảnh](topic:render#save-the-picture).
-- **Sương mù, khói và caustics.** Sương mù và mờ được chiếu sáng bởi mặt trời và đèn, có tia sáng xuyên qua; một cột khói hoặc một đám mây; caustics dưới kính và gương; lấy mẫu thích ứng dừng ở những điểm ảnh đã sạch. Chỉ trên card đồ họa. Xem [Sương mù, khói, nhiễu và caustics](topic:render#fog-smoke-noise-and-caustics).
-- **Hàng đợi kết xuất và MP4.** Thêm ảnh chất lượng cao và toàn bộ hoạt ảnh vào {{ui:Hàng đợi kết xuất}}; chúng kết xuất lần lượt và hàng đợi được giữ lại khi đóng trang. Cần WebGPU. Video cũng có thể lưu dưới dạng MP4 ở nơi trình duyệt ghi được. Xem [Hàng đợi kết xuất](topic:render#the-render-queue) và [Kết xuất video](topic:animation#render-the-video).
-
-### Xem trực tiếp và trình chiếu
-
-- **Xem trực tiếp.** {{ui:Xuất}} › {{ui:Xem trực tiếp}} hiển thị mô hình với giao diện thời gian thực bên cạnh khung nhìn, theo sát mọi chỉnh sửa và máy ảnh: bóng mặt trời, vật liệu, đèn và ánh sáng phản xạ từ tường. {{ui:Đi bộ}} qua mô hình, kéo {{ui:Giờ}} và {{ui:Tháng}} để di chuyển mặt trời, hoặc đưa nó sang một {{ui:Cửa sổ mới}}. Nó dùng WebGPU ở nơi trình duyệt có, nếu không thì WebGL 2. Xem [Xem trực tiếp](topic:live-view).
-- **Phân tán.** Rải cỏ, hoa, đá, cây và người trên các mặt hoặc bằng cọ, từ bảy mục môi trường mới và phần còn lại của thư viện; các bộ được lưu trong tệp. Xem [Phân tán cây, đá và người](topic:live-view#scatter-plants-rocks-and-people).
-- **Chia sẻ.** Toàn cảnh 360°, một tour toàn cảnh với mũi tên giữa các điểm, một trình xem độc lập (một trang web chạy ngoại tuyến và không tải gì từ internet), và video theo đường đi của máy ảnh, tất cả với giao diện thời gian thực. Xem [Chia sẻ](topic:live-view#share-panoramas-tours-a-viewer-a-video).
-- **VR với giao diện thời gian thực.** {{ui:Xem lại trong VR}} hiển thị mô hình với vật liệu, bầu trời, bóng mặt trời, đèn, các mục đã phân tán và ánh sáng phản xạ. Xem [Giao diện khi xem](topic:vr-review#what-it-looks-like).
+- **Lựa chọn công cụ kết xuất.** {{ui:Kết xuất ảnh…}} có danh sách **Công cụ kết xuất** phía trên Chế độ. Hai công cụ riêng của chúng tôi, Fast và Path tracer, là mặc định và hoạt động ở mọi nơi. Các mục khác lưu cảnh thành một gói (mô hình dưới dạng tệp USD, cùng một tệp cài đặt với giá trị vật liệu chính xác, các đèn đang bật, mặt trời, bầu trời, độ phơi sáng và camera) để mang sang chương trình khác. Ảnh do chương trình khác vẽ sẽ ghi rõ chương trình và phiên bản đã tạo ra nó. Xem [Chọn chương trình vẽ ảnh](topic:render-engines).
+- **Mở trong chương trình khác.** Danh sách Công cụ kết xuất có thể lưu cảnh thành tệp USD, tệp glTF (`.glb`) hoặc thư mục dự án Unreal (`.zip`), trong trình duyệt và trong CadCraft Studio. Trong Studio, còn có thể khởi chạy usdview hoặc chương trình mặc định của máy tính cho tệp đó. Xem [Mở cảnh trong chương trình khác](topic:render-open-in).
+- **Gửi sang công cụ trò chơi từ Studio.** Studio ghi cảnh vào một dự án Unreal Engine và giữ cho cảnh đồng bộ mỗi lần gửi, chỉ một chiều. Các chỉnh sửa của bạn nằm trong một lớp mà CadCraft không bao giờ ghi. Xem [Gửi cảnh sang công cụ trò chơi](topic:render-unreal).
+- **Công cụ kết xuất từ công cụ bổ sung.** Một tiện ích bổ sung có thể thêm công cụ vào danh sách. Công cụ viết bằng JavaScript vẽ trong trình duyệt và trong Studio; công cụ chạy một chương trình cần bạn đồng ý trong Studio. Xem [Vẽ ảnh bằng chương trình khác](topic:render-other-program) và [Thêm công cụ kết xuất bằng công cụ bổ sung](topic:render-engine-addons).
+- **Mô tả cảnh.** Nói với trợ lý đã kết nối của bạn "chạng vạng, mưa nhẹ, cây mùa thu, người trên quảng trường" và ModelCraft thiết lập tất cả trong một bước: mặt trời di chuyển theo ngày và giờ để bóng đổ theo, bầu trời thay đổi, các bề mặt ướt xuất hiện, và cây cùng người được đặt thành đối tượng thật trên các thẻ mà bạn có thể ẩn, di chuyển hoặc xóa. Thời gian trong ngày, ngày hoặc mùa, và thời tiết (quang đãng, nhiều mây, sương mù, mưa nhẹ, mưa, bão) cũng hoạt động riêng lẻ, và yêu cầu sau sẽ thay đổi chính cảnh đó. Sương mù hiển thị trong ảnh chất lượng cao trên card đồ họa; các công cụ khác hiển thị bầu trời, ánh sáng và các bề mặt ướt. Mưa không được vẽ thành các vệt rơi.
 
 ### Vật liệu
 
-- **Vật liệu tạo bằng nút.** {{ui:Đổ bóng}} không gian làm việc xây dựng các vật liệu của tệp thành đồ thị nút: ảnh và nhiễu và ô vuông, ô Voronoi, sóng, gạch, ngói, gỗ, đá cẩm thạch, gradient, bụi bẩn và mài mòn cạnh, xử lý màu, toán học, bản đồ bump và normal, thành vật liệu OpenPBR đầy đủ. Khung nhìn hiển thị mỗi thay đổi ngay lập tức. Xem [Tạo vật liệu bằng nút](topic:shading).
-- **Thư viện vật liệu và bộ kết cấu của riêng bạn.** Bảng Đổ bóng liệt kê các vật liệu của Thư viện: mười sáu bộ kết cấu CC0, mỗi bộ đều ghi công. Nhấp một bộ để dùng, hoặc kéo nó lên một mặt. {{ui:Hình ảnh hoặc tệp zip…}} hoặc {{ui:Một thư mục…}} tạo vật liệu từ các bản đồ của bạn, được nhận diện theo tên tệp. Xem [Vật liệu từ thư viện](topic:shading#materials-from-the-library).
-- **MaterialX vào và ra.** Xuất vật liệu dưới dạng MaterialX (OpenPBR Surface hoặc Standard Surface, kết cấu dạng PNG), và nhập tệp MaterialX cùng ảnh của chúng. Xem [MaterialX](topic:shading#materialx).
-- **Decal và vẽ kết cấu.** Đặt một ảnh lên bề mặt làm decal với vật liệu riêng, và vẽ lên ảnh của vật liệu bằng cọ tròn. Xem [Decal](topic:shading#decals) và [Vẽ trên kết cấu](topic:shading#paint-on-the-texture).
-- **Nướng kết cấu.** Nướng occlusion môi trường, độ cong, ánh sáng và pháp tuyến của một đối tượng chi tiết thành ảnh dọc theo UV của lưới, trên các nhân xử lý của máy tính. Xem [Nướng kết cấu](topic:shading#bake-textures).
+- **Vật liệu từ một ảnh.** Đưa cho ModelCraft một ảnh của một bề mặt (tường, sàn, đá) và nó tạo một vật liệu lát ghép lặp: ánh sáng trên ảnh được làm phẳng, các cạnh được làm để khớp nhau, và bản đồ màu, bản đồ độ nhám và bản đồ pháp tuyến được tính từ ảnh. Đây chỉ là xử lý ảnh thông thường trên ảnh của chính bạn, không dùng mô hình đã huấn luyện. Độ nhám là ước lượng. Ảnh phẳng, vuông và chụp thẳng cho ô lát tốt nhất; một hoa văn rõ như gạch có thể để lại bóng mờ tại chỗ nối được pha trộn.
 
-### Hoạt ảnh
+### Bề mặt
 
-- **Không gian làm việc Hoạt ảnh.** Tạo khóa cho vị trí, góc xoay và kích thước của đối tượng, độ sáng, độ lan tỏa và màu của từng đèn, và góc ống kính, ngay trong bảng. Dòng thời gian có chế độ xem {{ui:Đường cong}} (tay cầm Bézier, lặp lại) và chế độ xem {{ui:Clip}} lưu các khóa thành hành động để đặt lại và trộn; các khóa trên nhiều hàng có thể được di chuyển, kéo giãn, sao chép và dán. Xem [Hoạt ảnh mọi thuộc tính](topic:animate).
-- **Khóa hình dạng và driver.** Lưới giữ các hình dạng khác của chính nó, được pha trộn bằng thanh trượt có thể tạo khóa, hoặc đặt từ các giá trị khác bằng một biểu thức nhỏ. Xem [Khóa hình dạng](topic:animate#shape-keys-morphs) và [Driver](topic:animate#drivers).
-- **Armature.** Đặt xương vào lưới, để {{ui:Trọng số tự động}} chia các điểm giữa chúng hoặc tự vẽ trọng số, và tạo dáng và tạo khóa cho xương; skinning tuyến tính hoặc dual quaternion. Xem [Armature](topic:animate#armatures-bones-that-bend-a-mesh).
-- **IK và ràng buộc.** Reach (IK) với pole, look at, copy transforms, giới hạn, child of và follow path, cho xương và đối tượng. Xem [IK và ràng buộc](topic:animate#ik-and-constraints).
-- **Vật lý.** Nhóm và cấu kiện rơi, chồng lên nhau và va chạm như hộp hoặc quả cầu, và {{ui:Bake vật lý}} giữ kết quả dưới dạng khóa. Xem [Vật lý](topic:animate#physics-drop-stack-and-collide).
+- **Bề mặt tự do.** Bảng {{ui:Bề mặt}} tạo đường cong NURBS và bề mặt không cắt: đường cong đi qua các điểm, loft, kẻ thẳng, đùn, quay tròn, quét dọc theo một hoặc hai ray, bề mặt từ mạng lưới đường cong, mảng vá từ bốn cạnh, khớp và pha trộn. Mọi cạnh chung được đo là G0, G1 hoặc G2 (khe hở, góc, bước nhảy độ cong) trên các bề mặt chính xác, và một cạnh kém hơn mức bạn yêu cầu sẽ xuất hiện trong bảng Vấn đề với một lần sửa **Khớp**. Vằn zebra và màu độ cong được vẽ từ các bề mặt chính xác. Tệp STEP và IGES được xuất và nhập. Xem [Bề mặt tự do (NURBS)](topic:nurbs-surfaces).
 
-### Tệp
+### Khu đất và phòng
 
-- **USD.** {{ui:Lưu thành}} ({{key:Mod+Shift+S}}) lưu mô hình dưới dạng `.usda`, `.usdc` hoặc `.usdz`, và một tệp USD do ModelCraft lưu sẽ mở lại mà không mất gì. USD từ các chương trình khác mở hoặc nhập thành lưới, nhóm, cấu kiện, đèn và máy ảnh. {{ui:Lưu}} vẫn ghi `.modelcraft`. Xem [Lưu, mở và xuất USD](topic:usd).
-- **glTF, đầy đủ.** Tệp glTF vào dưới dạng lưới có thể chỉnh sửa với pháp tuyến, UV, màu đỉnh và kết cấu, các nút thành nhóm, đèn thành đèn và máy ảnh thành cảnh; kể cả tệp Draco và meshopt; một `.gltf` mở được khi thả cùng các tệp của nó. Xuất ghi lưới, kết cấu, đèn và máy ảnh. Xem [glTF](topic:formats#gltf-glb-gltf).
-- **Nhập FBX, PLY, STL và Alembic.** FBX 2011 trở lên (lưới, bộ UV, vật liệu, kết cấu nhúng, đèn, máy ảnh), PLY và STL với màu của chúng, và bộ đệm Alembic tại mẫu đầu tiên. OBJ vào cùng `.mtl` và ảnh khi bạn thả chúng cùng nhau. Xem [Định dạng tệp chi tiết](topic:formats).
-- **Xuất thêm.** PLY với màu, STL với màu của các mặt đã sơn, và OBJ cùng kết cấu trong một tệp zip. Xem [Định dạng tệp chi tiết](topic:formats).
-- **Tệp STEP.** {{ui:Nhập}} đọc các chi tiết và lắp ráp STEP (AP203, AP214, AP242) dưới dạng lưới kín ở kích thước thật, mỗi chi tiết ở đúng vị trí tệp đặt. Xem [STEP](topic:formats#step-step-stp).
-- **Tệp .3dm.** {{ui:Nhập}} đọc các mô hình `.3dm`: lưới, polysurface và phần đùn (từ các lưới được lưu trong tệp, nếu không thì được tessellate bởi ModelCraft), đường cong thành cạnh, khối thành cấu kiện và lớp thành thẻ. Xem [Nhập mô hình .3dm](topic:import-3dm-files).
-- **Khối đặc 3D từ DWG và DXF.** Nhập một bản vẽ giờ cũng mang theo khối đặc 3D, vùng và thân, mỗi cái thành một nhóm riêng, các khối kín thành khối đặc. Xem [Mô hình trên mặt bằng công trường](topic:site-plan#what-comes-in).
+- **Ảnh phác thảo lên mặt đất.** {{ui:Tệp}} › {{ui:Nhập ảnh chụp phác thảo…}} biến ảnh chụp bằng điện thoại của một bản phác thảo tay thành các cạnh trên mặt đất theo tỷ lệ bạn nhập: một nhóm, với một thẻ cho mỗi màu bút. Tờ giấy được tìm và nắn thẳng trên máy tính của bạn và không có gì được gửi đi đâu. Xem [Mô hình trên mặt bằng công trường](topic:site-plan).
+- **Bày đồ đạc cho phòng.** Chọn một sàn và dùng {{ui:Sắp xếp}} › {{ui:Bày đồ đạc cho phòng…}}. Đồ nội thất phòng ngủ, phòng khách, phòng ăn, bếp, phòng tắm hoặc văn phòng được đặt theo quy tắc, sát tường và cách xa cửa đi, cửa sổ, trong một nhóm mà bạn có thể lấy đi trong một bước. Đây là bố trí mặc định để bạn xem lại, không phải thiết kế. Xem [Thư viện khởi đầu](topic:starter).
 
 ### In 3D
 
-- **Công cụ in.** {{ui:Kiểm tra in 3D (STL hoặc 3MF)…}} › **Công cụ in** có {{ui:Xem trước giá đỡ}} (phần nhô ra, cột hoặc giá đỡ dạng cây, ước lượng lượng vật liệu), {{ui:Độ dày thành}} (các thành quá mỏng để in, liệt kê với {{ui:Hiện}}), {{ui:Làm rỗng}} (thành với độ dày bạn nhập, có lỗ thoát) và {{ui:Sửa chữa}} (liệt kê mọi bản sửa; các phần chồng lên nhau chỉ nối khi bạn yêu cầu). Làm rỗng và Sửa chữa cho ra một nhóm mà các mặt phẳng là một mặt đơn, hoặc một lưới khi kết quả không kín hoặc có quá nhiều mặt; dòng trạng thái cho biết cái nào. Xem [Giá đỡ, độ dày thành, làm rỗng và sửa chữa](topic:print-tools).
-- **Kiểu Người mới.** {{ui:Cài đặt}} › {{ui:ModelCraft}} › {{ui:Menu, phím và chuột}} › {{ui:Người mới}}: các nút lớn để thả hình dạng và lỗ, di chuyển, căn chỉnh và {{ui:Nhóm}} để các lỗ được cắt, rồi kiểm tra mô hình để in. Xem [Kiểu Người mới](topic:beginner).
+- **Cắt nghiêng.** Tách để in có thể nghiêng các đường cắt đến 60 độ, giúp các mảnh có diện tích dán lớn hơn. Đầu nối đứng vuông góc với đường cắt. Xem [Tách mô hình để in](topic:print-split).
+- **Kiểm tra in trong Vấn đề.** Các phát hiện từ kiểm tra in 3D hiển thị trong bảng Vấn đề với dấu trên mô hình, và Sửa lỗi xử lý chúng ngay từ đó. Xem [Chống đỡ, độ dày thành, khoét rỗng và sửa lỗi](topic:print-tools).
 
-### Trợ lý và máy của bạn
+### Trong mọi ứng dụng
 
-- **Thêm cho trợ lý AI.** Trợ lý giờ có thể liệt kê mặt và vật liệu, đẩy/kéo, sơn, tạo nhóm, thêm và hiện cảnh, thêm lưới, sửa chồng bộ điều chỉnh, xuất USD, kết xuất ảnh và đổ đầy hàng đợi kết xuất. Xem [Sử dụng ModelCraft với trợ lý AI](topic:use-with-ai-assistants).
-- **Máy của bạn.** {{ui:Cài đặt}} › {{ui:ModelCraft}} › {{ui:Kết xuất}} › {{ui:Máy của bạn}} hiển thị card đồ họa, nhân xử lý và bộ nhớ mà trình duyệt này cho ứng dụng dùng, và mức đặt điểm bắt đầu của xem trực tiếp. Xem [Máy của bạn kết xuất bằng gì](topic:your-machine).
+- **Ngôn ngữ.** Trợ giúp và ứng dụng có 54 ngôn ngữ. Mười ngôn ngữ mới: Litva, Latvia, Bosnia, Marathi, Telugu, Albania, Afrikaans, Filipino, Swahili và Uzbek. Các ngôn ngữ khác tiếng Anh là bản dịch máy cho đến khi người bản ngữ đọc lại, và các chủ đề trợ giúp có thể vẫn bằng tiếng Anh.
+- **Thiết bị nhập.** Bàn di chuột, bút, chuột 3D, bộ điều khiển trò chơi và điều khiển MIDI có thể điều khiển các ứng dụng, cho tất cả hoặc cho một ứng dụng.
+- **Hàng thanh công cụ.** {{ui:Cài đặt}} › {{ui:Chung}} › Hàng thanh công cụ đặt Xuống dòng (như trước), 2 hàng hoặc 1 hàng. Thanh không vừa sẽ cuộn ngang thay vì lấy chỗ từ bản vẽ. Xuống dòng vẫn là mặc định.
+- **Bảng thuộc tính.** Các ô của đèn trong ModelCraft dùng bảng chung: nhóm thu gọn được, cột nhãn và giá trị, và Mật độ gọn. Phép tính gõ như `2*450` vẫn hoạt động.
+- **Vấn đề.** Bảng Vấn đề (nút cảnh báo trên thanh ứng dụng) được mọi ứng dụng dùng chung. Trong ModelCraft, bảng chứa kiểm tra in và cảnh báo độ liên tục bề mặt.
+- **Live.** Phiên Live TeamWork cho thấy ai đang ở đâu. Xem [Mô hình cùng nhau với Live TeamWork](topic:work-live).
+- **Công cụ bổ sung.** Công cụ bổ sung có thể thêm công cụ kết xuất, như trên.
+- **Kết nối AI của bạn.** Hợp đồng công cụ và các kiểm tra của tám ứng dụng đã đạt, với tổng cộng 454 công cụ. Kết nối một cú nhấp trong Studio, connector được lưu trữ cho trợ lý trình duyệt, khóa riêng của bạn trong Studio và gói đã xuất bản chưa được hứa hẹn. Các ứng dụng không chứa AI riêng. Xem [Dùng ModelCraft với trợ lý AI](topic:use-with-ai-assistants).
 
-## Đã sửa
+## Đã sửa trong 0.8.1
 
-- {{ui:Khối đặc}} › {{ui:Hợp}}, {{ui:Trừ}} và {{ui:Giao}} có thể trả về một nhóm không kín, ở mọi kích thước. Giờ chúng cho ra nhóm kín.
-- {{ui:Khối đặc}} › {{ui:Trừ}} bị làm mờ khi chưa chọn gì, dù nó chọn lần lượt hai phần sau khi bạn chọn nó.
-- Bên trong dòng thời gian hoạt ảnh, phím gõ vào không đi đâu cả, kể cả {{key:Mod+S}}. {{key:Mod+Z}} và {{key:Mod+Y}} ở đó là hoàn tác và làm lại riêng của dòng thời gian; các phím {{key:Mod}} khác vẫn đến ứng dụng.
-
-## Trong mọi ứng dụng
-
-- **Đơn vị.** {{ui:Cài đặt}} › {{ui:Chung}} › {{ui:Đơn vị}} có một danh sách cho mỗi loại độ dài, diện tích, thể tích, góc và độ dốc, với các kích thước chính xác do định nghĩa đơn vị đưa ra (foot khảo sát Mỹ là đơn vị riêng). Tắt các đơn vị bạn không dùng và chúng rời khỏi danh sách; đánh dấu sao một đơn vị và công việc mới bắt đầu bằng đơn vị đó. Tệp luôn giữ đơn vị riêng của nó. Trong ModelCraft, danh sách đơn vị bên cạnh ô giá trị theo các công tắc (đơn vị của mô hình luôn nằm trong đó), dấu sao đặt đơn vị cho mô hình mới (khi ModelCraft có đơn vị đó), và độ dài được nhập với ký hiệu của bất kỳ đơn vị nào sẽ được đọc theo đơn vị đó. Xem [Đơn vị, giá trị đã nhập và danh sách đơn vị](common:unit-lists).
-- **Bố cục dày đặc hơn và các bảng tự gọn lại.** {{ui:Cài đặt}} › {{ui:Chung}} › {{ui:Mật độ bố cục}} › {{ui:Gọn}} hiển thị nhiều hơn trên màn hình (màn hình cảm ứng và điện thoại vẫn giữ nút lớn). Mỗi bảng bên có một thanh tiêu đề mảnh: kéo để neo hoặc nổi bảng, thả lên thanh của bảng khác để chung một khung dưới dạng thẻ, ghim để trượt về mép, hoặc ẩn và đưa lại từ mép. Xem [Sắp xếp các bảng](common:arrange-panels#make-the-layout-denser).
-- **Hộp thoại di chuyển được.** Kéo hộp thoại theo thanh tiêu đề để đưa nó khỏi bản vẽ; nó quay về chỗ bạn để lại. Nhấp đúp vào thanh tiêu đề để căn giữa lại. Xem [Di chuyển hộp thoại](common:arrange-panels#move-a-dialog).
-- **Công thức cho trợ lý AI.** Mười yêu cầu mẫu cho trợ lý của riêng bạn (dọn bản vẽ, in một bộ, kiểm tra bản vẽ, hỏi mô hình, tổng hợp bóc tách khối lượng, thử biến thể chi tiết…), mỗi cái kèm các công cụ nó gọi và quyền cần có, và mỗi cái được các bài kiểm thử của chúng tôi chạy lại. Các ứng dụng không chứa AI. Xem [Công thức cho trợ lý AI](common:assistants-recipes).
-- **Ngôn ngữ.** **Português (Portugal)** là mới trong {{ui:Cài đặt}} › {{ui:Chung}} › {{ui:Ngôn ngữ}}. Ngôn ngữ này, **Português (Brasil)**, **Español (México)** và **Bahasa Indonesia** giờ có mọi từ của các ứng dụng, dưới dạng bản nháp chưa được người bản ngữ xem lại. Các chủ đề trợ giúp vẫn bằng tiếng Anh.
-- **CadCraft Studio** nói rõ vì sao kiểm tra cập nhật thất bại (chưa có tệp cho hệ thống của bạn, không có mạng, chữ ký không hợp lệ) thay vì chỉ "Xong", và không đưa lại thẻ Có gì mới bạn đã đóng cho đến khi có bản phát hành mới hơn.
+- **Phần lớp của DWG.** Phần lớp của tệp DWG được đọc sai kiểu, có thể làm hỏng tệp khi nhập. Giờ nó được đọc đúng, trong ModelCraft và trong các ứng dụng khác đọc DWG.
+- **Máy tính bảng ở chiều dọc.** Chiều cao lưới thừa được dành cho vùng vẽ, và bố cục tờ bắt đầu từ 760 pixel chiều rộng trở xuống. Bảng kiểu của ModelCraft cũng có thay đổi này.
+- **Ngôn ngữ trong Studio.** CadCraft Studio và các bản đóng gói có thể đổi ngôn ngữ khi đang chạy; trước đây chỉ có tiếng Anh. Điều này chưa được kiểm tra trên mọi nền tảng: hãy báo cho chúng tôi nếu ngôn ngữ không đổi.
 
 ## Chưa có trong phiên bản này
 
-- **0.7 chưa được ký mã.** Việc ký, và gói Microsoft Store, được chuyển sang 0.8 vì việc xác thực chứng chỉ chưa xong. Kiểm tra SHA-256 bên cạnh mỗi tệp tại getcadcraft.com/download. Trên Windows, nếu SmartScreen chặn trình cài đặt, chọn {{ui:Thêm thông tin}}, rồi {{ui:Vẫn chạy}}. Trên Mac, lần đầu, nhấp chuột phải vào CadCraft Studio và chọn {{ui:Mở}}. CadCraft Studio chưa có trên cửa hàng ứng dụng nào, và chưa có bản dựng cho iPad hay iPhone.
-- Danh sách góc và độ dốc trong {{ui:Đơn vị}} được lưu, nhưng chưa có ô nào đọc chúng.
-- Kết xuất trên card đồ họa (WebGPU) mới chỉ được thử ở đây với một phần mềm thay thế, chưa thử trên card đồ họa thật, nên hãy kết xuất thứ gì đó nhỏ trên máy tính của bạn trước. Điều tương tự áp dụng cho xem trực tiếp, và VR mới chỉ được thử với trình giả lập tai nghe.
-- Không có WebGPU thì không có không gian làm việc Kết xuất hay hàng đợi kết xuất, và ảnh chất lượng cao không có độ sâu trường ảnh, bầu trời vật lý, ảnh bầu trời, sương mù, khói, caustics hoặc trộn ánh sáng.
-- {{ui:Kết xuất ảnh…}} chưa vẽ các mục đã phân tán; chúng hiển thị trong xem trực tiếp, các toàn cảnh, trình xem và video của nó.
-- Đèn có hoạt ảnh trong khung nhìn, nhưng video đã kết xuất dùng đèn như chúng đang có khi bắt đầu.
-- Xương và hoạt ảnh chưa được đọc hoặc ghi vào tệp glTF, FBX hay USD (mô hình có skinning vào ở trạng thái nghỉ, kèm trọng số của chúng), và vật liệu glTF và FBX ngoài màu gốc hoặc kết cấu chưa được giữ lại.
-- Màu STEP và tên chi tiết của lắp ráp chưa được đọc. Nhập `.3dm` mới được thử với tệp do bộ công cụ của định dạng ghi, chưa thử với tệp từ chính chương trình mô hình hóa; đối tượng SubD, văn bản và kích thước bị bỏ qua.
-- Thư viện cây từ CivilCraft đã có trong ModelCraft, nhưng đặt cây từ đó chưa được xây dựng.
-- Vẽ kết cấu lên các mặt đẩy/kéo lặp lại theo ô của vật liệu; để vẽ riêng một mặt, chuyển nó thành lưới và trải phẳng.
+- **Chưa ký mã.** Windows có thể hiện SmartScreen: chọn {{ui:Thêm thông tin}}, rồi {{ui:Vẫn chạy}}. Trên Mac, nhấp chuột phải và chọn {{ui:Mở}}. Các bản Store đang tạm dừng, và bản cho iPad và iPhone chưa được dựng lại cho 0.8.1.
+- Chương trình khác vẽ ảnh mà không có tiện ích công cụ kết xuất, camera toàn cảnh hoặc lập thể, và ảnh bầu trời qua chương trình khác, cùng với plug-in mở sân khấu Unreal chưa có. Các tệp đã được ghi; plug-in chưa được phát hành và chưa được chạy trong Unreal.
+- Bề mặt tự do: G3 và hạng A chưa được đo hoặc công bố, và cắt xén cùng khối đặc sẽ đến sau.
+- Ảnh từ chương trình khác không giống từng điểm ảnh với ảnh của chúng tôi: chỉ có camera, mặt trời, đèn và độ phơi sáng là khớp.
+- Bản sửa 0.8.1 cho việc đổi ngôn ngữ trong Studio chưa được kiểm tra trên mọi nền tảng.
 
-Phần còn lại nằm trong [Chưa xây dựng](topic:not-built-yet).
+Mọi thứ khác nằm trong [Chưa xây dựng](topic:not-built-yet). Về bản phát hành trước, xem [Có gì mới trong 0.7](topic:whats-new-0-7).

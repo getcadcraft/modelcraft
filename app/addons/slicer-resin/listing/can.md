@@ -1,0 +1,5 @@
+- Layer pictures for your printer's screen, with smooth edges
+- Hollow with a wall you choose and vent holes
+- Supports and a raft, from the overhang angle you set
+- Islands (pieces with nothing under them) marked on the layer preview
+- Time, resin and cost before you print

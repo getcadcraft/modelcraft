@@ -1,0 +1,21 @@
+{
+  "@locale": "tg",
+  "@name": "Тоҷикӣ",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (тавассути Bambu Connect)",
+  "step.orca": "OrcaSlicer-ро дар ин компютер насб кунед.",
+  "step.orca.link": "Гирифтани OrcaSlicer",
+  "step.connect": "Bambu Connect-ро дар ин компютер насб кунед.",
+  "step.connect.link": "Гирифтани Bambu Connect",
+  "step.bind": "Дар Bambu Connect P2S-и худро илова кунед. Ин корро як бор иҷро кунед.",
+  "step.send": "Тугмаи «Ба принтери 3D фиристодан»-ро пахш кунед. Файл дар Bambu Connect кушода мешавад: онро дар он ҷо санҷед ва чопро оғоз кунед.",
+  "note": "Bambu Connect барномаи худи Bambu Lab аст, ки барои чоп кардан аз барномаҳои дигар истифода мешавад ва чоп аз он ҷо оғоз мешавад.",
+  "confirm": "OrcaSlicer ин рӯйхатро бо пешниҳодҳои P2S тайёр кард. Миқдор: {grams} g, қабатҳо: {layers}.",
+  "confirm.next": "Онро дар Bambu Connect кушодан? То он ҷо оғоз кунед, ҳеҷ чиз чоп намешавад.",
+  "done": "Ба Bambu Connect фиристода шуд. Онро дар он ҷо санҷед ва чопро оғоз кунед.",
+  "fail.orca": "OrcaSlicer дар ин компютер ёфт нашуд. Онро насб кунед, сипас дубора кӯшиш кунед.",
+  "fail.slice": "OrcaSlicer ин чопро тайёр карда натавонист. {why}",
+  "fail.nogcode": "Файли OrcaSlicer ҳеҷ чопро дар бар надошт.",
+  "fail.bed": "Ин ба сатҳи чопи P2S намегунҷад.",
+  "fail.connect": "Bambu Connect кушода нашуд. Онро насб кунед, сипас дубора кӯшиш кунед."
+}

@@ -23,7 +23,7 @@ const near = (a, b, tol = 1e-6) => Math.abs(a - b) <= tol;
 globalThis.__flowTest = { ok, section, near, mine, ADDON, APP, VERBOSE };
 
 const t0 = Date.now();
-for (const part of ['sim', 'layout', 'play', 'flow8', 'flow-r3', 'flow-r4', 'plc', 'addon']) {
+for (const part of ['sim', 'layout', 'play', 'flow8', 'flow-r3', 'flow-r4', 'plc', 'modbus', 'plcmode', 'robot', 'robot-formats', 'orders', 'addon']) {
   if (ONLY && !ONLY.includes(part)) continue;
   try { await import(pathToFileURL(path.join(HERE, `t-${part}.mjs`)).href); }
   catch (e) { if (e.code === 'ERR_MODULE_NOT_FOUND' && String(e.message).includes(`t-${part}.mjs`)) continue; fail++; console.log(`  FAIL t-${part}.mjs threw — ${e.stack}`); }

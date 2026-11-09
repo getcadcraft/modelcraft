@@ -1,7 +1,7 @@
 {
   "id": "flow",
   "name": "Material flow",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "apps": [
     "modelcraft"
   ],
@@ -12,7 +12,7 @@
     "panel",
     "files"
   ],
-  "description": "Material-handling layout and simulation: conveyors, curves, inclines, zones, merges, diverts, stop gates, photo-eyes, stations, buffers and AGV paths snapped port to port in the 3D view; a seeded discrete-event simulation with playback, statistics and CSV. No physics; PLC emulation comes later.",
+  "description": "Material-handling layout and simulation: conveyors, curves, inclines, zones, merges, diverts, stop gates, photo-eyes, stations, buffers and AGV paths snapped port to port in the 3D view; a seeded discrete-event simulation with playback, statistics and CSV. No physics. PLC mode: a soft PLC on the model, or a real PLC over Modbus TCP through Studio.",
   "author": "CadCraft",
   "lang": "./lang/",
   "help": "./help/help.js",

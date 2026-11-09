@@ -1,0 +1,1 @@
+- Save a .sl1 file (a zip of layer pictures and a settings file)

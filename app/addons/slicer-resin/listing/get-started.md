@@ -1,0 +1,3 @@
+- Add it, then add the file format your printer uses (Elegoo GOO or SL1)
+- On the print stage, choose Resin in Printing with
+- Pick your printer and resin, press Preview layers, then Save the print file

@@ -1,0 +1,21 @@
+{
+  "@locale": "am",
+  "@name": "አማርኛ",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (በBambu Connect በኩል)",
+  "step.orca": "OrcaSlicer በዚህ ኮምፒውተር ላይ ይጫኑ።",
+  "step.orca.link": "OrcaSlicer ያግኙ",
+  "step.connect": "Bambu Connect በዚህ ኮምፒውተር ላይ ይጫኑ።",
+  "step.connect.link": "Bambu Connect ያግኙ",
+  "step.bind": "በBambu Connect ውስጥ P2S ማተሚያዎን ይጨምሩ። ይህንን አንድ ጊዜ ብቻ ያድርጉ።",
+  "step.send": "ወደ 3D ማተሚያ ላክን ይጫኑ። ፋይሉ በBambu Connect ውስጥ ይከፈታል፤ እዚያ ያረጋግጡና ህትመቱን ይጀምሩ።",
+  "note": "Bambu Connect ከሌሎች ሶፍትዌሮች ለማተም የBambu Lab የራሱ ፕሮግራም ነው፤ ህትመቱ ከዚያ ይጀምራል።",
+  "confirm": "OrcaSlicer ይህንን በP2S ቅድመ-ቅንብሮቹ አዘጋጅቷል፦ {grams} g፣ {layers} ንብርብር።",
+  "confirm.next": "በBambu Connect ይከፈት? እዚያ እስኪጀምሩት ድረስ ምንም አይታተምም።",
+  "done": "ወደ Bambu Connect ተልኳል። እዚያ ያረጋግጡና ህትመቱን ይጀምሩ።",
+  "fail.orca": "OrcaSlicer በዚህ ኮምፒውተር ላይ አልተገኘም። ይጫኑት፤ ከዚያ እንደገና ይሞክሩ።",
+  "fail.slice": "OrcaSlicer ይህንን ህትመት ማዘጋጀት አልቻለም። {why}",
+  "fail.nogcode": "የOrcaSlicer ፋይል ምንም ህትመት አልያዘም።",
+  "fail.bed": "ይህ በP2S ማተሚያው አልጋ ላይ አይገባም።",
+  "fail.connect": "Bambu Connect አልተከፈተም። ይጫኑት፤ ከዚያ እንደገና ይሞክሩ።"
+}

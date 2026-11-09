@@ -1,0 +1,1 @@
+- Anyone who changed resin or printer and needs the exposure that prints thin details sharp

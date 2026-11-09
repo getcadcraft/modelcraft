@@ -1,0 +1,3 @@
+- Add Library items to the bed, scaled to fit
+- Arrange or fit everything on the bed
+- Send over USB, or to Klipper, OctoPrint or PrusaLink on your network

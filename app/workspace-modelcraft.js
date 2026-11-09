@@ -171,7 +171,7 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
     left() { ctx = null; },
     resized() { mc.view.resize?.(); },
     refresh() {
-      infoTitle.textContent = $('[data-info-h]')?.textContent || t('ui.info');
+      infoTitle.textContent = ([...($('[data-info-h]')?.childNodes || [])].find((n) => n.nodeType === 3)?.textContent || '').trim() || t('ui.info');   // 2026-11-09: the heading's own text (it also holds the Auto-focus lock button)
       // a scene made from this camera (Add scene) is the current scene without opening it: a tab for every view marks it, the opened
       // tabs stay as they are (the 3D view is that camera still)
       if (mc.sceneIndex !== seenScene) { seenScene = mc.sceneIndex; if (seenScene >= 0 && ctx?.block('viewtabs')?.mode === 'all') lastView = 'scene:' + seenScene; }

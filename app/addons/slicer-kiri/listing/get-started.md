@@ -1,0 +1,2 @@
+- Add it
+- On the print stage, press Add Kiri:Moto, or choose it in the Slicer list

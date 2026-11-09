@@ -1,0 +1,1 @@
+- Owners of Prusa SL1 and SL1S, and anyone who converts SL1 for another printer

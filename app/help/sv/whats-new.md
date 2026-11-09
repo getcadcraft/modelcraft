@@ -1,110 +1,63 @@
 ---
-title: Nyheter i 0.7
-summary: Nät med modifierare, skulptering, UV och kurvobjekt, path tracing på grafikkortet och en arbetsyta för rendering, en realtidsvy med spridning och panoramor, nodmaterial, en arbetsyta för animation med ben och fysik, USD-, FBX-, STEP- och .3dm-filer samt utskriftsverktyg med en nybörjarstil.
-keywords: nyheter, vad är nytt, versionsinformation, ändringslogg, ändringar, 0.7, version, nya funktioner, nät, nätarbetsyta, modifierare, subdivision, veck, uv, veckla ut, sömmar, kurvor, kurvobjekt, nurbs, bezier, skulptera, gör om nät, retopologi, dela, beräkning, path tracing, webgpu, renderingsarbetsyta, renderingskö, mp4, exr, brusreducering, fysikalisk himmel, hdri, ies, skärpedjup, ljusblandning, dimma, kaustik, levande vy, realtid, gå, spridning, panorama, rundtur, visare, skuggning, noder, nodmaterial, materialbibliotek, materialx, dekaler, texturmålning, bakning, animera, grafredigerare, klipp, formnycklar, drivare, skelett, ben, skinning, ik, villkor, fysik, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D-solider, stöd, väggtjocklek, urholka, reparera, nybörjare, assistenter, din dator, enheter, portugisiska
-from: b9fc43e2
+title: Nyheter i 0.8 och 0.8.1
+summary: Ett val av renderingsmotor med filer för andra program, frihandsytor i NURBS med uppmätt kontinuitet, en scen du beskriver för din assistent, ett material gjort av ett foto, en skissbild på marken, möblerade rum, snedsnitt för 3D-utskrift och utskriftskontrollen i panelen Problem.
+keywords: nyheter, vad är nytt, versionsinfo, ändringslogg, ändringar, 0.8, 0.8.1, version, nya funktioner, renderingsmotor, motor, öppna i, usd, gltf, unreal, motor från tillägg, nurbs, ytor, loft, svep, kontinuitet, g0, g1, g2, zebra, step, iges, beskriv scenen, scen, väder, tid på dygnet, årstid, assistent, material från ett foto, foto, skissfoto, möblera, möblera ett rum, snedsnitt, dela, utskriftskontroll, problem, egenskapsrutnät, lampor, språk, indataenheter, verktygsfältsrader, dwg, live
+from: e4989b17
 ---
 
-Detta är vad som ändrats i ModelCraft 0.7, jämfört med 0.6. ModelCraft modellerar nu nät såväl som geometri för tryck/dra, renderar på grafikkortet och har en arbetsyta för varje typ av arbete: välj den i listan {{ui:Arbetsyta}} till vänster i verktygsfältet.
+Detta är vad som ändrades i ModelCraft 0.8 (2026-11-01) och 0.8.1 (2026-11-02), jämfört med 0.7. Dialogrutan {{ui:Rendera en bild…}} kan nu skicka scenen till ett annat program, panelen {{ui:Ytor}} gör släta frihandsytor, och en assistent som du ansluter kan ställa in en hel scen med en enda mening.
 
 ## Nytt
 
-### Nät
-
-- **Nät.** Markera en grupp eller komponent och klicka på {{ui:Konvertera till nät}} i {{ui:Entitetsinfo}}: den blir ett nät, med ytor med valfritt antal hörn som kan bära texturkoordinater, normaler, färger och vikter. {{ui:Konvertera till geometri}} gör den till geometri igen. Ångra på ett nät behåller bara det varje steg ändrade. En fil som innehåller ett nät kräver ModelCraft 0.7 för att öppnas. Se [Nät](topic:meshes).
-- **Nätarbetsytan.** Dubbelklicka på ett nät, eller välj {{ui:Nät}} i listan {{ui:Arbetsyta}}, för att redigera dess hörn, kanter och ytor: loopar och ringar, proportionell redigering, extrudera, inset, avfasning, loopsnitt, kniv, halvera, snurra, slå ihop, lös upp, fyll, rutnätsfyllning, brygga och glid. Inställningarna för senaste operationen kan ändras efteråt i panelen. Börja från ett plan, en kub, en sfär, en torus och mer. Tangenter för tryck/dra och modelleringstangenter fungerar båda. Se [Redigera ett nät i nätarbetsytan](topic:mesh-edit).
-- **Modifierare.** Spegling, matris, subdivisionsyta, avfasning, solidifiera, boolesk, förskjut, svetsa ihop, decimera, jämna ut, gitter, kurvdeformation och shrinkwrap ändrar vad ett nät visar utan att ändra själva nätet. Stapla dem, slå av eller på var och en för vyn och för renderingar, och {{ui:Verkställ}} en när du vill ha den permanent. Se [Modifierare på ett nät](topic:modifiers).
-- **Subdivision med veck.** {{ui:Veck}} i nätarbetsytan håller valda kanter skarpa under en subdivisionsyta. Renderingar kan använda fler nivåer än vyn, och på ett stort nät visar vyn en lägre nivå och säger det. Se [Subdivisionsyta](topic:modifiers#subdivision-surface).
-- **Kurvobjekt.** Bézier-, NURBS- och kurvor med raka segment som blir ett rör, ett band, en avsmalning eller en fylld platta, och text som kurva. Redigera deras punkter i arbetsytan {{ui:Kurva}}; {{ui:Till nät}} när formen är klar. Se [Kurvobjekt](topic:curves).
-- **UV-arbetsytan.** Markera sömmar (eller låt ModelCraft markera dem vid skarpa kanter), {{ui:Veckla ut}} och {{ui:Packa}}, eller projicera med låda, cylinder, sfär eller vyn. En UV-redigerare bredvid 3D-vyn flyttar, vrider och skalar bitarna, och en schackbräda och töjningsfärger visar resultatet. Se [Lägg ut ett näts UV](topic:uv).
-- **Skulptering.** Arbetsytan {{ui:Skulptera}} har penslarna rita, lera, jämna ut, greppa, blås upp, veck, nyp, platta och mask, spegling över X, och {{ui:Detalj}} som lägger till trianglar där du skulpterar. En pennas tryck styr penselns storlek och styrka. Varje drag är ett ångrasteg. Se [Skulptera ett nät](topic:sculpt).
-- **Gör om nät och retopologi.** {{ui:Gör om nät}} gör om ett helt nät till jämna trianglar, stänger hål och sammanfogar överlappande delar. För att bygga ett rent nät över ett detaljerat, välj det under {{ui:Retopologi}}: punkter du flyttar hamnar på dess yta. Se [Gör om nät](topic:mesh-edit#remesh).
-
-### Ritning
-
-- **Dela en kant eller kurva.** Verktyget {{ui:Dela}} markerar snitten när du rör dig längs en kant och delar med ett klick eller ett inskrivet tal. Med en kant, båge eller cirkel markerad skriver du `/5`. {{ui:Entitetsinfo}} › {{ui:Dela…}} frågar efter antalet, för surfplattor. En båge eller cirkel delas i lika vinklar på den verkliga bågen. Se [Dela en kant eller kurva i lika delar](topic:divide).
-- **Beräkningar i värderutan.** Skriv `2.5/3`, `12'6"+3/4"`, `(24'-0")/3` eller `2*450mm` för valfri längd, och `90/2` för en vinkel. En beräkning som inte kan göras säger vad som är fel och var. Se [Beräkningar](topic:value-box#calculations).
-
 ### Rendering
 
-- **Path tracing på grafikkortet.** {{ui:Rendera en bild…}} › {{ui:Hög kvalitet (path tracing)}} kör CadCrafts egen path tracer på grafikkortet där webbläsaren har WebGPU. Raden under bilden säger vilken motor som gjorde den. {{ui:Stopp}} behåller bilden och {{ui:Återuppta}} fortsätter därifrån. Utan WebGPU renderas bilden med path tracing via WebGL, som tidigare. Se [Hög kvalitet](topic:render#high-quality).
-- **Rendera i vyn.** Arbetsytan {{ui:Rendera}} path tracar själva vyn och börjar om när du kretsar eller redigerar: rendera ett {{ui:Område}}, klicka för att {{ui:Fokus}}, ställ in {{ui:Detalj}}. Den kräver WebGPU. Se [Rendera i vyn](topic:render#render-in-the-view).
-- **Material, ljus och himlar.** Högkvalitetsbilder skuggar varje yta med materialmodellen OpenPBR (beläggningar, ludd, tunna filmer, färgat glas, glöd). Med WebGPU finns också en {{ui:Fysikalisk himmel}} med {{ui:Dis}}, en {{ui:Himmelsbild (HDRI)}} och tillverkarens IES-ljusprofiler för lampor. Se [Himlar och ljusprofiler](topic:render#skies-and-light-profiles-on-the-graphics-card).
-- **En kamera som i fotografin.** Exponering från bländartal, slutartid och ISO i varje läge. Med WebGPU även skärpedjup, tvåpunktsperspektiv, vitbalans, 360°-panoramor (även i stereo) och kubkartor. Se [Kameran](topic:render#the-camera).
-- **Efterbearbeta bilden efter rendering.** Gradera den ({{ui:ACES filmic}}, {{ui:AgX}}, {{ui:Filmic}} eller {{ui:Standard}}, kontrast, bloom, glans, vinjettering, en `.cube`-färgtabell), blanda himlen, solen och varje lampgrupp, och titta på renderingselement ett i taget, allt utan att rendera igen. Det kvarvarande korniga tas bort av en brusreducerare på din egen dator. Se [Efterbearbeta bilden](topic:render#finish-the-picture) och [Blanda ljusen efter renderingen](topic:render#mix-the-lights-after-the-render).
-- **Fler sätt att spara en rendering.** 16-bitars PNG, en EXR med flera lager och varje renderingselement och ljusgrupp, och en renderingsfil (`.ccrender`) som öppnas igen med sin blandning och gradering. Se [Spara bilden](topic:render#save-the-picture).
-- **Dimma, rök och kaustik.** Dimma och dis belyst av solen och lampor, med ljusskaft; en rökpelare eller ett moln; kaustik under glas och speglar; adaptiv sampling som slutar på pixlar som redan är rena. Endast på grafikkortet. Se [Dimma, rök, brus och kaustik](topic:render#fog-smoke-noise-and-caustics).
-- **En renderingskö och MP4.** Lägg högkvalitetsbilder och hela animationer i {{ui:Renderingskö}}; de renderas en efter en, och kön finns kvar när sidan stängs. Den kräver WebGPU. Videor kan också sparas som MP4 där webbläsaren kan skriva det. Se [Renderingskön](topic:render#the-render-queue) och [Rendera videon](topic:animation#render-the-video).
-
-### Levande vy och presentationer
-
-- **Levande vy.** {{ui:Exportera}} › {{ui:Levande vy}} visar modellen i ett realtidsutseende bredvid vyn och följer varje redigering och kameran: solskuggor, material, lampor och ljus som studsar från väggar. {{ui:Gå}} genom den, dra {{ui:Tid}} och {{ui:Månad}} för att flytta solen, eller flytta den till ett {{ui:Nytt fönster}}. Den använder WebGPU där webbläsaren har det, annars WebGL 2. Se [Den levande vyn](topic:live-view).
-- **Spridning.** Sprid gräs, blommor, stenar, träd och människor över ytor eller med en pensel, från sju nya inredningsobjekt och resten av biblioteket. Uppsättningarna sparas i filen. Se [Sprid växter, stenar och människor](topic:live-view#scatter-plants-rocks-and-people).
-- **Dela.** En 360°-panorama, en panoramarundtur med pilar mellan platser, en fristående visare (en webbsida som öppnas offline och inte hämtar något från internet) och en video av kamerans bana, allt i realtidsutseendet. Se [Dela](topic:live-view#share-panoramas-tours-a-viewer-a-video).
-- **VR i realtidsutseendet.** {{ui:Granska i VR}} visar modellen med sina material, himmel, solskugga, lampor, spridda objekt och studsande ljus. Se [Så ser det ut](topic:vr-review#what-it-looks-like).
+- **Ett val av motor.** {{ui:Rendera en bild…}} har en lista **Motor** ovanför Läge. Våra egna två motorer, Snabb och Strålspårning, är standard och fungerar överallt. Andra poster sparar scenen som ett paket (modellen som USD-fil, plus en inställningsfil med de exakta materialvärdena, de lampor som är på, solen, himlen, exponeringen och kameran) som du kan ta med till ett annat program. En bild som ritats av ett annat program anger vilket program och vilken version som gjorde den. Se [Välj vilket program som ritar bilden](topic:render-engines).
+- **Öppna i ett annat program.** Listan Motor kan spara scenen som en USD-fil, en glTF-fil (`.glb`) eller en Unreal-projektmapp (`.zip`), i webbläsaren och i CadCraft Studio. I Studio kan den också starta usdview eller datorns eget program för filen. Se [Öppna scenen i ett annat program](topic:render-open-in).
+- **Skicka till en spelmotor från Studio.** Studio skriver scenen till ett Unreal Engine-projekt och håller den uppdaterad vid varje sändning, bara åt ett håll. Dina egna ändringar ligger i ett lager som CadCraft aldrig skriver till. Se [Skicka scenen till en spelmotor](topic:render-unreal).
+- **Motorer från tillägg.** Ett tillägg kan lägga till en motor i listan. En som skrivits i JavaScript ritar i webbläsaren och i Studio; en som kör ett program kräver ditt ja i Studio. Se [Rita bilden med ett annat program](topic:render-other-program) och [Lägg till en renderingsmotor med ett tillägg](topic:render-engine-addons).
+- **Beskriv scenen.** Säg till din anslutna assistent ”skymning, lätt regn, höstträd, folk på torget” så ställer ModelCraft in det i ett steg: solen flyttar sig till datum och tid så att skuggorna följer, himlen ändras, blöta ytor visas, och träd och människor placeras som riktiga objekt på taggar som du kan dölja, flytta eller ta bort. Tid på dygnet, datum eller årstid samt väder (klart, mulet, dimma, lätt regn, regn, storm) fungerar också på egen hand, och en senare begäran ändrar samma scen. Dimma syns i den högkvalitativa bilden på grafikkortet; de andra motorerna visar himlen, ljuset och de blöta ytorna. Regn ritas inte som fallande streck.
 
 ### Material
 
-- **Material gjorda med noder.** Arbetsytan {{ui:Skuggning}} bygger filens egna material som nodgrafer: bilder, brus och schackrutor, Voronoi-celler, vågor, tegel, kakel, trä, marmor, toningar, smuts och kantslitage, färgarbete, matematik, bump- och normalkartor, till det fullständiga OpenPBR-materialet. Vyn visar varje ändring direkt. Se [Gör material med noder](topic:shading).
-- **Ett materialbibliotek och egna texturuppsättningar.** Panelen {{ui:Skuggning}} visar bibliotekets material: sexton CC0-texturuppsättningar, var och en med källangivelse. Klicka på en för att använda den, eller dra den till en yta. {{ui:Bilder eller en zip…}} eller {{ui:En mapp…}} gör ett material av dina egna kartor, som hittas via deras filnamn. Se [Material från biblioteket](topic:shading#materials-from-the-library).
-- **MaterialX in och ut.** Exportera ett material som MaterialX (OpenPBR Surface eller Standard Surface, texturer som PNG), och importera MaterialX-filer med deras bilder. Se [MaterialX](topic:shading#materialx).
-- **Dekaler och texturmålning.** Placera en bild på en yta som dekal med ett eget material, och måla på ett materials bild med en rund pensel. Se [Dekaler](topic:shading#decals) och [Måla på texturen](topic:shading#paint-on-the-texture).
-- **Texturbakning.** Baka ambient occlusion, krökning, ljus och normalerna för ett detaljerat objekt till bilder längs ett näts UV, på datorns processorkärnor. Se [Baka texturer](topic:shading#bake-textures).
+- **Ett material från ett foto.** Ge ModelCraft ett foto av en yta (en vägg, ett golv, sten) så gör det ett upprepningsbart material: ljuset över fotot jämnas ut, kanterna görs så att de går ihop, och en färgkarta, en råhetskarta och en normalkarta räknas ut från bilden. Det är vanlig bildbehandling av din egen bild, utan någon tränad modell. Råheten är en uppskattning. Ett plant, kvadratiskt och rakt framifrån taget foto ger bästa upprepningsbara mönster; ett starkt mönster, som tegel, kan visa ett svagt spöke där skarven är utjämnad.
 
-### Animation
+### Ytor
 
-- **Arbetsytan Animera.** Sätt nycklar för ett objekts plats, vridning och storlek, varje lampas ljusstyrka, spridning och färg samt linsvinkeln, direkt i panelen. Tidslinjen får en vy {{ui:Kurvor}} (Bézier-handtag, upprepningar) och en vy {{ui:Klipp}} som sparar nycklar som åtgärder att placera igen och blanda. Nycklar på flera rader kan flyttas, töjas, kopieras och klistras in. Se [Animera valfri egenskap](topic:animate).
-- **Formnycklar och drivare.** Ett nät kan innehålla andra former av sig självt, blandade med reglage som kan få nycklar, eller styras av andra värden med ett litet uttryck. Se [Formnycklar](topic:animate#shape-keys-morphs) och [Drivare](topic:animate#drivers).
-- **Skelett.** Lägg ben i ett nät, låt {{ui:Automatiska vikter}} fördela punkterna mellan dem eller måla vikterna, och posera och sätt nycklar på benen. Linjär eller dual quaternion-skinning. Se [Skelett](topic:animate#armatures-bones-that-bend-a-mesh).
-- **IK och villkor.** Nå (IK) med en pol, titta mot, kopiera transformeringar, gränser, underordnad till och följ bana, för ben och objekt. Se [IK och villkor](topic:animate#ik-and-constraints).
-- **Fysik.** Grupper och komponenter faller, staplas och kolliderar som lådor eller bollar, och {{ui:Baka fysik}} behåller resultatet som nycklar. Se [Fysik](topic:animate#physics-drop-stack-and-collide).
+- **Frihandsytor.** Panelen {{ui:Ytor}} gör NURBS-kurvor och otrimmade ytor: kurvor genom punkter, loft, rätlinjiga ytor, extrudering, revolvering, svep längs en eller två skenor, ytor från ett kurvnät, plattor från fyra kanter, matchning och övergång. Varje gemensam kant mäts som G0, G1 eller G2 (glipa, vinkel, kurvaturhopp) på de exakta ytorna, och en kant som är sämre än du bad om visas i panelen Problem med en fix **Matcha**. Zebrastrimmor och kurvaturfärger ritas från de exakta ytorna. STEP- och IGES-filer går både ut och in. Se [Frihandsytor (NURBS)](topic:nurbs-surfaces).
 
-### Filer
+### Tomt och rum
 
-- **USD.** {{ui:Spara som}} ({{key:Mod+Shift+S}}) sparar modellen som `.usda`, `.usdc` eller `.usdz`, och en USD-fil som ModelCraft sparat öppnas igen utan att något gått förlorat. USD från andra program öppnas eller importeras som nät, grupper, komponenter, lampor och kameror. {{ui:Spara}} skriver fortfarande `.modelcraft`. Se [Spara, öppna och exportera USD](topic:usd).
-- **glTF, komplett.** glTF-filer kommer in som redigerbara nät med sina normaler, UV, vertexfärger och texturer. Noder blir grupper, ljus blir lampor och kameror blir scener. Draco- och meshopt-filer ingår. En `.gltf` öppnas när den släpps tillsammans med sina filer. Export skriver nät, texturer, lampor och kameror. Se [glTF](topic:formats#gltf-glb-gltf).
-- **Import av FBX, PLY, STL och Alembic.** FBX 2011 och nyare (nät, UV-uppsättningar, material, inbäddade texturer, ljus, kameror), PLY och STL med sina färger, och Alembic-cache vid första samplet. OBJ kommer in med sin `.mtl` och bilder när du släpper dem tillsammans. Se [Filformat i detalj](topic:formats).
-- **Fler exporter.** PLY med färger, STL med färgerna på målade ytor, och OBJ med sina texturer i en zip. Se [Filformat i detalj](topic:formats).
-- **STEP-filer.** {{ui:Importera}} läser STEP-delar (AP203, AP214, AP242) och sammanställningar som slutna nät i sin verkliga storlek, varje del där filen placerar den. Se [STEP](topic:formats#step-step-stp).
-- **.3dm-filer.** {{ui:Importera}} läser `.3dm`-modeller: nät, polyytor och extruderingar (från näten sparade i filen, annars tesselerade av ModelCraft), kurvor som kanter, block som komponenter och lager som taggar. Se [Hämta en .3dm-modell](topic:import-3dm-files).
-- **3D-solider från DWG och DXF.** Vid import av en ritning kommer nu även dess 3D-solider, regioner och kroppar, var och en som egen grupp, och slutna som solider. Se [Modellera på en situationsplan](topic:site-plan#what-comes-in).
+- **En skissbild på marken.** {{ui:Fil}} › {{ui:Importera ett skissfoto…}} gör en telefonbild av en handskiss till kanter på marken i den skala du anger: en grupp, med en tagg för varje pennfärg. Papperet hittas och räts ut på din dator, och inget skickas någonstans. Se [Modellera på en situationsplan](topic:site-plan).
+- **Möblera ett rum.** Markera ett golv och använd {{ui:Organisera}} › {{ui:Möblera ett rum…}}. Sovrums-, vardagsrums-, matsals-, kök-, badrums- eller kontorsmöbler placeras efter regler, mot väggarna och fria från dörrar och fönster, i en grupp som du kan ta bort i ett steg. Det är en standardlayout för dig att granska, inte en design. Se [Startbiblioteket](topic:starter).
 
 ### 3D-utskrift
 
-- **Utskriftsverktyg.** {{ui:Kontrollera för 3D-utskrift (STL eller 3MF)…}} › **Utskriftsverktyg** har en {{ui:Förhandsvisning av stöd}} (överhäng, kolonner eller trädstöd, ungefär hur mycket material), {{ui:Väggtjocklek}} (väggar som är för tunna för att skrivas ut, listade med {{ui:Visa}}), {{ui:Urholka}} (väggar med tjockleken du anger, med dräneringshål) och {{ui:Reparera}} (varje åtgärd listad; överlappande delar slås samman först när du ber om det). Urholka och Reparera ger en grupp vars plana sidor är enskilda ytor, eller ett nät när resultatet inte skulle slutas eller har för många ytor. Statusraden säger vilket. Se [Stöd, väggtjocklek, urholkning och reparation](topic:print-tools).
-- **Nybörjarstilen.** {{ui:Inställningar}} › {{ui:ModelCraft}} › {{ui:Menyer, tangenter och mus}} › {{ui:Nybörjare}}: stora knappar för att släppa in former och hål, flytta, justera och {{ui:Grupp}} så att hålen skärs, och kontrollera sedan modellen för utskrift. Se [Nybörjarstilen](topic:beginner).
+- **Snedsnitt.** Dela för utskrift kan luta sina snitt upp till 60 grader, vilket ger delarna större limyta. Kopplingar står vinkelrät mot snittet. Se [Dela en modell för utskrift](topic:print-split).
+- **Utskriftskontrollen i Problem.** Resultaten från 3D-utskriftskontrollen visas i panelen Problem med markeringar på modellen, och Reparera åtgärdar dem därifrån. Se [Stöd, väggtjocklek, urholkning och reparation](topic:print-tools).
 
-### AI-assistenter och din dator
+### I alla appar
 
-- **Fler funktioner för AI-assistenter.** En assistent kan nu lista ytor och material, tryck/dra, måla, skapa grupper, lägga till och visa scener, lägga till nät, redigera modifierarstackar, exportera USD, rendera en bild och fylla renderingskön. Se [Använd ModelCraft med AI-assistenter](topic:use-with-ai-assistants).
-- **Din dator.** {{ui:Inställningar}} › {{ui:ModelCraft}} › {{ui:Rendering}} › {{ui:Din dator}} visar grafiken, processorkärnorna och minnet som webbläsaren låter appen använda, och nivån som avgör var den levande vyn startar. Se [Vad din dator renderar med](topic:your-machine).
+- **Språk.** Hjälp och appar finns på 54 språk. Tio är nya: litauiska, lettiska, bosniska, marathi, telugu, albanska, afrikaans, filippinska, swahili och uzbekiska. Språk utöver engelska är maskinutkast tills en modersmålstalare har läst dem, och hjälpämnen kan fortfarande vara på engelska.
+- **Indataenheter.** En styrplatta, en penna, en 3D-mus, en spelkontroll och MIDI-kontroller kan styra apparna, för alla eller för en.
+- **Verktygsfältsrader.** {{ui:Inställningar}} › {{ui:Allmänt}} › Verktygsfältsrader anger Radbryt (som förut), 2 rader eller 1 rad. Ett fält som inte får plats rullar åt sidan i stället för att ta plats från ritningen. Radbryt är fortfarande standard.
+- **Egenskapsrutnät.** ModelCraft:s lampfält använder det gemensamma rutnätet: hopfällbara kategorier, kolumner för etikett och värde, och Kompakt täthet. Inskriven aritmetik som `2*450` fungerar fortfarande.
+- **Problem.** Panelen Problem (varningsknappen i appfältet) delas av alla apparna. I ModelCraft innehåller den utskriftskontrollen och varningarna för ytkontinuitet.
+- **Live.** En Live TeamWork-session visar vem som är var. Se [Modellera tillsammans med Live TeamWork](topic:work-live).
+- **Tillägg.** Tillägg kan lägga till renderingsmotorer, som ovan.
+- **Koppla din AI.** Verktygskontraktet och kontrollerna för de åtta apparna klarar sig, med 454 verktyg totalt. Anslutning med ett klick i Studio, en hostad kontakt för webbläsarassistenter, din egen nyckel i Studio och ett publicerat paket är ännu inte utlovade. Apparna innehåller ingen AI av egen tillverkning. Se [Använd ModelCraft med AI-assistenter](topic:use-with-ai-assistants).
 
-## Åtgärdat
+## Åtgärdat i 0.8.1
 
-- {{ui:Solider}} › {{ui:Union}}, {{ui:Subtrahera}} och {{ui:Snitt}} kunde ge en grupp som inte var sluten, i valfri storlek. De sluter sig nu.
-- {{ui:Solider}} › {{ui:Subtrahera}} var nedtonad när inget var markerat, trots att den väljer sina två delar i tur och ordning efter att du valt den.
-- I animationstidslinjen gick inmatade tangenter ingenstans, {{key:Mod+S}} också. {{key:Mod+Z}} och {{key:Mod+Y}} där är tidslinjens egna ångra och gör om; andra {{key:Mod}}-tangenter når appen.
+- **DWG-klassavsnittet.** Ett DWG-fils klassavsnitt lästes som fel typ, vilket kunde förstöra filen vid import. Det läses rätt nu, i ModelCraft och i de andra apparna som läser DWG.
+- **Surfplattor i porträtt.** Ledig rutnätshöjd går till duken, och ritlayouten börjar vid 760 pixlar bredd eller mindre. ModelCraft:s formatmall har ändringen också.
+- **Språk i Studio.** CadCraft Studio och de paketerade utgåvorna kan byta språk medan de körs; tidigare fanns de bara på engelska. Detta har ännu inte testats på alla plattformar: säg till om språket inte ändras.
 
-## I alla appar
+## Inte i den här versionen ännu
 
-- **Enheter.** {{ui:Inställningar}} › {{ui:Allmänt}} › {{ui:Enheter}} har en lista var för längd, area, volym, vinkel och lutning, med de exakta storlekarna som enheternas definitioner ger (US survey foot är en egen enhet). Stäng av enheter du aldrig använder så lämnar de enhetslistorna; markera en med stjärna så startar nytt arbete i den. En fil behåller alltid sin egen enhet. I ModelCraft följer enhetslistan bredvid värderutan av- och påslagningarna (modellens egen enhet finns alltid kvar i listan), stjärnan sätter enheten för en ny modell (när ModelCraft har den enheten), och en längd som skrivs med någon enhets beteckning läses i den enheten. Se [Enheter, inskrivna värden och enhetslistor](common:unit-lists).
-- **Tätare layout och paneler som döljs undan.** {{ui:Inställningar}} › {{ui:Allmänt}} › {{ui:Layouttäthet}} › {{ui:Kompakt}} får plats med mer på skärmen (pekskärmar och telefoner behåller sina stora knappar). Varje sidopanel har en smal namnlist: dra den för att docka eller frigöra panelen, släpp den på en annan panels namnlist för att dela en ram som flikar, fäst den för att glida undan till kanten, eller dölj den och hämta tillbaka den från kanten. Se [Ordna panelerna](common:arrange-panels#make-the-layout-denser).
-- **Dialogrutor flyttas.** Dra en dialogruta i namnlisten ur vägen för ritningen; den kommer tillbaka dit du lämnade den. Dubbelklicka på namnlisten för att centrera den igen. Se [Flytta en dialogruta](common:arrange-panels#move-a-dialog).
-- **Recept för AI-assistenter.** Tio genomarbetade förfrågningar för din egen assistent (städa en ritning, plotta en uppsättning, kontrollera ritningar, ställa frågor om en modell, summera en mängdavtagning, prova en variant av en del …), var och en med de verktyg den anropar och de behörigheter den behöver, och var och en körs om av våra tester. Apparna innehåller ingen AI. Se [Recept för AI-assistenter](common:assistants-recipes).
-- **Språk.** **Português (Portugal)** är nytt i {{ui:Inställningar}} › {{ui:Allmänt}} › {{ui:Språk}}. Det och **Português (Brasil)**, **Español (México)** och **Bahasa Indonesia** har nu varje ord i apparna, som utkast som ännu inte granskats av en modersmålstalare. Hjälpämnena är på engelska.
-- **CadCraft Studio** anger varför en uppdateringskontroll misslyckades (ingen fil för ditt system ännu, inget nätverk, en felaktig signatur) i stället för bara ”Klar”, och slutar visa ett Nyheter-kort som du stängt förrän det finns en nyare version.
+- **Inte kodsignerad.** Windows kan visa SmartScreen: välj {{ui:Mer info}}, sedan {{ui:Kör ändå}}. På en Mac högerklickar du och väljer {{ui:Öppna}}. Butiksversioner är pausade, och iPad- och iPhone-versionen byggdes inte om för 0.8.1.
+- Ett annat program som ritar bilden utan tillägg för renderingsmotorer, panorama- eller stereokameror och en himmelbild genom ett annat program, samt insticksprogrammet som öppnar Unreal-scenen, finns inte ännu. Filerna skrivs; insticksprogrammet är inte släppt och har inte körts i Unreal.
+- Frihandsytor: G3 och klass A mäts inte och utlovas inte, och trimning och solider kommer senare.
+- Bilder från andra program är inte pixel för pixel lika våra: bara kameran, solen, lamporna och exponeringen stämmer.
+- Rättelsen i 0.8.1 för språkbytet i Studio är inte testad på alla plattformar.
 
-## Ännu inte i den här versionen
-
-- **0.7 är inte kodsignerad.** Signering och Microsoft Store-paketet flyttades till 0.8 eftersom certifikatvalideringen ännu inte kommit igenom. Kontrollera SHA-256 bredvid varje fil på getcadcraft.com/download. På Windows, om SmartScreen stoppar installationsprogrammet, välj {{ui:Mer information}} och sedan {{ui:Kör ändå}}. På en Mac väljer du första gången att högerklicka på CadCraft Studio och välja {{ui:Öppna}}. CadCraft Studio finns ännu inte i någon appbutik, och det finns ännu ingen version för iPad eller iPhone.
-- Listorna för vinkel och lutning i {{ui:Enheter}} sparas, men ingen ruta läser dem ännu.
-- Rendering på grafikkortet (WebGPU) har här bara testats med en programvaruersättning, ännu inte på riktiga grafikkort, så rendera något litet på din egen dator först. Detsamma gäller den levande vyn, och VR har ännu bara prövats med en headsetemulator.
-- Utan WebGPU finns ingen arbetsyta {{ui:Rendera}} och ingen renderingskö, och högkvalitetsbilder saknar skärpedjup, fysikalisk himmel, himmelsbild, dimma, rök, kaustik och ljusblandning.
-- {{ui:Rendera en bild…}} ritar inte spridda objekt ännu; de visas i den levande vyn, dess panoramor, visare och video.
-- Lampor animeras i vyn, men en renderad video använder lamporna som de är när den startar.
-- Ben och animation läses inte från eller skrivs till glTF-, FBX- eller USD-filer ännu (skinnade modeller kommer in i viloläge, med sina vikter), och glTF- och FBX-material utöver grundfärgen eller texturen behålls ännu inte.
-- STEP-färger och delnamn i sammanställningar läses inte ännu. `.3dm`-import har testats med filer skrivna av formatets verktygslåda, ännu inte med filer från modelleringsprogrammet självt. SubD-objekt, text och måttsättning utelämnas.
-- Växtbiblioteket från CivilCraft finns i ModelCraft, men att placera växter från det finns ännu inte.
-- Att måla en textur på ytor från tryck/dra upprepas med materialets kakel. För att måla en enda yta, gör den till ett nät och veckla ut den.
-
-Allt annat finns i [Finns inte ännu](topic:not-built-yet).
+Allt annat finns under [Finns inte ännu](topic:not-built-yet). För föregående version, se [Nyheter i 0.7](topic:whats-new-0-7).

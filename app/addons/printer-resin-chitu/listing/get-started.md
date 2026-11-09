@@ -1,0 +1,2 @@
+- Add it with Resin printing
+- Choose CBDDLP or CTB in File format, then Save the print file. If your printer refuses the file, flip an option under File format and try again

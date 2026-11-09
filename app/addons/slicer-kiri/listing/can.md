@@ -1,0 +1,1 @@
+- Choose Kiri:Moto in the Slicer list on the print stage

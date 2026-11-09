@@ -91,6 +91,17 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
               <i class="bi bi-<?= e($__icon) ?>" aria-hidden="true"></i><span><?= e($__label) ?></span>
             </button>
           <?php endforeach; ?>
+          <?php if ($__group === 'Draw'): /* i18n-ignore: a group key */ ?>
+            <?php /* 0.9 FX.137: the ten arc methods (lib/arcs), one tool each; a button here is a tool button like the rest */ ?>
+            <details class="mc-menu" data-arc-menu>
+              <summary class="mc-tool" title="<?= Lang::e('ui.tool.arcm.title') ?>"><i class="bi bi-bezier2" aria-hidden="true"></i><span><?= Lang::e('ui.tool.arcm') ?></span></summary>
+              <div class="mc-menu-list" role="menu">
+                <?php foreach (['3p', 'sce', 'sca', 'scl', 'sea', 'sed', 'ser', 'cse', 'csa', 'csl'] as $__am): ?>
+                  <button type="button" role="menuitem" data-tool="arc<?= $__am ?>" title="<?= Lang::e('ui.tool.arc' . $__am . '.title') ?>" aria-pressed="false"><?= Lang::e('ui.tool.arc' . $__am) ?></button>
+                <?php endforeach; ?>
+              </div>
+            </details>
+          <?php endif; ?>
           <?php if ($__group === 'File'): /* i18n-ignore: a group key */ ?>
             <details class="mc-menu" data-export-menu>
               <summary class="mc-tool" title="<?= Lang::e('ui.export.title') ?>"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span><?= Lang::e('ui.export') ?></span></summary>
@@ -280,7 +291,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
       <h2 class="mc-h" data-info-h><?= Lang::e('ui.info') ?></h2>
       <div data-info></div>
     </section>
-    <section class="mc-sec">
+    <section class="mc-sec" data-af-id="colors">
       <h2 class="mc-h" id="mc-colors-h"><?= Lang::e('ui.colors') ?></h2>
       <div class="mc-palette" data-palette role="radiogroup" aria-labelledby="mc-colors-h"></div>
       <p class="mc-note" data-palette-note><?= Lang::e('ui.colors.note') ?></p>
@@ -372,7 +383,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
       <p class="mc-note" data-issues-empty><?= Lang::e('ui.issues.empty') ?></p>
       <button type="button" class="btn-line btn-sm-cc" data-issues-bcf disabled><?= Lang::e('ui.issues.bcf') ?></button>
     </section>
-    <section class="mc-sec">
+    <section class="mc-sec" data-af-id="scenes">
       <div class="mc-sec-head">
         <h2 class="mc-h"><?= Lang::e('ui.scenes') ?></h2>
         <button type="button" class="mc-linkbtn" data-scene-add><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= Lang::e('ui.scenes.add') ?></button>

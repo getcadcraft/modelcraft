@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 // The catalogue, ports, snapping and the flow graph built from geometry (lib/catalog.js, lib/layout.js, lib/examples.js).
 const { ok, section, near, mine } = globalThis.__flowTest;
-const C = await mine('lib/catalog.js');
-const LY = await mine('lib/layout.js');
-const EX = await mine('lib/examples.js');
-const { checkGraph, simulate } = await mine('lib/sim.js');
+const C = await mine('../../flow/catalog.js');
+const LY = await mine('../../flow/layout.js');
+const EX = await mine('../../flow/examples.js');
+const { checkGraph, simulate } = await mine('../../flow/sim.js');
 
 const nearP = (a, b, tol = 1e-9) => a.every((x, i) => Math.abs(x - b[i]) <= tol);
 

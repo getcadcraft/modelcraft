@@ -8,9 +8,17 @@
  *   - the model is in metres and cc-nurbs in millimetres (display scale 0.001; picked points × 1000);
  *   - picking in 3D: a click on the view while a command waits for a curve, surface, edge or end (capture phase, before the tools), and
  *     a point-picking tool ('nurbspts') that uses ModelCraft's own snapping (Tools.snap);
- *   - continuity problems go to the shell's Problems (source 'modelcraft.nurbs', fix "Match" = surface.match, one panel undo step).
+ *   - continuity problems go to the shell's Problems (source 'modelcraft.nurbs', fix "Match" = surface.match, one panel undo step);
+ *   - solids (0.9 DC.54, session nurbs-09): the Booleans run on ModelCraft's own manifold-3d (solids.js, loaded on the first one), and
+ *     "Add to the model" makes a NURBS solid one closed group of the model (its faces as triangles within 0.05 mm), through the same
+ *     bake the node editor uses (modelcraft.js bakeNodeMeshes: ONE model undo step); the patch set keeps the exact solid.
  *
- *   mountSurfacesMc({ box, model, view, cam, tools, docData, t, print, save, open, base, afterDraw }) → { session, display, panel, refresh() }
+ *   - scan fit (0.9 SU.1082, session reverse-nurbs-09): the Scan group fits planes, cylinders and free-form patches to the selected mesh
+ *     (or everything shown) through `scan()` → { positions (mm), indices }; the numbers come from cc-nurbs reverse.js.
+ *
+ *   - SubD cage (0.9 D9.8): `cage()` → { verts (mm), quads } of the selected mesh; each regular quad becomes an exact bicubic surface (cc-nurbs cage.js).
+ *
+ *   mountSurfacesMc({ box, model, view, cam, tools, docData, t, print, save, open, base, afterDraw, bake, scan, cage }) → { session, display, panel, refresh() }
  *   window.modelcraft.surfaces (tests) = that object once mounted.
  */
 import * as THREE from 'three';
@@ -43,7 +51,7 @@ class NurbsPointsTool extends Tool {
 }
 registerTool('nurbspts', NurbsPointsTool);
 
-export function mountSurfacesMc({ box, model, view, cam, tools, docData, t, print, save, open, base, afterDraw, over }) {
+export function mountSurfacesMc({ box, model, view, cam, tools, docData, t, print, save, open, base, afterDraw, over, bake = null, scan = null, cage = null }) {
   const store = docData.forAddon('nurbs');
   let viewOpts = { mode: 'shaded', cvs: false };
   let src = null, panel = null, collecting = false, quiet = false;
@@ -96,6 +104,20 @@ export function mountSurfacesMc({ box, model, view, cam, tools, docData, t, prin
       over.focus({ preventScroll: true });
     }),
     save, open, base, print, range: () => display.range(),
+    cloud: (map, tol) => { display.setCloud(map, tol); view.invalidate(); },   // the scan fit's deviation map (0.9 round 2)
+    cage: cage ? { get: cage } : null,   // 0.9 D9.8: SubD cage to exact surfaces (the selected mesh's quads, mm)
+    scan: scan ? { get: scan } : null,   // 0.9 SU.1082: Fit surfaces to the selected mesh (mm)
+    manifold: () => import('./solids.js').then((L) => L.manifold()),
+    bake: bake ? {
+      label: t('nurbs.ui.solid.bake_mc'),
+      run: (id) => {
+        try {
+          const b = N.solid.solid(session.doc, id), m = N.solid.mesh(session.doc, id, { tol: 0.05 });
+          bake([{ positions: m.positions, indices: m.indices, name: b.name || t('nurbs.ui.solid.bake_name', { id }) }]);
+          print(t('nurbs.ui.solid.baked_mc', { name: b.name || id, n: m.indices.length / 3, volume: Math.round(m.report.volume * 100) / 100 }));
+        } catch (e) { print(t(e && e.code ? e.code : 'nurbs.ui.err.failed', (e && e.vars) || { error: String(e?.message || e) })); }
+      },
+    } : null,
   };
   panel = mountSurfacesPanel(box, host);
   store.onOpen(() => fromFile());

@@ -24,6 +24,7 @@ import { getHost, toolResult, stackRollback, peekUndo } from "./host.js";
 import { renderTools } from './render-tools.js';
 import { lookTools } from './look-tools.js';
 import { photoTools } from './photo-tools.js';
+import { modelLinkTools } from './link-mc.js';   // 0.9 SU.810b: a live link from a program that saves .3dm files
 
 const r6 = (v) => Math.round(v * 1e6) / 1e6;
 
@@ -333,6 +334,7 @@ export function installAgents(app) {
       app.changed();
       return { undone };
     } });
+  for (const d of modelLinkTools(app)) C.tool(d);
   if (app.file) C.tool({ name: 'usd_export', group: 'export', title: 'Export USD', description: 'The model as OpenUSD (groups and components as prims, materials, scenes as cameras), .usda (default), .usdc or .usdz, as File › Save as USD writes it. With a path (Studio) it is written there, else it downloads.',
     inputSchema: obj({ format: { description: 'usda (text, default), usdc (binary) or usdz (packed with its textures).', type: 'string', enum: ['usda', 'usdc', 'usdz'] }, path: { type: 'string', minLength: 1, maxLength: 4096, description: 'Studio: a file inside the folders the person allowed (Settings › Assistants › Folders); without it the file downloads.' }, overwrite: { description: 'true replaces an existing file at the path (default false: an existing file is never overwritten).', type: 'boolean', default: false } }),
     run: async (a) => {

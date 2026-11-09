@@ -2,9 +2,9 @@
 // 0.8 round 3 (model_PART_3), SU.858 next step: belts break down — an accumulating or a plain belt stops for a repair, every load on it stays
 // put, nothing gets on or off, it runs on from where it stopped; availability ≈ MTBF / (MTBF + MTTR); seeded; the layout's hours and minutes.
 const { ok, section, mine } = globalThis.__flowTest;
-const { simulate, checkGraph } = await mine('lib/sim.js');
-const C = await mine('lib/catalog.js');
-const PB = await mine('lib/playback.js');
+const { simulate, checkGraph } = await mine('../../flow/sim.js');
+const C = await mine('../../flow/catalog.js');
+const PB = await mine('../../flow/playback.js');
 
 const H = 3600;
 const strip = (r) => JSON.stringify({ ...r, trace: undefined });

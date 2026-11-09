@@ -16,6 +16,31 @@ import { apply, det3, mmul } from './vec.js';
 
 const MM = 1000;
 
+/**
+ * The SubD cage for cc-nurbs (0.9 D9.8): the quads of each selected mesh placement's BASE mesh (not the modifier result), vertices in world
+ * space in millimetres, windings kept (a mirrored placement is flipped back). Faces with other than four corners are not quads and are left out.
+ *   cageQuads(model, {path, sel}) → { verts: [[x,y,z]…], quads: [[a,b,c,d]…] } | null
+ */
+export function cageQuads(model, { path = [], sel = [] } = {}) {
+  const ctx = model.context(path) || model.context([]);
+  const verts = [], quads = [];
+  for (const s of sel) {
+    if (!s || s.t !== 'i' || !ctx.def.insts.has(s.id)) continue;
+    const inst = ctx.def.insts.get(s.id), d = model.defs.get(inst.def), M = d && d.mesh;
+    if (!M || inst.hidden) continue;
+    const m = mmul(ctx.m, inst.m), mirror = det3(m) < 0, at = new Map();
+    const vid = (v) => { if (!at.has(v)) { at.set(v, verts.length); verts.push(apply(m, [M.P[3 * v], M.P[3 * v + 1], M.P[3 * v + 2]]).map((c) => c * MM)); } return at.get(v); };
+    for (let f = 0; f < M.nf; f++) {
+      if (M.fFl[f] & 1) continue;   // FL_DEAD
+      const fv = M.faceVerts(f);
+      if (fv.length !== 4) continue;
+      const q = fv.map(vid);
+      quads.push(mirror ? [q[0], q[3], q[2], q[1]] : q);
+    }
+  }
+  return quads.length ? { verts, quads } : null;
+}
+
 export function printTriangles(model, { path = [], sel = [] } = {}) {
   const ctx = model.context(path) || model.context([]);
   const tris = [];

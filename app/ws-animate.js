@@ -60,7 +60,7 @@ function command(name, host) {
   else if (name === 'keytransform') tl.keyTransform(selectedPlacements(host));
   else if (name === 'auto') tl.setAuto(!tl.autoKey);
   else if (name === 'delete') tl.deleteKeys();
-  else if (name === 'play') { if (!tl.isOpen) tl.open(); tl.play(); }
+  else if (name === 'play') { if (!tl.isOpen) tl.open(); tl.togglePlay(); }   // 0.9 FX.31: Play, and Pause while it plays
   else if (name === 'stop') tl.stop();
   else if (name === 'prev' || name === 'next') document.querySelector(name === 'prev' ? '[data-tl-prev]' : '[data-tl-next]')?.click();
   else if (name === 'keys' || name === 'curves' || name === 'clips') { if (!tl.isOpen) tl.open(); tl.setMode(name); }
@@ -75,6 +75,7 @@ function toolState(cmd, host) {
   const tl = activeTimeline(), name = cmd.slice('animate-'.length);
   if (!tl) return { ok: false, why: host.t('app.an.why.notl') };
   if (name === 'auto') return { ok: true, pressed: tl.autoKey };
+  if (name === 'play') return tl.playing ? { ok: true, pressed: true, icon: 'pause-fill', label: host.t('app.tl.pause'), title: host.t('app.tl.pause.title') } : { ok: true, pressed: false };
   if (name === 'keys' || name === 'curves' || name === 'clips') return { ok: true, pressed: tl.isOpen && tl.mode === name };
   if (name === 'keytransform' && !selectedPlacements(host).length) return { ok: false, why: host.t('app.tl.keysel.none') };
   for (const p of PARTS) { const s = p.toolState?.(name, host, tl); if (s) return s; }

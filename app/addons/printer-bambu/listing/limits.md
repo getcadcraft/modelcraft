@@ -1,0 +1,1 @@
+Works from CadCraft Studio on a computer, not in a browser or on a tablet. P2S with a 0.4 mm nozzle for now. The print starts from Bambu Connect, not from here. CadCraft does not use LAN Only or Developer Mode.

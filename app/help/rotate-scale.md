@@ -21,6 +21,8 @@ keywords: scale grips, stretch, non-uniform, per axis, flip, mirror, mirrored co
 
    Positive angles turn counterclockwise, seen from the side the ring faces.
 
+Press {{key:Ctrl}} (or {{key:Alt}}) while you rotate to turn a **copy** and leave the original where it is, as with Move; the tip says whether copy is on, and pressing the key again turns it off. Type `3x` straight after a rotated copy for more copies around the same center.
+
 Like Move, rotating part of connected geometry twists the faces attached to it. Group things first to turn them whole.
 
 :::note

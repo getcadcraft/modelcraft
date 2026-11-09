@@ -1,0 +1,1 @@
+USB needs Chrome or Edge on a computer, and the page must stay open while it prints. A network printer has to allow this site. The basic slicer has no bridges, seam choice or layer preview yet. Bambu Lab printers need the Bambu Lab printers add-on.

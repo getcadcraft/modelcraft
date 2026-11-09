@@ -1,0 +1,2 @@
+- People who print miniatures, jewellery, dental models and prototypes in resin
+- Anyone tired of a resin slicer that asks them to pay for a setting

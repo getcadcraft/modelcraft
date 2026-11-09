@@ -52,6 +52,8 @@ A browser tab can't open a connection for an assistant: in the browser apps the 
 | `usd_export` | Export | The model as OpenUSD (.usda, .usdc or .usdz), as saving the model as USD writes it ([USD](topic:usd)); to a folder you allowed in Studio, else a download |
 | `render_still` | Export | A rendered picture of the view or of a saved scene, as the {{ui:Render}} dialog's {{ui:Render}} button makes it, with your Render settings unless it asks for others (fast or high quality, size, samples, sky); a PNG it can look at, or a PNG, EXR or render file in a folder you allowed in Studio ([Render a picture](topic:render)) |
 | `render_queue` | Export | Adds high-quality pictures to the Render dialog's queue (the view, or saved scenes) and runs the queue; the finished pictures go to a folder you allowed, or stay in the Render dialog's {{ui:Render queue}} for you. Needs WebGPU |
+| `link_push` | Edit | Updates a model linked from another program (see [Keep a .3dm model live](topic:live-3dm-link)) |
+| `link_status` | Read | Says whether a linked model is still here and when it last updated |
 | `undo` | Edit | Takes back its own steps |
 
 Solids an assistant makes come in as groups, so they never merge with what you drew. There is no tool that saves the model: saving stays with you, and exporting or rendering needs **Export** ticked. A render changes nothing in the model; rendering a saved scene moves the view to it, as {{ui:Scenes}} does.

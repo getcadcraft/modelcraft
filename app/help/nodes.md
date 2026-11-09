@@ -21,9 +21,13 @@ Drag a node by its title bar. Drag the background to pan, turn the wheel to zoom
 
 ## Types and units
 
-Ports have a type: number, yes/no, point, vector, curve, surface, mesh, or "geometry" for any of those. A point can feed a vector input and back. Numbers carry a unit: a **length** is in millimetres and an **angle** is in degrees. A length cannot feed an angle, and a length times a length (an area) is refused, so a wrong wire is stopped when you make it.
+Ports have a type: number, yes/no, point, vector, curve, surface, mesh, solid, or "geometry" for any of those. A point can feed a vector input and back. Numbers carry a unit: a **length** is in millimetres and an **angle** is in degrees. A length cannot feed an angle, and a length times a length (an area) is refused, so a wrong wire is stopped when you make it.
 
 A square dot is a **list**. When a list reaches a single-value input the node runs once for each item, and its result becomes a list. The shorter list repeats its last item. For example, a **Series** of heights into **Move** makes a stack of copies.
+
+## Solids and Booleans as nodes
+
+The **Solids** group makes closed bodies from the same exact surfaces as the Surfaces panel: **Box solid**, **Cylinder solid** and **Sphere solid** (sizes in mm), **Union**, **Subtract** and **Intersect** (the second solid is taken from the first; the tolerance is how far the solid engine's triangles may be from the exact surfaces), **Fillet between faces** (the faces by their number in the solid, 1 for its first; a radius and, above 0, a radius at the end), **Solid volume** (mm³) and **Solid to mesh** (to see or bake it). A solid has its own port type: a point or a number cannot be wired into a solid input, and the dot stays red. The Boolean and Fillet nodes use the program's own solid engine, loaded the first time the editor opens.
 
 ## Errors
 

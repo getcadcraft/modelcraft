@@ -1,0 +1,20 @@
+{
+  "id": "twin",
+  "name": "Digital twin",
+  "version": "0.9.0",
+  "apps": [
+    "modelcraft"
+  ],
+  "api": "1.4",
+  "license": "Apache-2.0",
+  "entry": "./main.js",
+  "permissions": [
+    "panel",
+    "files"
+  ],
+  "description": "Your Material flow layout as a working plant: equipment that looks like equipment, a soft PLC (IEC 61131-3 ST, PLCopen XML) running your logic on the model with faults and repeatable tests, rigid-body physics on the loads, layouts compared with repeat runs and 95 % intervals, video, the path tracer, animated USD, and a bill of materials. For testing and showing; not a safety validation.",
+  "author": "CadCraft",
+  "lang": "./lang/",
+  "help": "./help/help.js",
+  "default": "off"
+}

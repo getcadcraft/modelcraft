@@ -36,9 +36,13 @@ import {
 import { parseValue, formatLength } from './units.js';
 import { collider } from './collide.js';
 import { t } from "./i18n.js";
+import * as ARCS from './arcs/arcs.js';
+
+/** The ten AutoCAD-style arc methods (0.9 FX.137), one tool name each: arc3p, arcsce, arcsca, … → the id arcs.js solves by. Continue is left out. */
+const ARC_TOOL_IDS = Object.fromEntries(ARCS.METHOD_IDS.filter((id) => id !== 'CON').map((id) => ['arc' + id.toLowerCase(), id]));
 
 /** Tool names in the page's language (getters: the catalog is read when a name is asked for). */
-export const TOOL_NAMES = Object.defineProperties({}, Object.fromEntries(['select', 'line', 'rect', 'circle', 'polygon', 'arc', 'arcc', 'curve', 'follow', 'offset', 'paint', 'push', 'move', 'rotate', 'scale', 'erase', 'tape', 'protractor', 'dim', 'section', 'orbit', 'pan', 'zoom', 'place', 'paste', 'pick', 'axes', 'sculpt', 'light', 'divide'].map((k) => [k, { get: () => t('m3d.toolname.' + k), enumerable: true }])));
+export const TOOL_NAMES = Object.defineProperties({}, Object.fromEntries(['select', 'line', 'rect', 'circle', 'polygon', 'arc', 'arcc', ...Object.keys(ARC_TOOL_IDS), 'curve', 'follow', 'offset', 'paint', 'push', 'move', 'rotate', 'scale', 'erase', 'tape', 'protractor', 'dim', 'section', 'orbit', 'pan', 'zoom', 'place', 'paste', 'pick', 'axes', 'sculpt', 'light', 'divide'].map((k) => [k, { get: () => t('m3d.toolname.' + k), enumerable: true }])));
 /** Single-key shortcuts (lower case; ' ' = Space). */
 export const TOOL_KEYS = { ' ': 'select', l: 'line', r: 'rect', c: 'circle', n: 'polygon', a: 'arc', f: 'offset', b: 'paint', p: 'push', m: 'move', q: 'rotate', s: 'scale', e: 'erase', t: 'tape', d: 'dim', o: 'orbit', h: 'pan', z: 'zoom' };
 
@@ -64,7 +68,7 @@ export class Tools {
     if (this.tool) this.tool.cancel();
     this.name = name;
     this.lock = null;
-    const C = { select: SelectTool, line: LineTool, rect: RectTool, circle: CircleTool, polygon: CircleTool, arc: ArcTool, arcc: ArcCenterTool, curve: CurveTool, follow: FollowTool, offset: OffsetTool, paint: PaintTool, push: PushTool, move: MoveTool, rotate: RotateTool, scale: ScaleTool, erase: EraseTool, tape: TapeTool, protractor: ProtractorTool, dim: DimTool, section: SectionTool, orbit: CamTool, pan: CamTool, zoom: CamTool, place: PlaceTool, paste: PasteTool, pick: PickTool, axes: AxesTool, sculpt: SculptTool, light: LightTool, divide: DivideTool }[name] || EXTRA_TOOLS.get(name) || SelectTool;
+    const C = (ARC_TOOL_IDS[name] ? ArcMethodTool : null) || { select: SelectTool, line: LineTool, rect: RectTool, circle: CircleTool, polygon: CircleTool, arc: ArcTool, arcc: ArcCenterTool, curve: CurveTool, follow: FollowTool, offset: OffsetTool, paint: PaintTool, push: PushTool, move: MoveTool, rotate: RotateTool, scale: ScaleTool, erase: EraseTool, tape: TapeTool, protractor: ProtractorTool, dim: DimTool, section: SectionTool, orbit: CamTool, pan: CamTool, zoom: CamTool, place: PlaceTool, paste: PasteTool, pick: PickTool, axes: AxesTool, sculpt: SculptTool, light: LightTool, divide: DivideTool }[name] || EXTRA_TOOLS.get(name) || SelectTool;
     this.tool = new C(this, name, arg);
     this.host.toolSet?.(name);
     this.host.overlay(null);
@@ -733,6 +737,109 @@ class ArcCenterTool extends ClickTool {
   cancel() { this.reset(); }
 }
 
+
+/**
+ * The ten arc methods (0.9 FX.137), driven by the shared lib/arcs: the steps are ROLES[method] (start, centre, second point, end, then an
+ * angle, chord length, direction or radius). Drawn on the plane the Arc-from-center tool uses: the face of the first click, else level.
+ * Clicks give points; for the last step the pointer is read through ARCS.pointerValue. Typed: segments (12s) any time, a distance along
+ * the cursor for a point, degrees for an angle or direction (red axis of the plane = 0, minus = clockwise), a length for a chord or radius
+ * (minus = the other way round). Drawn as the same tagged arc edges as the other arc tools, one undo step.
+ */
+class ArcMethodTool extends ClickTool {
+  constructor(T, name) { super(T, name); this.id = ARC_TOOL_IDS[name]; this.roles = ARCS.ROLES[this.id]; this.segs = ARC_SEGS; this.reset(); }
+  get role() { return this.roles[this.vals.length]; }
+  get hint() {
+    if (!this.o) return t('m3d.tool.arcm_first_' + this.roles[0]);
+    return t('m3d.tool.arcm_' + this.role);
+  }
+  get vcbLabel() {
+    if (!this.o) return t('m3d.vcb.segments');
+    const r = this.role;
+    return r === 'angle' ? t('m3d.vcb.angle') : r === 'radius' ? t('m3d.vcb.radius') : r === 'direction' ? t('m3d.vcb.direction') : t('m3d.vcb.length');
+  }
+  reset() { this.o = null; this.n = null; this.U = null; this.V = null; this.vals = []; this.pickedPts = []; this.last3 = null; this.curP = null; this.busy = false; }
+  to2(p) { const d = sub(p, this.o); return { x: dot(d, this.U), y: dot(d, this.V) }; }
+  to3(q) { return add(this.o, add(mul(this.U, q.x), mul(this.V, q.y))); }
+  flat(p) { return sub(p, mul(this.n, dot(sub(p, this.o), this.n))); }
+  /** Edge-run of an arc in the plane (a 2D {cx, cy, r, a0, a1} → 3D points). */
+  points(arc) {
+    const ctr = this.to3({ x: arc.cx, y: arc.cy });
+    const u0 = add(mul(this.U, Math.cos(arc.a0)), mul(this.V, Math.sin(arc.a0)));
+    return arcPts(ctr, this.n, u0, arc.r, Math.min(ARCS.sweep(arc), 2 * Math.PI), this.segs);
+  }
+  /** The input the pointer stands for now, as the display text for the value box. */
+  show(val) {
+    const r = this.role;
+    if (r === 'angle' || r === 'direction') return String(Math.round((val * 180) / Math.PI * 100) / 100);
+    if (r === 'length' || r === 'radius') return this.fmt(Math.abs(val));
+    return this.fmt(dist(this.last3, this.curP));
+  }
+  hover(ev) {
+    this.lastEv = ev;
+    if (!this.o) { const r = this.T.snap(ev); this.cur = r; this.h.overlay({ marker: this.marker(r), tip: r.tip }); return; }
+    const r = this.T.snap(ev, { from: this.last3, plane: planeFrom(this.n, this.o) });
+    const q = this.flat(r.p);
+    this.cur = { ...r, p: q }; this.curP = q; this.lastDir = r.dir || null; this.lastKind = r.kind;
+    const c2 = this.to2(q), lines = [];
+    const last = this.vals.length === this.roles.length - 1;
+    const res = last ? ARCS.drag(this.id, this.vals, c2) : null;
+    if (res) { const ap = this.points(res.arc); lines.push(...ap.slice(1).map((p, i) => ({ a: ap[i], b: p, kind: 'arc' }))); }
+    // the rubber line from the last click to the pointer (the radius leg, or the chord), dashed when an arc is showing
+    lines.push({ a: this.last3, b: q, kind: r.kind, dash: !!res });
+    const val = ARCS.pointerValue(this.id, this.vals, c2);
+    this.h.overlay({ lines, marker: this.marker(r), tip: res && (this.role === 'angle' || this.role === 'direction') ? this.show(val) + '°' : r.tip });
+    this.h.vcb(this.vcbLabel, this.show(val));
+  }
+  pickPoint(ev) {
+    if (!this.o) {
+      const r = this.cur || this.T.snap(ev);
+      this.o = r.p; this.n = r.face ? r.face.n : this.T.axes().z;
+      const pa = planeAxes(this.n, this.T.axes()); this.U = pa.u; this.V = pa.v;
+      this.last3 = r.p; this.busy = true;
+      this.vals.push({ x: 0, y: 0 });
+      this.h.vcb(this.vcbLabel, ''); this.h.tip(this.hint);
+      return;
+    }
+    this.hover(ev);
+    if (!this.curP) return;
+    this.accept(ARCS.pointerValue(this.id, this.vals, this.to2(this.curP)), this.curP);
+  }
+  /** Take the next input; at the last one solve and draw. `p3` is the picked point (a point step), kept as the next rubber-line start. */
+  accept(val, p3) {
+    this.vals.push(val);
+    if (p3) this.last3 = p3;
+    if (this.vals.length < this.roles.length) { this.h.vcb(this.vcbLabel, ''); this.h.tip(this.hint); if (this.lastEv) this.hover(this.lastEv); return true; }
+    const res = ARCS.solve(this.id, this.vals);
+    if (!res.arc) { this.vals.pop(); this.h.print(t('m3d.tool.arcm_err_' + res.error)); return false; }
+    drawArc(this.T, this.points(res.arc), t('m3d.undo.arc'));
+    this.reset(); this.h.overlay(null); this.h.vcb(this.vcbLabel, ''); this.h.tip(this.hint);
+    return true;
+  }
+  value(v, text) {
+    if (v.kind === 'sides') { if (v.n < 2 || v.n > 999) { this.h.print(t('m3d.tool.use_2_to_999_segments')); return false; } this.segs = v.n; this.h.print(t('m3d.tool.arc_segs', { n: v.n })); if (this.lastEv) this.hover(this.lastEv); return true; }
+    if (!this.o) return false;
+    const r = this.role, neg = /^\s*-/.test(text || '');
+    if (r === 'angle' || r === 'direction') {
+      const deg = v.kind === 'num' ? v.v : v.num ?? parseFloat(text);
+      if (!Number.isFinite(deg) || (r === 'angle' && deg === 0)) return false;
+      return this.accept(deg * Math.PI / 180);
+    }
+    if (r === 'length' || r === 'radius') {
+      if (v.kind !== 'len' && v.kind !== 'num') return false;
+      const x = Math.abs(v.v);
+      if (!(x > 0)) return false;
+      return this.accept(neg ? -x : x);
+    }
+    // a point step: a distance along the way the pointer points from the last click
+    if (v.kind !== 'len' || !(v.v > 0)) return false;
+    const d = this.curP ? norm(sub(this.curP, this.last3)) : null;
+    if (!d || !len(d)) return false;
+    const p = add(this.last3, mul(d, v.v));
+    return this.accept(this.to2(p), p);
+  }
+  cancel() { this.reset(); }
+}
+
 // ---- smooth curves (0.4 M27) ----
 /**
  * Curve: click points (snapping as Line does); the curve passes through each. Enter or a double-click finishes, a click on
@@ -1076,6 +1183,15 @@ class PaintTool extends Tool {
   }
 }
 
+/** 0.9 FX.30: what a stopped push or move touches, in words: "— stopped where it touches Box" (the name of the object in the
+ *  way; loose geometry of the open group has none). `by` is collide.js's clamp(...).by. */
+function stoppedWords(h, by, plain) {
+  if (!by) return t(plain);
+  const pl = by.path && by.path.length ? h.model.placementAt(by.path) : null;
+  const name = pl ? (pl.inst.name || h.model.defs.get(pl.inst.def)?.name || '') : '';
+  return t('m3d.tool.stopped_touching', { name: name || t(by.path && by.path.length ? 'm3d.tool.touch_object' : 'm3d.tool.touch_loose') });
+}
+
 // ---- push/pull ----
 class PushTool extends ClickTool {
   constructor(...a) { super(...a); this.reset(); this.last = null; }
@@ -1101,8 +1217,8 @@ class PushTool extends ClickTool {
     if (at) d = dot(sub(at.p, this.p0), this.n);
     else { const a = alongLine(this.h.cam, ev.x, ev.y, this.p0, this.n); d = a ? a.s : 0; }
     this.apply(d);
-    const tip = at && at.kind === 'face' && !this.stopped ? TIPS.face : this.fmt(Math.abs(this.d)) + (this.stopped ? t('m3d.tool.stopped_where_it_touches') : '');
-    this.h.overlay({ marker: at ? this.marker(at) : null, tip, lines: [{ a: this.p0, b: add(this.p0, mul(this.n, this.d)), kind: 'axis', dash: true }] });
+    const tip = at && at.kind === 'face' && !this.stopped ? TIPS.face : this.fmt(Math.abs(this.d)) + (this.stopped ? stoppedWords(this.h, this.stoppedBy, 'm3d.tool.stopped_where_it_touches') : '');
+    this.h.overlay({ marker: at ? this.marker(at) : null, tip, lines: [{ a: this.p0, b: add(this.p0, mul(this.n, this.d)), kind: 'axis', dash: true }], ...(this.stopped && this.stoppedBy?.tris.length ? { faces: this.stoppedBy.tris } : {}) });
   }
   /** Does the pushed face, where it was, lie in front of point p under the cursor? */
   hides(ev, p) {
@@ -1111,10 +1227,10 @@ class PushTool extends ClickTool {
   }
   apply(d) {
     const T = this.T, k = this.k;
-    this.stopped = false;
+    this.stopped = false; this.stoppedBy = null;
     if (this.coll && Math.abs(d) > EPS) {
       const r = this.coll.clamp(mul(this.n, d));
-      if (r.hit) { d = Math.sign(d) * len(r.delta); this.stopped = true; }
+      if (r.hit) { d = Math.sign(d) * len(r.delta); this.stopped = true; this.stoppedBy = r.by || null; }
     }
     this.d = d;
     const r = this.h.model.preview((m) => pushPull(m.context(this.h.path).def, this.fid, d * k), this.scope());
@@ -1202,9 +1318,33 @@ class PushTool extends ClickTool {
 const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 /** Push/pull's collider: the face travels; its own solid (everything connected to it) is neither in the way nor moving. */
+/**
+ * 0.9 FX.30: the faces and edges of the piece the face fid is part of, joining pieces through the faces as well as the edges: a
+ * face with a hole (the ring left by Offset) ties its inner loop's points to its outer loop's, so the pocket you push is still
+ * one piece with the solid around it. (connected() follows edges only: the inner outline of an offset face shares no edge
+ * with the outside, so the walls of the solid counted as a second object the pushed face ran into.)
+ */
+export function pieceOf(def, fid) {
+  const vf = new Map(), ve = new Map();
+  for (const [id, f] of def.faces) for (const l of f.loops) for (const v of l) { if (!vf.has(v)) vf.set(v, new Set()); vf.get(v).add(id); }
+  for (const [id, e] of def.edges) for (const v of [e.a, e.b]) { if (!ve.has(v)) ve.set(v, new Set()); ve.get(v).add(id); }
+  const fids = new Set([fid]), eids = new Set(), seenV = new Set(), stack = [];
+  const takeFace = (id) => { for (const l of def.faces.get(id).loops) for (const v of l) if (!seenV.has(v)) { seenV.add(v); stack.push(v); } };
+  takeFace(fid);
+  while (stack.length) {
+    const v = stack.pop();
+    for (const id of ve.get(v) || []) {
+      eids.add(id);
+      const e = def.edges.get(id);
+      for (const w of [e.a, e.b]) if (!seenV.has(w)) { seenV.add(w); stack.push(w); }
+    }
+    for (const id of vf.get(v) || []) if (!fids.has(id)) { fids.add(id); takeFace(id); }
+  }
+  return [...[...fids].map((id) => ({ t: 'f', id })), ...[...eids].map((id) => ({ t: 'e', id }))];
+}
 function pushCollider(T, sc, fid) {
   const P = T.host.path, def = T.ctx().def;
-  const own = connected(def, [{ t: 'f', id: fid }]);
+  const own = pieceOf(def, fid);
   const ownF = new Set(own.filter((s) => s.t === 'f').map((s) => s.id)), ownE = new Set(own.filter((s) => s.t === 'e').map((s) => s.id));
   const faceE = new Set(faceWithEdges(def, fid).filter((s) => s.t === 'e').map((s) => s.id));
   return collider(sc, {
@@ -1261,11 +1401,11 @@ class MoveTool extends ClickTool {
     const r = this.T.snap(ev, { from: this.p0, scene: this.sc0, skip: this.copy ? null : this.skip });
     this.lastDir = r.dir || null; this.lastKind = r.kind;
     this.apply(sub(r.p, this.p0));
-    this.h.overlay({ lines: [{ a: this.p0, b: r.p, kind: r.kind }], marker: this.marker(r), tip: this.stopped ? t('m3d.tool.stopped_where_it_touches_2') : r.tip });
+    this.h.overlay({ lines: [{ a: this.p0, b: r.p, kind: r.kind }], marker: this.marker(r), tip: this.stopped ? stoppedWords(this.h, this.stoppedBy, 'm3d.tool.stopped_where_it_touches_2') : r.tip, ...(this.stopped && this.stoppedBy?.tris.length ? { faces: this.stoppedBy.tris } : {}) });
   }
   apply(delta) {
-    this.stopped = false;
-    if (this.coll) { const r = this.coll.clamp(delta); delta = r.delta; this.stopped = r.hit; }
+    this.stopped = false; this.stoppedBy = null;
+    if (this.coll) { const r = this.coll.clamp(delta); delta = r.delta; this.stopped = r.hit; this.stoppedBy = r.by || null; }
     this.delta = delta;
     const T = this.T, sel = this.h.sel.filter((s) => s.t !== 'g' && s.t !== 'd' && s.t !== 's'), copy = this.copy;
     const ld = T.localDir(delta);

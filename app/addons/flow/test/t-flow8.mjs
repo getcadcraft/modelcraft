@@ -4,15 +4,15 @@
 import path from 'node:path';
 import { Worker as NodeWorker } from 'node:worker_threads';
 const { ok, section, near, mine, ADDON } = globalThis.__flowTest;
-const CAL = await mine('lib/calendar.js');
-const { Sim, simulate, checkGraph } = await mine('lib/sim.js');
-const LY = await mine('lib/layout.js');
-const EX = await mine('lib/examples.js');
-const C = await mine('lib/catalog.js');
-const ED = await mine('lib/edit.js');
-const RT = await mine('lib/realtime.js');
-const RUN = await mine('lib/runner.js');
-const PB = await mine('lib/playback.js');
+const CAL = await mine('../../flow/calendar.js');
+const { Sim, simulate, checkGraph } = await mine('../../flow/sim.js');
+const LY = await mine('../../flow/layout.js');
+const EX = await mine('../../flow/examples.js');
+const C = await mine('../../flow/catalog.js');
+const ED = await mine('../../flow/edit.js');
+const RT = await mine('../../flow/realtime.js');
+const RUN = await mine('../../flow/runner.js');
+const PB = await mine('../../flow/playback.js');
 
 const H = 3600, D = 86400, W = 604800;
 const strip = (r) => JSON.stringify({ ...r, trace: undefined });

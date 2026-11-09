@@ -14,10 +14,12 @@
  */
 import * as UNITS from './unit-table.js';
 import { assistantPrefs, ASSIST_KEY, getHost } from './host.js';
+import { faceTris } from './model.js';
 import { t as tr } from './i18n.js';
 
 /** The doc's block (shell-modules.md § Mounting 2). Kept as the doc has it; browser-mount-kit.mjs compares them. */
 export function mountShellModules(host) {
+  { const f = () => window.ccDocTitleFollow && window.ccDocTitleFollow(host); if (window.ccDocTitleFollow) f(); else window.addEventListener('load', f); }   // 2026-11-09: tab title = document name (one pattern, app-shell.js)
   const when = (api, name, go) => (window[api] ? go() : document.addEventListener('cc-' + name + '-ready', go, { once: true }));
   // EG.18 calc sheets — parameters in, drives out, saved inside the app's own file
   when('ccCalc', 'calc', () => {
@@ -43,6 +45,11 @@ export function mountShellModules(host) {
     for (const [name, fn] of Object.entries(host.probes || {})) ccLessons.probe(name, fn);
     ccLessons.registerTools(host.control);
     host.emit = (event, data) => ccLessons.emit(event, data);           // the app calls host.emit('tool', { name: 'line' }) where it runs a command
+  });
+  // DI.1 drawing details — what the app counts, and where the written details are kept in its file
+  when('ccDocInfo', 'docinfo', () => {
+    ccDocInfo.attach({ read: host.docinfo?.read, persist: (json) => host.file.set('docinfo', json), step: host.step, onChange: host.docinfo?.onChange });   // read() → { units, extents, counts, extra, bytes, path }
+    ccDocInfo.registerTools(host.control);
   });
   // AC.12 Suggest, AC.13 activity log, AC.8 Ask box — they ride on host.control, so the app hands over very little
   when('ccSuggest', 'suggest', () => {
@@ -81,6 +88,26 @@ function lessonsOf(mc) {
   };
 }
 
+/** DI.1: what ModelCraft counts. The model is in metres. Triangles are counted from the shown geometry once per change, only while there is some. */
+function docInfoOf(mc) {
+  const model = mc.model;
+  let memo = { v: -1, n: 0 };
+  return {
+    read: () => {
+      let groups = 0;
+      for (const d of model.defs.values()) groups += d.insts.size;
+      if (memo.v !== model.version) {
+        let n = 0;
+        model.walk((def) => { if (def.mesh) { n += (def.shown?.triangulate?.().tri.length || 0) / 3; return; } for (const f of def.faces.values()) n += faceTris(def, f).length; });
+        memo = { v: model.version, n: Math.floor(n) };
+      }
+      const bb = model.bbox(), counts = { groups };
+      if (memo.n) counts.triangles = memo.n;
+      return { units: 'm', path: mc.path() || mc.name(), extents: bb ? { min: bb.min, max: bb.max } : null, counts };
+    },
+  };
+}
+
 /** What ModelCraft hands over (the doc's table, § 3). */
 export function modelHost(mc, keep) {
   const model = mc.model;
@@ -92,6 +119,7 @@ export function modelHost(mc, keep) {
     units: UNITS,
     step: (label, fn) => { const r = model.change(label, () => fn()); mc.changed(); return r; },
     file: { set: (key, json) => keep(key, json) },
+    docinfo: docInfoOf(mc),
     selection: () => {
       const s = mc.selection()[0];
       if (!s) return null;
@@ -105,6 +133,7 @@ export function modelHost(mc, keep) {
     ...lessonsOf(mc),
     rev: () => model.version,
     document: () => ({ docId: mc.name(), path: mc.path() || '', name: mc.name() }),
+    dirty: () => !!mc.model.dirty,   // 2026-11-09: the tab title's unsaved mark (assets/js/app-doc-title.js)
     perms: {
       get: () => ASSIST(),
       set: (rec) => { try { localStorage.setItem(ASSIST_KEY + 'modelcraft', JSON.stringify(rec)); } catch { /* private mode */ } },
@@ -119,20 +148,22 @@ export function modelHost(mc, keep) {
 
 /** Mounts everything; the page calls opened() after a file opens or New, save(file) / load(file) in its two file places, tool(name) on a command. */
 export function mountModelShell(mc) {
-  const kept = { calcs: null, reasons: null };
+  const kept = { calcs: null, reasons: null, docinfo: null };
   const keep = (key, json) => { if (!(key in kept)) return; kept[key] = json || null; mc.model.dirty = true; mc.changed(); };
   const host = modelHost(mc, keep);
   mountShellModules(host);
   const reload = () => {
     if (window.ccCalc) ccCalc.load(kept.calcs);
     if (window.ccReasons) ccReasons.load(kept.reasons);
+    if (window.ccDocInfo) ccDocInfo.load(kept.docinfo);
   };
   document.addEventListener('cc-calc-ready', reload, { once: true });
   document.addEventListener('cc-reasons-ready', reload, { once: true });
+  document.addEventListener('cc-docinfo-ready', reload, { once: true });
   return {
     host,
     /** A file was read: its sheets and reasons (untrusted: the modules clean them). */
-    load(file) { kept.calcs = file && typeof file.calcs === 'object' ? file.calcs : null; kept.reasons = file && typeof file.reasons === 'object' ? file.reasons : null; reload(); },
+    load(file) { kept.calcs = file && typeof file.calcs === 'object' ? file.calcs : null; kept.reasons = file && typeof file.reasons === 'object' ? file.reasons : null; kept.docinfo = file && file.docinfo && typeof file.docinfo === 'object' ? file.docinfo : null; reload(); },
     /** A new file or another one opened: Suggest drops what it had pending, lessons look again. */
     opened() { if (host.fileOpened) host.fileOpened(tr('mc.shell.opened')); if (window.ccLessons) ccLessons.emit('model', {}); },
     /** The page writes the file object: the sheets and reasons go in (null = the key is not written, so an old file stays as it was). */
@@ -140,6 +171,9 @@ export function mountModelShell(mc) {
       const c = window.ccCalc ? ccCalc.save() : kept.calcs, r = window.ccReasons ? ccReasons.save() : kept.reasons;
       if (c) file.calcs = c;
       if (r) file.reasons = r;
+      // DI.1: the drawing details, with this save's time; a file whose details were never written is left as it was
+      const di = window.ccDocInfo ? (ccDocInfo.state().written ? ccDocInfo.save() : null) : kept.docinfo;
+      if (di) file.docinfo = di;
       return file;
     },
     changed() { if (window.ccLessons) ccLessons.emit('model', {}); if (window.ccTotals) ccTotals.invalidate?.(); },

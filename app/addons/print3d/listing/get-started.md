@@ -1,0 +1,3 @@
+- Press Print stage in ModelCraft
+- Search the Library and press Add
+- Position things, choose your printer and material, and press Send to 3D printer

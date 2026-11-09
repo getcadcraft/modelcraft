@@ -32,6 +32,7 @@
   "teamwork": true,
   "totals": true,
   "lessons": true,
+  "docinfo": true,
   "ai-suggest": true,
   "ai-activity": true,
   "ai-ask": true,
@@ -47,6 +48,6 @@
     "site"
   ],
   "input": "input-modelcraft.js",
-  "workspaces": { "layouts": ["docked", "toolbox", "autorev"], "adapter": "workspace-modelcraft.js" },
+  "workspaces": { "layouts": ["docked", "toolbox", "autorev", "duncan", "vector", "sketch"], "adapter": "workspace-modelcraft.js" },
   "engines": true
 }

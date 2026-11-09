@@ -16,7 +16,7 @@ Click {{ui:Views}} in the {{ui:Camera}} group, then {{ui:Animation timeline}}. T
 On a phone the timeline opens under the view as well. Its controls are one row: swipe it sideways to reach the rest; the button that closes the timeline stays at its end.
 :::
 
-Drag the slider (or click in a row) to move the playhead. {{ui:Play}} plays from the playhead; {{ui:Previous key}} and {{ui:Next key}} jump between keys.
+Drag the slider (or click in a row) to move the playhead. {{ui:Play}} plays from the playhead and turns into {{ui:Pause}} while it plays; click it again to stop where it is. {{key:Space}} does the same while the timeline is open (with the timeline closed, Space is still Select). {{ui:Previous key}} and {{ui:Next key}} jump between keys. A style of your own can give play and pause another key: {{ui:Settings}}, then the menus, keys and mouse, the command *Play or pause the animation*.
 
 ## Move the camera
 

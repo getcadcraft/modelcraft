@@ -13,20 +13,23 @@
  * with a progress line and Cancel; Live runs the model at the pace of the clock (lib/realtime.js).
  * ModelCraft's own code is not changed: the 3D marks are this add-on's own three.js groups in window.modelcraft.view.scene.
  */
-import { KIND, KINDS, GROUPS, defaults, cleanParams, CONVEYOR_KINDS } from './lib/catalog.js';
-import { newLayout, cleanLayout, addAfter, freePorts, snapItem, buildGraph, nextId } from './lib/layout.js';
-import { Sim, checkGraph } from './lib/sim.js';
-import { makePlayer } from './lib/playback.js';
-import { summaryRows, elementRows, toCsv, fmt } from './lib/report.js';
+import { KIND, KINDS, GROUPS, defaults, cleanParams, CONVEYOR_KINDS } from '../../flow/catalog.js';
+import { newLayout, cleanLayout, addAfter, freePorts, snapItem, buildGraph, nextId } from '../../flow/layout.js';
+import { Sim, checkGraph } from '../../flow/sim.js';
+import { makePlayer } from '../../flow/playback.js';
+import { summaryRows, elementRows, toCsv, fmt } from '../../flow/report.js';
 import { createPlc, ioMap, ioCsv } from './lib/plc.js';
 import { startLink } from './lib/plc-link.js';
-import { exampleLine, exampleAgv } from './lib/examples.js';
-import { runSim } from './lib/runner.js';
-import { makeRealtime } from './lib/realtime.js';
-import { groundPoint, gridSnap, groupOf, moveItems, placeAt, makeHistory, itemZ } from './lib/edit.js';
-import { PRESETS, cleanCalendar } from './lib/calendar.js';
-import { DIST_KINDS } from './lib/rng.js';
+import { exampleLine, exampleAgv } from '../../flow/examples.js';
+import { runSim } from '../../flow/runner.js';
+import { makeRealtime } from '../../flow/realtime.js';
+import { groundPoint, gridSnap, groupOf, moveItems, placeAt, makeHistory, itemZ } from '../../flow/edit.js';
+import { PRESETS, cleanCalendar } from '../../flow/calendar.js';
+import { DIST_KINDS } from '../../flow/rng.js';
+import { parseOrders, ordersCsv } from '../../flow/orders.js';
 import { FlowView } from './view.js';
+import { mountRobotUi } from './robot-ui.js';
+import { mountPlcUi } from './plc-ui.js';
 
 const DIST_FIELDS = { const: ['v'], uniform: ['a', 'b'], exp: ['mean'], normal: ['mean', 'sd'], tri: ['a', 'm', 'b'], erlang: ['mean', 'k'] };
 export const TRACE_HOURS = 2, MAX_EVENTS = 2e7, SPEEDS = [1, 10, 60, 600], DAY_NAMES = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -79,6 +82,7 @@ export function activate(api) {
   let sel = null, built = buildGraph(layout), fv = null;
   let result = null, player = null, playT = 0, playing = false, speed = 60, raf = 0, lastTs = 0, msg = '', bad = false;
   let root = null, timeEl = null, slider = null, playBtn = null;
+  let robots = null, plcmode = null;
   let job = null, progress = null, progEl = null;      // a run in the worker
   let live = null, liveRaf = 0;                         // Live: { sim, rt, player }
   let mouseOn = api.storage.get('mouse') !== false, armed = null, drag = null;
@@ -98,7 +102,7 @@ export function activate(api) {
     if (json === writtenJson) return;
     writtenJson = json;
     if (!docApi) { api.storage.set('layout', layout); return; }
-    const empty = !layout.items.length && !layout.calendars.length && !(layout.pools || []).length;
+    const empty = !layout.items.length && !layout.calendars.length && !(layout.pools || []).length && !(layout.orders || []).length;
     docApi.setData('layout', empty ? null : layout);
     if (legacy) { api.storage.set('layout', null); legacy = false; }
   };
@@ -193,7 +197,7 @@ export function activate(api) {
     const until = layout.run.hours * 3600;
     return { seed: layout.run.seed, until, warmup: Math.min(layout.run.warmup * 60, until * 0.9), traceUntil: Math.min(until, TRACE_HOURS * 3600), maxEvents: MAX_EVENTS };
   };
-  const workerUrl = () => { try { return new URL('./lib/worker.js', import.meta.url).href; } catch { return null; } };
+  const workerUrl = () => { try { return new URL('../../flow/worker.js', import.meta.url).href; } catch { return null; } };
   /** Run in a worker (the page stays alive; a progress line; Cancel); on this thread where a worker cannot start. */
   async function run() {
     stopAll();
@@ -393,6 +397,7 @@ export function activate(api) {
       case 'text': return h('label', { title: t('hint.' + name) }, h('span', { text: label }), h('input', { type: 'text', value: p[name], placeholder: t('hint.' + name), onchange: (e) => set(e.target.value) }));
       case 'ref': {
         if (name === 'calendar') return choice(label, p[name], [['', t('choice.none')], ...layout.calendars.map((c) => [c.id, c.name])], set);
+        if (name === 'orders') return choice(label, p[name], [['', t('choice.none')], ...(layout.orders || []).map((c) => [c.id, c.name])], set);
         if (name === 'pool') return choice(label, p[name], [['', t('choice.none')], ...(layout.pools || []).map((c) => [c.id, c.name + ' (' + c.size + ')'])], set);
         const kinds = name === 'on' ? CONVEYOR_KINDS : ['agv-drop'];
         const opts = [['', t('choice.none')], ...layout.items.filter((i) => kinds.includes(i.kind)).map((i) => [i.id, i.id])];
@@ -451,6 +456,55 @@ export function activate(api) {
       let n = 1; while (layout.pools.some((c) => c.id === 'crew-' + n)) n++;
       layout.pools.push({ id: 'crew-' + n, name: t('pools.default', { n }), size: 1 }); say(t('pools.added')); changed();
     } })));
+    return box;
+  }
+
+  // ---------------------------------------------------------------------------------------------------- orders from a file (0.9 TW.15)
+  let ordersErr = null, ordersUnit = 's';
+  function ordersMessage(e) { return t('orders.err.' + e.code, { line: e.line, column: e.column, value: e.value }); }
+  function takeOrders(text, fileName) {
+    const r = parseOrders(text, { timeUnit: ordersUnit });
+    if (!r.ok) { ordersErr = { file: fileName, error: r.error }; say(ordersMessage(r.error), true); render(); return; }   // the first bad row, in words; nothing is loaded, nothing skipped
+    ordersErr = null;
+    layout.orders = layout.orders || [];
+    if (layout.orders.length >= 10) { say(t('orders.tooMany'), true); render(); return; }
+    let n = 1; while (layout.orders.some((c) => c.id === 'orders-' + n)) n++;
+    layout.orders.push({ id: 'orders-' + n, name: fileName.replace(/\.[^.]*$/, '').slice(0, 60) || 'orders-' + n, file: fileName.slice(0, 120), unit: r.unit, rows: r.rows });
+    say(t('orders.loaded', { name: fileName, rows: r.rows.length, count: r.count })); changed();
+  }
+  function openOrders() {
+    const inp = h('input', { type: 'file', accept: '.csv,.txt,text/csv,text/plain' });
+    inp.addEventListener('change', async () => {
+      const f = inp.files && inp.files[0];
+      if (!f) return;
+      if (f.size > 5e6) { say(t('msg.tooBig'), true); render(); return; }
+      takeOrders(await f.text(), f.name);
+    });
+    inp.click();
+  }
+  async function sampleOrders() {
+    try {
+      const m = await import('./data/orders-sample.js');
+      takeOrders(m.default, 'orders-sample.csv');
+    } catch { say(t('orders.noSample'), true); render(); }
+  }
+  function ordersPanel() {
+    const box = h('fieldset', {}, h('legend', { text: t('orders.title') }), h('p', { class: 'msg', text: t('orders.note') }));
+    layout.orders = layout.orders || [];
+    for (const o of layout.orders) {
+      const users = layout.items.filter((i) => i.kind === 'source' && i.params.mode === 'orders' && i.params.orders === o.id).map((i) => i.id);
+      const loads = o.rows.reduce((a, r) => a + (r.qty || 1), 0);
+      box.append(h('div', { class: 'row' },
+        h('input', { type: 'text', value: o.name, 'aria-label': t('orders.name'), onchange: (e) => { o.name = e.target.value.slice(0, 60); changed(); } }),
+        h('span', { class: 'msg', text: t('orders.summary', { rows: o.rows.length, count: loads, first: clock(o.rows[0] ? o.rows[0].t : 0), last: clock(o.rows.length ? o.rows[o.rows.length - 1].t : 0), file: o.file || '-' }) + ' ' + (users.length ? t('orders.usedBy', { ids: users.join(', ') }) : t('orders.unused')) }),
+        h('button', { type: 'button', text: t('orders.save'), onclick: () => download((o.id || 'orders') + '.csv', ordersCsv(o.rows), 'text/csv') }),
+        h('button', { type: 'button', text: t('orders.remove'), onclick: () => { layout.orders = layout.orders.filter((x) => x !== o); for (const it of layout.items) if (it.params.orders === o.id) it.params.orders = ''; say(t('orders.removed')); changed(); } })));
+    }
+    if (ordersErr) box.append(h('p', { class: 'msg', role: 'alert', text: t('orders.first', { file: ordersErr.file }) + ' ' + ordersMessage(ordersErr.error) }));
+    box.append(choice(t('orders.unit'), ordersUnit, [['s', t('orders.unit.s')], ['min', t('orders.unit.min')], ['h', t('orders.unit.h')]], (v) => { ordersUnit = v; }));
+    box.append(h('div', { class: 'row' },
+      h('button', { type: 'button', text: t('orders.open'), disabled: layout.orders.length >= 10, onclick: openOrders }),
+      h('button', { type: 'button', text: t('orders.sample'), disabled: layout.orders.length >= 10, onclick: sampleOrders })));
     return box;
   }
 
@@ -529,6 +583,7 @@ export function activate(api) {
     // shifts and operators
     p.append(shiftsPanel());
     p.append(poolsPanel());
+    p.append(ordersPanel());
     // run
     const rn = layout.run, setR = (k) => (v) => { layout.run = { ...rn, [k]: v }; layout = cleanLayout(layout).layout; changed(); };
     p.append(h('fieldset', {}, h('legend', { text: t('run.title') }),
@@ -557,9 +612,18 @@ export function activate(api) {
     } else { slider = playBtn = null; if (!live) timeEl = null; }
     p.append(h('p', { class: 'msg', text: t('panel.note') }));
     root.append(p);
+    if (robots) robots.refresh();
+    if (plcmode) plcmode.refresh();
   }
 
   api.ui.panelSection({ id: 'flow', title: t('panel.title'), side: 'right', render(el) { root = el; render(); } });
+  // robot cell (0.9 SU.1128): its own panel section; the cycle time can become a station's process time
+  // PLC mode (0.9 SU.858): Soft (the Digital twin's soft PLC) or Real (Modbus TCP through Studio), its own panel section; files plc-ui.js, lib/plc-mode.js
+  plcmode = mountPlcUi({ api, t, getGraph: () => built.graph, getLive: () => live, docApi, download });
+  robots = mountRobotUi({ api, t, getLayout: () => layout, docApi, download, useCycle: (id, seconds) => {
+    const it = layout.items.find((i) => i.id === id);
+    if (it) { it.params = cleanParams(it.kind, { ...it.params, time: { kind: 'const', v: Math.round(seconds * 1000) / 1000 } }); changed(); }
+  } });
   // the 3D view may come up after the add-on: draw once it is there
   const wait = setInterval(() => { if (view() && attachMouse()) { clearInterval(wait); fv.drawLayout(layout, built, sel); } }, 300);
   api.onDeactivate(() => clearInterval(wait));
@@ -572,6 +636,6 @@ export function activate(api) {
     const pr = mc.cam.project(at), r = o.getBoundingClientRect();
     return pr ? { x: r.left + pr[0], y: r.top + pr[1] } : null;
   };
-  window.ccFlow = { layout: () => layout, run, cancel: cancelRun, live: goLive, liveStop: stopLive, isLive: () => !!live, running: () => !!job, undo, redo, history: () => ({ canUndo: hist.canUndo, canRedo: hist.canRedo }), screenOf, selected: () => sel, armed: () => armed, arm, docWritten: () => writtenJson, result: () => result, frame: (s) => (player ? player.frame(s) : null), showAt: (s) => showAt(s), load: (L) => setLayout(cleanLayout(L).layout, ''), example: (k) => setLayout(k === 'agv' ? exampleAgv() : exampleLine(), '') };
+  window.ccFlow = { plcMode: () => plcmode, liveSim: () => (live ? live.sim : null), layout: () => layout, run, cancel: cancelRun, live: goLive, liveStop: stopLive, isLive: () => !!live, running: () => !!job, undo, redo, history: () => ({ canUndo: hist.canUndo, canRedo: hist.canRedo }), screenOf, selected: () => sel, armed: () => armed, arm, docWritten: () => writtenJson, result: () => result, frame: (s) => (player ? player.frame(s) : null), showAt: (s) => showAt(s), load: (L) => setLayout(cleanLayout(L).layout, ''), example: (k) => setLayout(k === 'agv' ? exampleAgv() : exampleLine(), '') };
   api.onDeactivate(() => { delete window.ccFlow; });
 }

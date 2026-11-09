@@ -19,3 +19,4 @@ keywords: limits, not built, physics, plc, emulation, modbus, opc ua, robot, cra
 
 - Connecting a PLC to the model (emulation): sensors as PLC inputs, motors and diverts as PLC outputs. Planned for CadCraft Studio, which can talk to a PLC; the web edition will keep simulating only.
 - Robots, cranes, shuttles and lifts; pallet and tote stacks; walking time and skills for operators.
+- **Robots:** a robot cell checks reach and cycle time and writes a path list, ROS URDF, a joint trajectory and URScript; no collision checking, and no other maker language yet.

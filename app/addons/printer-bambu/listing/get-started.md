@@ -1,0 +1,5 @@
+- Install OrcaSlicer on your computer: github.com/OrcaSlicer/OrcaSlicer/releases
+- Install Bambu Connect on your computer: wiki.bambulab.com/en/software/bambu-connect
+- In Bambu Connect, add your P2S
+- Add this add-on, open the print stage in Studio, and choose Bambu Lab P2S under Your printer
+- Press Send to 3D printer, then check the file in Bambu Connect and start the print

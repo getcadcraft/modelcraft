@@ -20,6 +20,8 @@ import * as E from './nodes/index.js';
 export async function mountNodesMc({ parent, view, docData, t, bake = null, status = () => {} }) {
   const { openNodesWindow } = await import('/assets/js/app-nodes.js');
   const store = docData.forAddon('nodes');
+  // the solid nodes (0.9 SU.747c) run the Booleans on ModelCraft's own manifold-3d, handed over once; a failed load leaves them saying the engine is missing
+  try { N.nodesSolid.setEngine(await import('./solids.js').then((L) => L.manifold())); } catch { /* i18n-ignore: no engine, the nodes say so */ }
   const w = openNodesWindow({
     parent, E, N, THREE, scene: view.scene, scale: 0.001, t, problemsId: 'modelcraft.nodes',
     store: { get: () => store.data('graph'), set: (json) => store.setData('graph', json.nodes.length ? json : null) },

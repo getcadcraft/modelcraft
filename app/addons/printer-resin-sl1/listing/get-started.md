@@ -1,0 +1,2 @@
+- Add it with Resin printing
+- Choose SL1 in File format, then Save the print file

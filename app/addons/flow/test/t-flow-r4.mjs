@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 // 0.8 round 4 (part-model_PART_4), SU.858 rest: gates and vehicles break down, idle vehicles park, stations share a pool of operators.
 const { ok, section, mine } = globalThis.__flowTest;
-const { simulate, checkGraph } = await mine('lib/sim.js');
-const C = await mine('lib/catalog.js');
-const LAY = await mine('lib/layout.js');
+const { simulate, checkGraph } = await mine('../../flow/sim.js');
+const C = await mine('../../flow/catalog.js');
+const LAY = await mine('../../flow/layout.js');
 
 const H = 3600;
 const L = (from, out, to, i = 'in') => ({ from, out, to, in: i });

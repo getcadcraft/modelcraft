@@ -23,6 +23,7 @@
 
 import { pack, unpack } from './live-client.js';
 import { t } from './i18n.js';
+import { attachPresence } from './live-presence.js';
 import { mmul as mmul4 } from './vec.js';
 
 export const SCHEMA = 1;
@@ -270,7 +271,8 @@ export function createLive(model, opts = {}) {
     // pointers of the people in VR; the client keeps the newest of each peer and hands them here
     others: new Map(),
     drawPresence(peers) { live.others = new Map(peers); },
-    setPresence(p) { client?.setPresence(p); },
+    // merged: the shared layer's pointer (sp, cur, sel) and the headset's `xr` travel in one presence (0.9 SU.1112)
+    setPresence(p) { client?.setPresence({ ...(client.lastPresence || {}), ...p }); },
     peers() { return live.others; },
     nameOf(c) { const p = client && client.peers && client.peers.get(c); return (p && p.name) || t('live.someone'); },
     apply(ops) {
@@ -385,7 +387,7 @@ export function createLiveAdapter({ host } = {}) {
     let offs = [];
     const say = (m) => { try { app.print ? app.print(m) : null; } catch { /* no message line */ } };
     const off = lv.on((c) => {
-      if (c && c.adapter === a) { a.bind(c); offs = messages(c, say); app.live = a; }
+      if (c && c.adapter === a) { a.bind(c); offs = messages(c, say); offs.push(attachPresence(c, a, presenceView(app), { t })); app.live = a; }
       else if (!c && a.client) { offs.forEach((f) => f()); a.unbind(); app.live = null; off(); }
     });
   }
@@ -393,6 +395,45 @@ export function createLiveAdapter({ host } = {}) {
 }
 
 /** A browser opening a link with #live=<code> (a page a host serves on the LAN) or ?live=<ROOM>#<secret> joins. */
+/**
+ * Where ModelCraft's pointer is and where others' go (0.9 SU.1112, live-presence.js): model metres on the plane through
+ * the view's centre, facing the camera; the selection as its bounding box (tools.selBox, in the open group's world).
+ */
+export function presenceView(app) {
+  const cam = () => app.cam;
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  return {
+    // 0.9 ED.1: follow a view — ModelCraft's own camera (camera.js: eye, target, fov, persp)
+    snap() { const c = cam(); if (!c || !c.eye) return null; return c.persp === false ? { k: '3d', e: c.eye, t: c.target, o: 1, z: c.height } : { k: '3d', e: c.eye, t: c.target, f: c.fov }; },
+    apply(vw) {
+      const c = cam(); if (!c || !c.set || !vw || vw.k !== '3d') return false;
+      c.set({ eye: vw.e, target: vw.t, fov: vw.f || c.fov, persp: !vw.o });
+      if (vw.o && vw.z && c.persp === false) { const d = vw.z / (2 * Math.tan((c.fov * Math.PI) / 360)), dir = [c.eye[0] - c.target[0], c.eye[1] - c.target[1], c.eye[2] - c.target[2]], n = Math.hypot(...dir) || 1; c.eye = c.target.map((v, i) => v + (dir[i] / n) * d); }
+      if (app.view && app.view.invalidate) app.view.invalidate();
+      return true;
+    },
+    get el() { return app.view && (app.view.over || app.view.gl); },
+    toModel(x, y, w) {
+      const c = cam();
+      if (!c || !c.ray) return null;
+      const k0 = c.w / (w || c.w), r = c.ray(x * k0, y * k0), n = c.axes().z;
+      const den = dot(n, r.d);
+      if (Math.abs(den) < 1e-12) return null;
+      const k = dot(n, sub(c.target, r.o)) / den;
+      return Number.isFinite(k) ? [r.o[0] + r.d[0] * k, r.o[1] + r.d[1] * k, r.o[2] + r.d[2] * k] : null;
+    },
+    toScreen(p, w) {
+      const c = cam();
+      const s = c && c.project ? c.project([p[0], p[1], p[2] || 0]) : null;
+      if (!s || s[2] < -1 || s[2] > 1) return null;
+      const k = (w || c.w) / c.w;
+      return [s[0] * k, s[1] * k];
+    },
+    selection: () => { const b = app.tools && app.tools.selBox ? app.tools.selBox() : null; return b ? [[...b.min, ...b.max]] : []; },
+    hidden: () => { const e = app.view && (app.view.over || app.view.gl); return !e || !e.isConnected || e.offsetParent === null; },
+  };
+}
+
 export async function joinFromPage(app, fileHost, w = globalThis) {
   const lv = fileHost && fileHost.live;
   if (!lv || !app) return false;

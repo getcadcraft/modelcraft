@@ -1,0 +1,21 @@
+{
+  "id": "factory",
+  "name": "Factory floor",
+  "version": "0.9.0",
+  "apps": [
+    "modelcraft"
+  ],
+  "api": "1.0",
+  "license": "Apache-2.0",
+  "entry": "./main.js",
+  "permissions": [
+    "panel",
+    "files",
+    "network"
+  ],
+  "description": "Machines and cells from the Material flow layout, read live (MTConnect; OPC UA, MQTT, Modbus, BACnet through CadCraft Studio) or from a seeded simulator. Operator screen over the layout, a job queue to Studio's Send to a machine, history and simple OEE. Reading first: writing is off unless switched on per device and confirmed. Not a safety system.",
+  "author": "CadCraft",
+  "lang": "./lang/",
+  "help": "./help/help.js",
+  "default": "off"
+}

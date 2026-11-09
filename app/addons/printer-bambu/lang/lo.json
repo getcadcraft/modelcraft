@@ -1,0 +1,21 @@
+{
+  "@locale": "lo",
+  "@name": "ລາວ",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (ຜ່ານ Bambu Connect)",
+  "step.orca": "ຕິດຕັ້ງ OrcaSlicer ໃນຄອມພິວເຕີເຄື່ອງນີ້.",
+  "step.orca.link": "ດາວໂຫຼດ OrcaSlicer",
+  "step.connect": "ຕິດຕັ້ງ Bambu Connect ໃນຄອມພິວເຕີເຄື່ອງນີ້.",
+  "step.connect.link": "ດາວໂຫຼດ Bambu Connect",
+  "step.bind": "ໃນ Bambu Connect ໃຫ້ເພີ່ມ P2S ຂອງທ່ານ. ເຮັດຄັ້ງດຽວ.",
+  "step.send": "ກົດ ສົ່ງໄປເຄື່ອງພິມ 3D. ໄຟລ໌ຈະເປີດໃນ Bambu Connect: ກວດສອບທີ່ນັ້ນ ແລ້ວເລີ່ມການພິມ.",
+  "note": "Bambu Connect ແມ່ນໂປຣແກຣມຂອງ Bambu Lab ສຳລັບການພິມຈາກຊອບແວອື່ນ ແລະ ການພິມຈະເລີ່ມຈາກທີ່ນັ້ນ.",
+  "confirm": "OrcaSlicer ໄດ້ຈັດກຽມອັນນີ້ດ້ວຍ ຄ່າກຳນົດ P2S ຂອງມັນ: {grams} g, {layers} ຊັ້ນ.",
+  "confirm.next": "ເປີດໃນ Bambu Connect ບໍ? ຈະຍັງບໍ່ມີການພິມຈົນກວ່າທ່ານຈະເລີ່ມທີ່ນັ້ນ.",
+  "done": "ສົ່ງໄປ Bambu Connect ແລ້ວ. ກວດສອບທີ່ນັ້ນ ແລ້ວເລີ່ມການພິມ.",
+  "fail.orca": "ບໍ່ພົບ OrcaSlicer ໃນຄອມພິວເຕີເຄື່ອງນີ້. ກະລຸນາຕິດຕັ້ງ ແລ້ວລອງໃໝ່.",
+  "fail.slice": "OrcaSlicer ບໍ່ສາມາດຈັດກຽມການພິມນີ້ໄດ້. {why}",
+  "fail.nogcode": "ໄຟລ໌ຂອງ OrcaSlicer ບໍ່ມີການພິມ.",
+  "fail.bed": "ອັນນີ້ບໍ່ພໍດີກັບແທ່ນພິມຂອງ P2S.",
+  "fail.connect": "Bambu Connect ບໍ່ເປີດ. ກະລຸນາຕິດຕັ້ງ ແລ້ວລອງໃໝ່."
+}

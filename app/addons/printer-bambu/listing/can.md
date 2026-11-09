@@ -1,0 +1,2 @@
+- Send from the print stage to Bambu Connect with one button
+- Use OrcaSlicer's P2S start sequence and material presets

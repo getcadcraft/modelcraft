@@ -1,0 +1,21 @@
+{
+  "@locale": "my",
+  "@name": "မြန်မာ",
+  "@note": "Draft translation, not yet reviewed by a native speaker",
+  "label": "Bambu Lab P2S (Bambu Connect မှတစ်ဆင့်)",
+  "step.orca": "ဤကွန်ပျူတာတွင် OrcaSlicer ကို ထည့်သွင်းပါ။",
+  "step.orca.link": "OrcaSlicer ရယူရန်",
+  "step.connect": "ဤကွန်ပျူတာတွင် Bambu Connect ကို ထည့်သွင်းပါ။",
+  "step.connect.link": "Bambu Connect ရယူရန်",
+  "step.bind": "Bambu Connect တွင် သင်၏ P2S ကို ထည့်ပါ။ ဤအဆင့်ကို တစ်ကြိမ်သာ လုပ်ပါ။",
+  "step.send": "3D printer သို့ ပို့ရန် ကို နှိပ်ပါ။ ဖိုင်ကို Bambu Connect တွင် ဖွင့်မည်၊ ထိုနေရာတွင် စစ်ဆေးပြီး ပရင့်ထုတ်ရန် စတင်ပါ။",
+  "note": "Bambu Connect သည် အခြားဆော့ဖ်ဝဲမှ ပရင့်ထုတ်ရန် Bambu Lab ၏ ကိုယ်ပိုင်ပရိုဂရမ် ဖြစ်ပြီး ပရင့်ထုတ်မှုကို ထိုနေရာမှ စတင်ပါသည်။",
+  "confirm": "OrcaSlicer သည် ၎င်း၏ P2S preset များဖြင့် ဤအရာကို ပြင်ဆင်ထားသည်- {grams} g၊ {layers} အလွှာ။",
+  "confirm.next": "Bambu Connect တွင် ဖွင့်မလား။ ထိုနေရာတွင် စတင်သည်အထိ မည်သည့်အရာမျှ ပရင့်မထုတ်ပါ။",
+  "done": "Bambu Connect သို့ ပို့ပြီးပါပြီ။ ထိုနေရာတွင် စစ်ဆေးပြီး ပရင့်ထုတ်ရန် စတင်ပါ။",
+  "fail.orca": "ဤကွန်ပျူတာတွင် OrcaSlicer ကို မတွေ့ပါ။ ထည့်သွင်းပြီး ထပ်ကြိုးစားပါ။",
+  "fail.slice": "OrcaSlicer သည် ဤပရင့်ထုတ်မှုကို ပြင်ဆင်၍ မရပါ။ {why}",
+  "fail.nogcode": "OrcaSlicer ၏ ဖိုင်တွင် ပရင့်ထုတ်မည့်အရာ မပါပါ။",
+  "fail.bed": "ဤအရာသည် P2S ၏ bed အပေါ် မကိုက်ညီပါ။",
+  "fail.connect": "Bambu Connect ကို မဖွင့်နိုင်ပါ။ ထည့်သွင်းပြီး ထပ်ကြိုးစားပါ။"
+}
