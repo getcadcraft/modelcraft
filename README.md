@@ -6,9 +6,9 @@ Push, pull and think in three dimensions.
 
 **[Website](https://getcadcraft.com/apps/modelcraft) | [Use it in your browser](https://getcadcraft.com/use/modelcraft) | [Download CadCraft Studio](https://getcadcraft.com/download#studio) | [Help and tutorials](https://getcadcraft.com/tutorials/modelcraft) | [News](https://getcadcraft.com/news) | [Suggest a feature](https://getcadcraft.com/suggest)**
 
-[![ModelCraft 0.9](screenshots/paper.png)](https://getcadcraft.com/use/modelcraft)
+[![ModelCraft 0.10](screenshots/paper.png)](https://getcadcraft.com/use/modelcraft)
 
-<sub>ModelCraft 0.9 in the browser, dark theme. [A second view](screenshots/model.png).</sub>
+<sub>ModelCraft 0.10 in the browser, dark theme. [A second view](screenshots/model.png).</sub>
 
 ModelCraft is the 3D modeling for design app in the [CadCraft](https://getcadcraft.com) family: Fast push/pull modeling with groups, components, guides and inference snapping, for massing and early design.
 
