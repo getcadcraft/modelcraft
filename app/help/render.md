@@ -3,7 +3,7 @@ title: Render a picture of the model
 summary: Make a picture that looks like daylight: sky, sun from your model's place and date, soft shadows, glass and metal looks, then save it as a PNG.
 section: tasks
 order: 112
-keywords: render, rendering, path tracing, path traced, ray tracing, global illumination, reflections, refraction, high quality, photo, photoreal, realistic, picture, image, png, still, sky, sun, daylight, shadows, soft shadows, ambient occlusion, glass, metal, glossy, materials, exposure, brightness, overcast, dusk, studio, presentation, fog, haze, mist, smoke, cloud, volume, light shafts, god rays, caustics, adaptive sampling, noise
+keywords: render, preset, presets, scene preset, interior, exterior, section view, night, one click, rendering, path tracing, path traced, ray tracing, global illumination, reflections, refraction, high quality, photo, photoreal, realistic, picture, image, png, still, sky, sun, daylight, shadows, soft shadows, ambient occlusion, glass, metal, glossy, materials, exposure, brightness, overcast, dusk, studio, presentation, fog, haze, mist, smoke, cloud, volume, light shafts, god rays, caustics, adaptive sampling, noise
 ---
 
 {{ui:Render a picture…}} makes a picture of the view that looks like daylight rather than a drawing: a sky, the sun where your model's place and date put it, soft shadows, light from the whole sky that darkens corners and gaps, and colors that can look like glass, metal or gloss paint. The model is not changed.
@@ -12,7 +12,7 @@ keywords: render, rendering, path tracing, path traced, ray tracing, global illu
 
 1. Set up the view the way you want the picture: orbit, zoom, pick a [scene](topic:scenes), hide what should not show. The picture uses the view's own camera.
 2. Click {{ui:Export}} in the {{ui:File}} group, then {{ui:Render a picture…}}.
-3. Choose the {{ui:Size}} and the {{ui:Quality}}, then click {{ui:Render}}.
+3. Pick a {{ui:Scene}} if the one pressed is not what you want (see [Scene presets](topic:render#scene-presets-a-good-picture-in-one-click)), choose the {{ui:Size}}, then click {{ui:Render}}.
 
    The picture fills in as it renders and gets smoother with each pass. {{ui:Stop}} (or {{key:Esc}}) ends it early and keeps the picture so far.
 
@@ -20,6 +20,25 @@ keywords: render, rendering, path tracing, path traced, ray tracing, global illu
 
 :::tip
 Start with {{ui:Draft}} at {{ui:The view's size}} to check the camera and the look, then render {{ui:Good}} or {{ui:Best}} at a bigger size for the final picture.
+:::
+
+## Scene presets: a good picture in one click
+
+The top of the dialog has four {{ui:Scene}} buttons. Each sets the sky, the brightness, the ground, the edge lines, the quality and the sun in one click, so there is nothing to learn before the first picture. Click one, then {{ui:Render}}.
+
+| Scene | What it sets | Use it for |
+|---|---|---|
+| {{ui:Exterior}} | Clear sky, the model's own sun, ground on | The building from outside |
+| {{ui:Interior}} | Overcast sky (even light, no hard sun patches), half a stop brighter | A view from inside a room |
+| {{ui:Section view}} | White studio, no ground, edge lines in the fast render | A model cut by a section |
+| {{ui:Night}} | The sun down (midnight in midwinter for the site's half of the world), one stop brighter | Lamps lighting the model. With no lamps the picture is dark |
+
+- {{ui:Pick for this view}} chooses for you: {{ui:Section view}} when a section cut is on, {{ui:Interior}} when the camera is inside the model, otherwise {{ui:Exterior}}. The first time you open the dialog it starts this way by itself.
+- Every setting stays below and can be changed. Once you change one the scene sets, no button is pressed and the line under the buttons says the settings are your own. Click the scene again to put its values back.
+- A scene does not touch the engine, the mode, the size, the materials, the camera or the lamps.
+
+:::note
+The scenes give the same values in ModelCraft and BimCraft. How the finished picture looks depends on your model and your graphics card.
 :::
 
 ## Settings

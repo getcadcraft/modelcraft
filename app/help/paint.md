@@ -14,7 +14,7 @@ The {{ui:Colors}} section on the right shows a row of solid colors, {{ui:Default
 
 ## Paint
 
-1. Press {{key:B}} ({{ui:Paint}}), or click a color.
+1. Press {{key:B}} ({{ui:Paint}}), or, with nothing selected, click a color. (With something selected, clicking a color paints the selection at once.)
 2. Click a face to paint it.
 3. Click a group or a component to paint that copy: its faces that have no color of their own take this color. Faces you painted inside it keep theirs.
 

@@ -21,6 +21,11 @@ $__lx = static function (string $key, array $html): string {
     foreach (array_keys($html) as $i => $k) $mark[$k] = "\u{E000}" . $i . "\u{E001}";
     return strtr(Lang::e($key, $mark), array_combine(array_values($mark), array_values($html)));
 };
+// "Massing to BimCraft" (0.10 BK.44): sent in a new tab only where BimCraft is open in this area and the build it runs here takes
+// a building mass (manifest "accepts": ["mass"], as CivilCraft's "Develop in BimCraft" asks); else the dialog saves the IFC file.
+$__bim = Catalog::app('bimcraft');
+$__bimBuild = $__bim && Catalog::openIn($__bim, $__area['key']) ? AppBuilds::resolve($__bim['slug'], $__area['key']) : null;
+$__bimUrl = $__bimBuild && in_array('mass', $__bimBuild['manifest']['accepts'] ?? [], true) ? $__area['path'] . '/' . $__bim['slug'] : '';
 $__tools = [
     'File' => [   // i18n-ignore: the group's key (its aria-label, which the shell's toolbar arrangement saves); the visible name is ui.tb.group.*
         ['act', 'new', 'file-earmark-plus', Lang::t('ui.tool.new'), Lang::t('ui.tool.new.title')],
@@ -78,7 +83,7 @@ $__tools = [
 ];
 $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labels: ui.views.<name>
 ?>
-<main id="main" class="mc" data-modelcraft>
+<main id="main" class="mc" data-modelcraft<?php if ($__bimUrl): ?> data-bim-url="<?= e($__bimUrl) ?>" data-bim-app="<?= e($__bim['name']) ?>"<?php endif; ?>>
   <h1 class="visually-hidden"><?= Lang::e('ui.page.h1', ['app' => $app['name']]) ?></h1>
 
   <div class="mc-tools" role="toolbar" aria-label="<?= Lang::e('ui.tb.aria') ?>">
@@ -115,6 +120,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <button type="button" role="menuitem" data-export="print3d"><?= Lang::e('ui.export.print3d') ?></button>
                 <button type="button" role="menuitem" data-export="ifc"><?= Lang::e('ui.export.ifc') ?></button>
                 <button type="button" role="menuitem" data-act="storeys"><?= Lang::e('ui.export.storeys') ?></button>
+                <button type="button" role="menuitem" data-act="massing"><?= Lang::e('ui.export.massing') ?></button>
                 <button type="button" role="menuitem" data-export="dwg"><?= Lang::e('ui.export.dwg') ?></button>
                 <button type="button" role="menuitem" data-export="dxf"><?= Lang::e('ui.export.dxf') ?></button>
                 <hr>
@@ -199,6 +205,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <?php endforeach; ?>
                 <hr>
                 <button type="button" role="menuitemcheckbox" aria-checked="true" data-persp><?= Lang::e('ui.views.persp') ?></button>
+                <button type="button" role="menuitemcheckbox" aria-checked="false" data-views4><?= Lang::e('ui.views.four') ?> <kbd>Ctrl+M</kbd></button>
                 <button type="button" role="menuitemcheckbox" aria-checked="false" data-present><?= Lang::e('ui.views.present') ?> <kbd>Shift+P</kbd></button>
                 <button type="button" role="menuitemcheckbox" aria-checked="false" data-timeline-toggle><?= Lang::e('ui.views.timeline') ?></button>
                 <button type="button" role="menuitem" data-xr-enter aria-disabled="true"><?= Lang::e('ui.views.vr') ?></button>
@@ -234,7 +241,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
     <section class="mc-sec">
       <div class="mc-sec-head" data-tree-top title="<?= Lang::e('ui.outliner.top_title') ?>">
         <h2 class="mc-h"><?= Lang::e('ui.outliner') ?></h2>
-        <button type="button" class="mc-linkbtn" data-close-ctx hidden><?= Lang::e('ui.outliner.close') ?></button>
+        <button type="button" class="mc-linkbtn" data-close-ctx hidden title="<?= Lang::e('ui.outliner.close') ?>"><i class="bi bi-box-arrow-left" aria-hidden="true"></i> <?= Lang::e('ui.outliner.close') ?></button>
       </div>
       <p class="mc-crumbs" data-crumbs></p>
       <input type="search" class="mc-input mc-tree-search" data-tree-search placeholder="<?= Lang::e('ui.outliner.search') ?>" aria-label="<?= Lang::e('ui.outliner.search') ?>" autocomplete="off" spellcheck="false" hidden>
@@ -244,7 +251,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
     <section class="mc-sec">
       <div class="mc-sec-head">
         <h2 class="mc-h"><?= Lang::e('ui.comps') ?></h2>
-        <button type="button" class="mc-linkbtn" data-starter><i class="bi bi-grid" aria-hidden="true"></i> <?= Lang::e('ui.comps.starter') ?></button>
+        <button type="button" class="mc-linkbtn" data-starter title="<?= Lang::e('ui.comps.starter') ?>"><i class="bi bi-grid" aria-hidden="true"></i> <?= Lang::e('ui.comps.starter') ?></button>
       </div>
       <ul class="mc-list" data-comps></ul>
       <p class="mc-note" data-comps-empty data-keys-note="comps"><?= $__lx('ui.comps.empty', ['key' => '<kbd>G</kbd>']) ?></p>
@@ -267,11 +274,11 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
         <li><?= $__lx('ui.hint.camera', ['shift' => '<kbd>Shift</kbd>']) ?></li>
         <li><?= Lang::e('ui.hint.local') ?></li>
       </ul>
-      <p class="mc-hint-guide"><button type="button" class="btn-line btn-sm-cc" data-guide-open><i class="bi bi-signpost-2" aria-hidden="true"></i> <?= Lang::e('ui.hint.tour') ?></button></p>
+      <p class="mc-hint-guide d-flex flex-wrap gap-2"><button type="button" class="btn-line btn-sm-cc" data-hint-sample><i class="bi bi-lightning-charge" aria-hidden="true"></i> <?= Lang::e('ui.hint.trysample') ?></button><button type="button" class="btn-line btn-sm-cc" data-guide-open><i class="bi bi-signpost-2" aria-hidden="true"></i> <?= Lang::e('ui.hint.tour') ?></button></p>
       <div data-recent-files data-max="6"></div>
     </div>
     <?php /* The guided first model (0.6 LC.21, session model-part-extra_PART_2): firstmodel.js reads the steps from the model; modelcraft.js fills the card. */ ?>
-    <section class="mc-guide" data-guide hidden aria-labelledby="mc-guide-h" aria-live="polite"></section>
+    <section class="mc-guide tour-toast" data-guide hidden aria-labelledby="mc-guide-h" aria-live="polite"></section>
     <div class="mc-drop" data-drop hidden><span><i class="bi bi-box-arrow-in-down-right" aria-hidden="true"></i> <?= Lang::e('ui.drop') ?></span></div>
     <div class="mc-scenebar" data-scenebar hidden></div>
     <div class="mc-touchbar" data-touchbar role="toolbar" aria-label="<?= Lang::e('ui.touch.aria') ?>" hidden>
@@ -317,7 +324,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
     <section class="mc-sec">
       <h2 class="mc-h" id="mc-tags-h"><?= Lang::e('ui.tags') ?></h2>
       <ul class="mc-list mc-tags" data-tags aria-labelledby="mc-tags-h"></ul>
-      <button type="button" class="mc-linkbtn" data-tag-add><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= Lang::e('ui.tags.add') ?></button>
+      <button type="button" class="mc-linkbtn" data-tag-add title="<?= Lang::e('ui.tags.add') ?>"><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= Lang::e('ui.tags.add') ?></button>
       <p class="mc-note"><?= Lang::e('ui.tags.note') ?></p>
     </section>
     <section class="mc-sec">
@@ -386,7 +393,7 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
     <section class="mc-sec" data-af-id="scenes">
       <div class="mc-sec-head">
         <h2 class="mc-h"><?= Lang::e('ui.scenes') ?></h2>
-        <button type="button" class="mc-linkbtn" data-scene-add><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= Lang::e('ui.scenes.add') ?></button>
+        <button type="button" class="mc-linkbtn" data-scene-add title="<?= Lang::e('ui.scenes.add') ?>"><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= Lang::e('ui.scenes.add') ?></button>
       </div>
       <ol class="mc-scenes" data-scenes></ol>
       <p class="mc-note" data-scenes-empty><?= $__lx('ui.scenes.empty', ['up' => '<kbd>Page Up</kbd>', 'down' => '<kbd>Page Down</kbd>']) ?></p>

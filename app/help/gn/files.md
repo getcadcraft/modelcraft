@@ -1,134 +1,134 @@
 ---
-title: Abrir, guardar, importar y exportar
-summary: Archivo ModelCraft, mba'e ikatúva oike ha oguenohẽ, mba'éichapa oguardavá archivo, ha mba'e ojecambia offline ha nevegadór-kuéra apytépe.
-keywords: abrir, guardar, importar, exportar, archivo, 3dm, skp, recuperar, autoguardado, reciente, escritorio, abrir en 3D, traspaso, descargar, archivo modelcraft, dae, collada, obj, gltf, glb, stl, step, stp, ifc, dwg, dxf, formatos, sin conexión, guardar como
-from: 0b4896d1
+title: Abrir, guardar, importar ha exportar
+summary: Archivo ModelCraft, mba'e piko ojeike ha ojesend, mba'éichapa oñemboguata archivo-kuéra, ha mba'e oñemoambue sin conexión ha navegador-kuéra apopy.
+keywords: abrir, guardar, importar, exportar, archivo, 3dm, skp, recuperar, autoguardado, recientes, escritorio, abrir en 3d, entrega, descargar, archivo modelcraft, dae, collada, obj, gltf, glb, stl, step, stp, ifc, dwg, dxf, formatos, sin conexión, guardar como
+from: 3f09ab72
 ---
 
-ModelCraft ojeporta ha ojekuaa archivo nde computadora-pe. Ndaipóri oñemoĩ internet-pe: peteĩ archivo ndejeporu nevegadór-pe ojeléva, ha peteĩ archivo ndeguardá ojejapo descarga. Ehecha [Dónde van tus archivos](common:your-files).
+ModelCraft oñemboguata ha omoñe'ẽ archivo-kuéra nde kompiutadórpe. Nada ndojejoaprimi: archivo ereabrí nde navegadórpe ojehecha, ha archivo ereguardá ha'e peteĩ descarga. Ehecha [Mba'épa oho nde archivo-kuéra](common:your-files).
 
-## Formatos peteĩ vistazo-pe
+## Formato-kuéra ojehechauka
 
-| Formato | Abrir | Importar | Exportar | Mba'ére oĩ |
+| Formato | Abrir | Importar | Exportar | Mba'éichapa oiporu |
 |---|---|---|---|---|
-| ModelCraft (`.modelcraft`) | sí | no | {{ui:Guardar}} | Nde tembiapo archivo. Omanténe opa. |
-| USD (`.usd`, `.usda`, `.usdc`, `.usdz`) | sí | sí | {{ui:Guardar como}}, {{ui:Exportar}} | Programa renderizado ha escena armado-pe. ModelCraft-ipe USD omanténe opa. Ehecha [Guardar, abrir y exportar USD](topic:usd). |
-| SketchUp (`.skp`) | no | sí | no | Modelo SketchUp-gui oike haguã. Omanténe grupos, componentes, colores, texturas caraháme, tags ha bordes blandos. Ehecha [Traer un modelo SKP](topic:import-sketchup-files). |
-| Collada (`.dae`) | no | sí | sí | Modelo mbohasa 3D modelador ambuékuéra-pe. Omanténe grupos, componentes ha colores. |
-| OBJ (`.obj`) | no | sí | sí | Programa renderizado ha visualización-pe. |
-| glTF (`.glb`, `.gltf`) | no | sí | solo `.glb` | Visualizador web, motor de juego, AR-pe. |
-| STL (`.stl`) | no | sí | sí | Impresión 3D-pe (milímetros). |
-| PLY (`.ply`) | no | sí | sí | Mallas colores-pe: escaneos, impresión a color. |
-| FBX (`.fbx`) | no | sí | no | Modelos animación ha juego programakuérare (FBX 2011 ha ipyahúva). |
-| Alembic (`.abc`) | no | sí | no | Caché geometría-pe, ijyvykuéra muestra-pe. |
-| STEP (`.step`, `.stp`) | no | sí | no | Piezas programa modelador ha proveedores-gui, malla cerrada ramo tamaño verdadero-pe. Ehecha [Formatos de archivo](topic:formats). |
-| `.3dm` | no | sí | no | Modelos NURBS: polisuperficies, mallas, curvas, bloques ha capas, malla, borde, componente ha tag ramo. Ehecha [Traer un modelo .3dm](topic:import-3dm-files). |
-| 3MF (`.3mf`) | no | no | sí | Impresión 3D, colores-pe (milímetros). Desde {{ui:Verificar impresión 3D (STL o 3MF)…}}: ehecha [Preparar un modelo para impresión 3D](topic:print-3d). |
-| IFC (`.ifc`) | no | no | sí | Programa BIM-pe, ha BimCraft. |
-| DWG (`.dwg`) | no | sí | sí | Plano de sitio wala planta baja modelo haguã; modelo oguenohẽ CAD programa-pe. |
-| DXF (`.dxf`) | no | sí | sí | Upe mbojoja, cualquier programa CAD-pe. |
+| ModelCraft (`.modelcraft`) | he'ẽ | nahániri | {{ui:Guardar}} | Nde trabajo rehegua archivo. Oguereko opa mba'e. |
+| USD (`.usd`, `.usda`, `.usdc`, `.usdz`) | he'ẽ | he'ẽ | {{ui:Guardar como}}, {{ui:Exportar}} | Renderizado ha escena programa-kuéra. ModelCraft rehegua USD oguereko opa mba'e. Ehecha [Guardar, abrir ha exportar USD](topic:usd). |
+| SketchUp (`.skp`) | nahániri | he'ẽ | nahániri | Modelo SketchUp-gui ojeike. Oguereko grupo, componente, colores, textura caras-pe, etiqueta ha borde blando. Ehecha [Importar peteĩ modelo SKP](topic:import-sketchup-files). |
+| Collada (`.dae`) | nahániri | he'ẽ | he'ẽ | Modelo ojeambue ótro modelador 3D-kuéra-gui. Oguereko grupo, componente ha colores. |
+| OBJ (`.obj`) | nahániri | he'ẽ | he'ẽ | Renderizado ha visualización programa-kuéra. |
+| glTF (`.glb`, `.gltf`) | nahániri | he'ẽ | `.glb` anivéva | Visor web-kuéra, motor de juego-kuéra, AR. |
+| STL (`.stl`) | nahániri | he'ẽ | he'ẽ | Impresión 3D (milímetro-pe). |
+| PLY (`.ply`) | nahániri | he'ẽ | he'ẽ | Malla color-yvate: escaneo, impresión a color. |
+| FBX (`.fbx`) | nahániri | he'ẽ | nahániri | Modelo animación ha juego programa-kuéra-gui (FBX 2011 ha upéi). |
+| Alembic (`.abc`) | nahániri | he'ẽ | nahániri | Caché de geometría, iñepyrũ muestra-pe. |
+| STEP (`.step`, `.stp`) | nahániri | he'ẽ | nahániri | Piezas modelador-kuéra ha proveedor-kuéra-gui, malla cerrada tamaño realpe. Ehecha [Formatos de archivo en detalle](topic:formats). |
+| `.3dm` | nahániri | he'ẽ | nahániri | Modelo NURBS: polisuperficie, malla, curva, bloque ha capa, malla, borde, componente ha etiqueta-pe. Ehecha [Importar peteĩ modelo .3dm](topic:import-3dm-files). |
+| 3MF (`.3mf`) | nahániri | nahániri | he'ẽ | Impresión 3D, colores-pe (milímetro-pe). Desde {{ui:Verificar impresión 3D (STL o 3MF)…}}: ehecha [Preparar modelo impresión 3D-pe](topic:print-3d). |
+| IFC (`.ifc`) | nahániri | nahániri | he'ẽ | Programa BIM-kuéra ha BimCraft. |
+| DWG (`.dwg`) | nahániri | he'ẽ | he'ẽ | Plano de situación térã planta para modelar encima; modelo ou CAD programa-pe omondo. |
+| DXF (`.dxf`) | nahániri | he'ẽ | he'ẽ | Mbaʼe rehegua, opa CAD programa-pe. |
 
-[Formatos de archivo en detalle](topic:formats) ohechauka mba'épa oguarda ha mba'épa ndoguardái cada formato-pe.
+[Formatos de archivo en detalle](topic:formats) ohechauka ojuhúva ha oñeha'ãva cada formato-pe.
 
 ## Archivo ModelCraft
 
-Archivo `.modelcraft` omanténe modelo opa: geometría, grupos, componentes, guías, escenas, unidades, ha cámara ha estilo ndeporu jave ndeguardákiri. Ndoguardái historia de deshacer.
+Archivo `.modelcraft` oguereko modelo entero: geometría, grupo, componente, guía, escena, unidad, ha cámara ha estilo ojeporúva ndereguardákuri. Ndoguerekoi historial de deshacer.
 
 ### Abrir modelo
 
-1. Clic-ejapo {{ui:Abrir}} grupo {{ui:Archivo}}-pe, wala ejeprensa {{key:Mod+O}}.
-2. Tesäi modelo pantalla-pe ndoguardavái cambios, ModelCraft ohenói: "¿Este modelo tiene cambios sin guardar? ¿Guardar una copia primero?" Eligi {{ui:Guardar una copia}}, {{ui:Descartar cambios}} wala {{ui:Cancelar}}.
-3. Eligi archivo `.modelcraft`.
+1. Eka {{ui:Abrir}} grupo {{ui:Archivo}}-pe, térã eapretá {{key:Mod+O}}.
+2. Modelo ecránpe oguereko cambio ndoguardauiva, ModelCraft ohaʼarã: "Ko modelo oguereko cambio ndoguardauiva. ¿Guardar peteĩ kopia primero?" Ejedi {{ui:Guardar una copia}}, {{ui:Descartar cambios}} térã {{ui:Cancelar}}.
+3. Ejedi archivo `.modelcraft`.
 
-Modelo oikuaa upe unidades ojeguardavahágui, cámara ojeguardavahágui. Avei ndeipe'a peteĩ archivo `.modelcraft` 3D vista-pe, wala clic-ejapo lista reciente archivo-gui tarjeta de inicio-pe (nevegadór ojeikuaa haguã jey archivo ha escritorio app).
+Modelo oikéta unidad-kuéra oñemboguáva ha cámara oñemboguáva. Ikatu avei eji archivo `.modelcraft` 3D vista-pe, térã ejedi peteĩ listado de archivo recientes start card-pe (navegadór ikatúvare ojeikeha archivo, ha escritorio app).
 
 :::desktop
-Escritorio app-pe, doble clic `.modelcraft` archivo-pe oikeséva ModelCraft-pe, ha {{ui:Abrir con}} Collada, OBJ, glTF, DWG wala DXF archivo-pe avei oike (peteĩ modelo pyahúpe oike).
+Escritorio app-pe, doble clic archivo `.modelcraft`-pe ojeikeha ModelCraft-pe, ha **Abrir con** Collada, OBJ, glTF, DWG térã DXF archivo-pe avei (ojeiké modelo pyahúpe).
 :::
 
 ### Guardar modelo
 
-Clic-ejapo {{ui:Guardar}} wala ejeprensa {{key:Mod+S}}. Nevegadór ojedescargáta `<nombre>.modelcraft`, upe nombre ha'e archivo ojeporúva, wala "Untitled" peteĩ modelo pyahúpe.
+Eka {{ui:Guardar}} térã eapretá {{key:Mod+S}}. Navegadór ojedescarga `<nombre>.modelcraft`, nombre ha'e archivo ojeporu ojeabrivaʼekue, térã "Untitled" modelo pyahu-pe.
 
 :::desktop
-Escritorio app-pe, {{ui:Guardar}} oguardáta archivo ojeporúva upe mbyte-pe. Modelo pyahu oporandu mba'épa oguardáta.
+Escritorio app-pe, {{ui:Guardar}} ojegueraha archivo ojeabrivaʼekue hendápe. Modelo pyahu-pe ojerohory ndive hendápe ojeguardávaʼerã.
 :::
 
-- {{ui:Guardar como}} ({{key:Mod+Shift+S}}) oguardáta peteĩ copia `.modelcraft` archivo-pe wala [USD](topic:usd)-pe; nevegadór oikóramo, oporandu sú ha tenda. Si nó, emoĩ jey descargado archivo-pe: oguardava jey upe archivo ojeporúva rire, oikuaáta nombre pyahu.
-- Cada guardado ha'e peteĩ descarga pyahu. Nevegadór ajuste-kuéra rehe, oho downloads carpeta-pe térã oporandu mba'épa oguardáta. Si upe nombre ojeikuaa ko'ápe, nevegadór oñemoĩ peteĩ número, por ejemplo `Untitled (1).modelcraft`.
+- {{ui:Guardar como}} ({{key:Mod+Shift+S}}) oguardákuri kopia `.modelcraft` archivo-pe térã [USD](topic:usd)-pe; navegadór ikatúvare ohaʼarã nombre ha tenda. Ndaikatúiramo, ejerrenombra ojedescargavaʼekue archivo.
+- Cada guardado ha'e peteĩ descarga pyahu. Navegadór-pe mbohapy-kuéra ndojehechái, ojeguata tenda downloads-pe térã ohaʼarã ndehe mo'ãva. Hérava hína ojeguerekóramo archivo ko nombre ndive, navegadór-kuéra oñembohetaʼỹ peteĩ número, mohẽ `Untitled (1).modelcraft`.
 
 :::chromium
-Oiporavo haguã cada vez carpeta, eho nevegadór ajuste-pe, eheka "descargas" ha ejapo "Preguntar dónde guardar cada archivo antes de descargar".
+Cada vez tenda ejeporavo ramo, eke navegadór ajustes-pe, ehecha "downloads" ha eaktiva "Ask where to save each file before downloading".
 :::
 
 :::firefox
-Oiporavo haguã carpeta cada vez, eho **Ajustes**, upéi **General**, ha "Descargas" rupi eligi "Preguntar siempre dónde guardar archivos".
+Cada vez tenda ejeporavo ramo, eke **Settings**, upéi **General**, ha "Downloads" ryepýpe ejedi "Always ask you where to save files".
 :::
 
 :::safari
-Oipakuaa haguã dónde oho descargas, eho **Safari**, upéi **Ajustes**, upéi **General**, ha omoĩ "Ubicación de descargas de archivos".
+Descargas oho mo'ãva ajustar ramo, eke **Safari**, upéi **Settings**, upéi **General**, ha ajuste "File download location".
 :::
 
-### Empezar modelo pyahu
+### Modelo pyahu oñemboguata
 
-Clic-ejapo {{ui:Nuevo}}. Ndeguardái cambios rehe, ModelCraft ohenói jepe. Modelo pyahu oñepyrũ vacío, nde nevegadór ojeguerekóva unidad-pe (Estados Unidos-pe pie ha pulgada; ambue tenda-pe milímetro), escena nderekóiva.
+Eka {{ui:Nuevo}}. Cambio ndoguardauiva oguereko ramo, ModelCraft ohaʼarã mboʼehaópe. Modelo pyahu oñepyrũ vacío, nde idioma unidad-pe (Estados Unidos-pe pulgada ha pie, ambue tenda-pe milímetro), escena'ỹ.
 
-### Nevegadór oñemboty mboyve guardá ndejapóvo
+### Navegador oñemboguáramo ndojeguardavaʼekue
 
-ModelCraft oguardáta copia ndeguardavái-va nevegadór-pe segundo mokõi rire cada cambio. Nevegadór térã pestaña omboty mboyve guardá ndejapóvo, ojehupytýva ModelCraft oikérõ jey, oporandu "¿Recuperar tu trabajo?". Recuperar oikeséta modelo oĩva upe ohasáva, ndoguardavái archivo-pe: guardá jey ojeikuaa haguã. Ehecha [Recuperar tu trabajo](common:recover).
+ModelCraft oñongatu peteĩ kopia ndojeguardavaʼekue mba'e navegadór-pe segundo mokõi cambio upéi. Kopia oñemoañete mboheraʼỹme, modelo guasu ndoñemoʼãmbaʼekue. Ojeheja tab térã navegadór ojejuhu ndejeguardavaʼéramo, ModelCraft ojehaʼa "¿Recuperar tu trabajo?" ojeikekuévo ModelCraft-pe. Recuperar oikeha modelo oiko haguéicha, ndojeguardavaʼekuri archivo-pe: guardá ha'e ndoguardatáramo. Ehecha [Recuperar tu trabajo](common:recover).
 
 ### Desde CadCraft: Abrir en ModelCraft
 
-CadCraft dibujo app-pe, **Vista**, upéi **Más**, upéi **Abrir en ModelCraft** ome'ẽ dibujo pe hasýva ModelCraft-pe pestaña pyahúpe, DWG ramo. Oike ojeikuaa DWG importado ramo: tierra-pe líneas, grupo-pe, ojapo haguã prepara. Ndoguenohẽi nada; archivo oiko nevegadór almacenamiento-pe.
+CadCraft dibujo app-pe, **Vista**, upéi **Más**, upéi **Abrir en ModelCraft** omoĩ dibujo ojeabrivaʼekue ModelCraft-pe tab pyahúpe, DWG-kuéra. Oike DWG importado haguéicha: tierra-pe líneas, grupo-pe, modelo-pe ojeporu porã. Nada ndojejoaprimi; archivo oho navegadór-pe.
 
 ## Importar
 
-Importar oinkluí archivo modelo ojeporúvape; ndoipejoapy.
+Importar oñemoĩ archivo modelo ojeabrivaʼekue-pe; ndoñembyai.
 
-1. Clic-ejapo {{ui:Importar}} grupo {{ui:Archivo}}-pe, wala omboty archivo 3D vista-pe.
-2. Eligi SketchUp, Collada, OBJ, glTF, FBX, PLY, STL, Alembic, STEP, `.3dm`, USD, DWG wala DXF archivo.
+1. Eka {{ui:Importar}} grupo {{ui:Archivo}}-pe, térã omoĩ archivo 3D vista-pe.
+2. Ejedi SketchUp, Collada, OBJ, glTF, FBX, PLY, STL, Alembic, STEP, `.3dm`, USD, DWG térã DXF archivo.
 
-   Archivo oike **peteĩ grupo**, eligíva, ha vista oiko jehecha haguã. Barra de estado ohechauka mba'épa oike ha ohechauka mba'e ndoikéi, por ejemplo "No importado: 2 textura".
+   Archivo oike **peteĩ grupo**, ojeiporavo, ha vista ohechauka. Barra de estado ohechauka mba'épa oike, ha ohechauka mba'e ndoikéiva, mohẽ "No importado: 2 textura".
 
-3. Ojapo haguã geometría-pe tuichave, clic-ejapo doble grupo-pe ojapo haguã adentro, wala clic-ejapo {{ui:Descomponer}}.
+3. Geometría rehe ojapo porã ramo, eapretá doble clic grupo-pe ndive, térã eka {{ui:Descomponer}}.
 
-Mba'e ikuaávo:
+Mba'e ohechakuaa:
 
-- **Tamaño ha dirección arriba:** Collada archivo-kuéra ohechauka unidad ha mboka arriba, ModelCraft ombohasa. glTF oĩ siempre metro-pe. OBJ archivo-kuéra ndoguerekói unidad: ModelCraft ohupyty metro-pe, Y arriba-pe. Si OBJ oike 1000 jey tuichave térã michĩve, ejeporu [Escalar](topic:rotate-scale) factor `0.001` térã `1000` ndive.
-- **DWG ha DXF** oike líneas (bordes) tierra-pe, caras ndaipóri. Si dibujo noñeʼẽi unidad, diálogo "Unidades del dibujo" oporandu mba'e ha'e peteĩ unidad de dibujo. Ehecha [Modelar sobre un plano de sitio](topic:site-plan).
-- **Límites:** archivo 300 MB ryguasúva ndoikéi importar, 200 MB ryguasúva ndoikéi abrir. Archivo 2 millón vértice térã cara ryguasúva ndoikéi, ojeikuaa tuichave.
+- **Tamaño ha dirección arriba:** Collada archivo-kuéra ohechauka unidad ha eje arriba, ha ModelCraft oñembopy'ũ. glTF oĩmi metro-pe. OBJ archivo-kuéra ndoguerekói unidad: ModelCraft ohenda metro-pe, Y arriba. OBJ oike 1000 ririvéva térã iñemboriahúva ramo, ejeporá [Escalar](topic:rotate-scale) `0.001` térã `1000` ndive.
+- **DWG ha DXF** oike líneas (bordes) tierra-pe, ndaha'éi caras-pe. Dibujo ndoikuaávoi unidad ramo, peteĩ diálogo "Drawing units" ohaʼarã mbaʼépa peteĩ unidad de dibujo. Ehecha [Modelar en plano de situación](topic:site-plan).
+- **Límite-kuéra:** 300 MB-gui archivo-kuéra ndoikéi importar, ha 200 MB-gui ndoikéi abrir. Mbohapy millón-gui vértice térã cara ojuhúva ndoikéi tuvichaiterei haguéicha. 64 MB-gui OBJ ndojelee. Texto archivo-kuéra (Collada, OBJ, ASCII STL, USD texto) ojelee peteĩ pedazo-pe, 4 MB-pe, upéicha ndaipóri texto tuichakue peteĩ bloque-pe; 16 MB OBJ ojeporu 0.5 GB memoria peteĩ prueba-pe.
 
 ## Exportar
 
-1. Clic-ejapo {{ui:Exportar}} grupo {{ui:Archivo}}-pe.
-2. Eligi formato: {{ui:glTF binario (.glb)}}, {{ui:Collada (.dae)}}, {{ui:OBJ (.obj)}}, {{ui:STL para impresión (.stl, milímetros)}}, {{ui:PLY con colores (.ply)}}, {{ui:USD (.usda, .usdc, .usdz)…}}, {{ui:IFC para BimCraft (.ifc)}}, {{ui:DWG para CAD (.dwg, 2004)}} wala {{ui:DXF para CAD (.dxf, R12)}}.
+1. Eka {{ui:Exportar}} grupo {{ui:Archivo}}-pe.
+2. Eiporu formato: {{ui:glTF binario (.glb)}}, {{ui:Collada (.dae)}}, {{ui:OBJ (.obj)}}, {{ui:STL para impresión (.stl, milímetros)}}, {{ui:PLY con colores (.ply)}}, {{ui:USD (.usda, .usdc, .usdz)…}}, {{ui:IFC para BimCraft (.ifc)}}, {{ui:DWG para CAD (.dwg, 2004)}} térã {{ui:DXF para CAD (.dxf, R12)}}.
 
-Nevegadór ojedescargáta archivo, nombre modelo ndive. Modelo opa oexportáta, ndaha'éi solo upe ojeporúva. Modelo vacío ndoexportái: "El modelo está vacío: dibujá algo primero." Ehecha [Exportar un modelo para otros programas](topic:export-model).
+Navegadór ojedescarga archivo, nombre modelo haguéicha. Modelo entero oexporta, ndaha'éi selección añoite. glTF, Collada ha OBJ archivo-kuéra oñemboguata segundo plano-pe, upéicha ModelCraft ojapo ojeporu modelo guasu exportando; descarga oñepyrũ archivo ojehaʼa ramo. Modelo vacío ndoexportái: "El modelo está vacío: primero dibujá algo." Ehecha [Exportar modelo otro programa-kuéra-pe](topic:export-model).
 
-## En línea y sin conexión
+## Sin conexión y con conexión
 
-ModelCraft oiko nde computadora-pe, upévare modelado, abrir, guardar, importar ha exportar oiko sin conexión app oñemoñepyrũmi.
+Opa mba'e ModelCraft-pe oñemboguata nde kompiutadórpe, upévare modelar, abrir, guardar, importar ha exportar ikatu ojapo conexión'ỹre aplicación oñemboguatava rire.
 
-Ndaipóriva conexión, guardá sin conexión uso haguã mbo'e internet-pe:
+Conexión'ỹre ModelCraft oñepyrũ ramo, guardá conexiónpe sin conexión uso-pe:
 
-1. Clic-ejapo {{ui:Guardar para usar sin conexión}} barra superior-pe.
-2. Botón ohechauka "Guardando 40 de 212" guardándo jave. ModelCraft oguardáta sína archivo (DWG leéva avei), ko ayuda ha biblioteca 3D, upévare oguereko tiempo.
-3. Botón oñemoĩ {{ui:Listo para usar sin conexión}} jave, ModelCraft oikeséta upe mismo dirección-gui sin conexión, ha DWG importación avei oiko sin conexión.
+1. Eka {{ui:Guardar para usar sin conexión}} barra superior-pe.
+2. Botón ohechauka "Guardando 40 de 212" omboguata. ModelCraft oguarda hembiapokue archivo-kuéra (DWG lector avei), ko ayuda ha biblioteca 3D, upévare ikatu ojeikuaa tiempo.
+3. Botón ohechauka {{ui:Listo para usar sin conexión}} ramo, ModelCraft oñepyrũ mismo dirección-pe conexión'ỹre, ha DWG importar avei ikatu sin conexión.
 
-Upe botón rire clic-ejapo {{ui:Listo para usar sin conexión}} ojeporu haguã {{ui:Guardar otra vez (obtener la versión más nueva)}} wala {{ui:Quitar la copia sin conexión}}. Botón oñe'ẽ {{ui:No se pudo guardar}} jave, archivo ndoikóiva descarga: chequeá conexión ha clic-ejapo jey. {{ui:Uso sin conexión no disponible}} ohechauka upe nevegadór ventana ndoikéi guardá copia (ventana privada ha computadora managed). Ehecha [Trabajar sin conexión](common:offline).
+Eka {{ui:Listo para usar sin conexión}} upéi {{ui:Guardar otra vez (obtener la versión más nueva)}} térã {{ui:Quitar la copia sin conexión}}. Botón ohechauka {{ui:No se pudo guardar}}, archivo ndojedescargáiva: ehechakuaa conexión ha eka ojeho'ỹ. {{ui:Uso sin conexión no disponible}} ohechauka navegador ko ventana ndoikéi kopia guardar (ventana privada ha computadora administrada). Ehecha [Trabajar sin conexión](common:offline).
 
-Nube-pe guardar ndaikatúi jepe. Opa modelo oĩ upe guardaʼỹva-pe.
+Nde tenda ndoikéiva guardar nube-pe ko'ã rire. Modelo ojeguardavaʼekue oĩ ojeguardavaʼekue tenda-pe.
 
 :::offline
-Ndaipóri conexión. Ikatu nde modelá ha guardá. Barra superior ndohechaukái {{ui:Listo para usar sin conexión}}, ani rejapyrũ jey pestaña conexión rire.
+Ndejeupe'ỹ sin conexión. Ikatu nde modelar ha guardar. Barra superior-pe ndojehechái {{ui:Listo para usar sin conexión}} ramo, ndaikatúi ejejeroviaʼỹ ko tab conexiónpe ndejupi peve.
 :::
 
 ## Escritorio app
 
 :::desktop
-Ejeporu ModelCraft CadCraft Studio-pe, escritorio app ohupytýva ocho app. Archivo ojeporta ha oguardáta eligi-va mbytépe.
+Ereiporu ModelCraft CadCraft Studio-pe, escritorio app ohaʼe ocho aplicación-kuéra ndive. Archivo-kuéra ojeabri ha ojeguarda ejeporaváre.
 :::
 
 :::web
-ModelCraft oñemoĩ nevegadór-pe Mac, Windows ha Linux-pe, ha CadCraft Studio-pe, escritorio app ocho app-nde peteĩ instalación-pe, getcadcraft.com/download-gui.
+ModelCraft navegadórpe oñemboguata Mac, Windows ha Linux-pe, ha CadCraft Studio-pe, escritorio app ocho aplicación-kuéra ndive peteĩ instalación-pe, getcadcraft.com/download-gui.
 :::

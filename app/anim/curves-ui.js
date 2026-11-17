@@ -14,6 +14,7 @@
 import { channels, sampleChannel, setEase, setHandleMode, setCycle, removeKey, moveKeys, EASES, HANDLE_MODES, CYCLES } from '../render/anim.js';
 import { toPx, fromPx, frame, zoom, pan, points, hit, inBox, ticks, dragKey, dragHandle } from './graph.js';
 import { el } from '../ui-util.js';
+import { PadDetector } from '../wheel-pad.js';   // D7.56: a trackpad's two-finger swipe pans
 
 const COMP_VARS = ['--layer-red', '--layer-green', '--layer-blue', '--layer-violet'];
 
@@ -215,10 +216,12 @@ export function mountCurves(o) {
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', () => { drag = null; o.preview?.(null); draw(); });
+  const pad = new PadDetector();
   canvas.addEventListener('wheel', (e) => {
     if (!view) return;
     e.preventDefault();
-    const [x, y] = local(e), f = e.deltaY > 0 ? 1.15 : 1 / 1.15;
+    if (!e.shiftKey && !e.metaKey && pad.isSwipe(e)) { view = pan(view, -e.deltaX, -e.deltaY); draw(); return; }   // D7.56: two fingers pan; a pinch and a mouse wheel zoom (Shift / Ctrl keep their one-axis zoom)
+    const [x, y] = local(e), f = (e.ctrlKey && e.deltaMode === 0 ? Math.exp(Math.max(-30, Math.min(30, e.deltaY)) * 0.01) : e.deltaY > 0 ? 1.15 : 1 / 1.15);   // a pinch zooms by its size
     view = zoom(view, x, y, f, e.ctrlKey || e.metaKey ? 'v' : e.shiftKey ? 't' : 'both');
     draw();
   }, { passive: false });

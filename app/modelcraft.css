@@ -317,6 +317,10 @@ body.app-shell .sp-tab { bottom: 3.25rem; }
   padding: .75rem 1rem; font-size: .875rem; background: var(--sheet-2);
   border: var(--pen-2) solid var(--ink); border-radius: var(--radius);
 }
+.mc-guide.tour-toast { top: auto; left: auto; right: .75rem; bottom: .75rem; width: calc(100% - 1.5rem); max-width: calc(100% - 1.5rem);
+  padding: .5rem .75rem; background: #17703A; border: 0; font-size: 1rem; }
+@media (min-width: 576px) { .mc-guide.tour-toast { width: min(75vw, 800px); } }
+@media (min-width: 992px) { .mc-guide.tour-toast { width: max(22rem, 25vw); } }   /* 2026-11-12: the guide is a tour toast, bottom right (the 3D-print card stays top left) */
 .mc-guide-top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
 .mc-guide-step { margin: 0; color: var(--ink-2); font-size: .8125rem; }
 .mc-guide-h { margin: .2rem 0 .4rem; font-size: 1rem; font-weight: 700; font-stretch: 112%; }
@@ -434,3 +438,39 @@ html.cc-compact.cc-land .mc-tl-lanes { max-height: 4rem; }
 .ws-status-slot > .mc-status { display: flex; gap: .75rem; }
 .ws-status-slot .mc-vcb-input { width: 8rem; font-size: .75rem; }
 .ws-palette-scroll > [data-info] { zoom: .85; padding: .5rem .75rem; }
+
+/* 0.9 RH.1: four views (viewports-mc.js). The two real canvases are moved over the active pane by inline style; the other panes are plain canvases. */
+.mc-four { background: var(--line, #8a949e); }
+.mc-pane { position: absolute; overflow: hidden; cursor: pointer; background: var(--sheet); }
+.mc-pane[hidden] { display: none; }
+.mc-pane canvas { display: block; width: 100%; height: 100%; }
+.mc-pane:hover, .mc-pane:focus-visible { outline: var(--pen-2, 2px) solid var(--action, #1e48c8); outline-offset: -2px; }
+.mc-pane-frame { position: absolute; pointer-events: none; z-index: 3; outline: var(--pen-2, 2px) solid var(--action, #1e48c8); outline-offset: -2px; }
+.mc-pane-label { position: absolute; z-index: 4; pointer-events: none; font-size: .78rem; line-height: 1; padding: .2rem .4rem; background: color-mix(in srgb, var(--sheet) 80%, transparent); color: var(--ink-2, #34404e); border-radius: 2px; }
+.mc-pane-label.is-active { color: var(--action, #1e48c8); font-weight: 600; }
+
+/* 0.10 BK.44: Massing to BimCraft (massing-mc-ui.js) */
+.mc-massing { width: min(46rem, calc(100vw - 2rem)); }
+.mc-massing .mc-field { display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: .5rem; align-items: center; margin: .375rem 1rem; }
+.mc-massing .mc-note, .mc-massing-list { margin: .5rem 1rem; }
+.mc-massing-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.mc-massing-table th, .mc-massing-table td { text-align: left; padding: .25rem .5rem .25rem 0; border-bottom: 1px solid var(--line, #c9d1da); vertical-align: top; }
+
+/* A section's links sat on its title's line and both were cut short. Owner 2026-11-12 (CadCraft first, then "do the same for the other seven apps"): open, or a
+   layout whose sections do not fold, the title has its own line and the links a line under it with icon and label; closed, only the icons, on the title's line.
+   A count beside the title stays on the title's line. */
+.mc-sec-head { flex-wrap: wrap; }
+.mc-sec-head::before { content: ""; order: 4; flex: 0 0 100%; height: 0; margin-top: -.5rem; }   /* a full-width nothing: what comes after it starts a new line */
+.mc-sec-head:not(:has(> :is(.mc-linkbtn, .mc-links, .mc-sec-acts, .mc-check):not([hidden])))::before { display: none; }
+.mc-sec-head > :is(.mc-linkbtn, .mc-links, .mc-sec-acts, .mc-check):not([hidden]) { order: 5; flex: 0 1 auto; display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .9rem; text-align: left; }
+.mc-sec-head > .mc-linkbtn:not([hidden]) { gap: .3rem; }
+.mc-sec-head[data-af] { overflow: visible; }
+.mc-sec-head[data-af] > :is(.mc-linkbtn, .mc-links, .mc-sec-acts, .mc-check):not([hidden]) { overflow: visible; white-space: normal; }
+.mc-sec-head[data-af] > .mc-h { flex: 0 1 auto; }
+.mc-sec-head[data-af="closed"] { flex-wrap: nowrap; }
+.mc-sec-head[data-af="closed"]::before { display: none; }
+.mc-sec-head[data-af="closed"] > :is(.mc-linkbtn, .mc-links, .mc-sec-acts, .mc-check):not([hidden]) { order: 0; flex: 0 0 auto; flex-wrap: nowrap; gap: .1rem; }
+.mc-sec-head[data-af="closed"] > .mc-check { display: none; }   /* a filter for a list that is folded away */
+.mc-sec-head[data-af="closed"] .mc-linkbtn { font-size: 0; text-decoration: none; padding: .15rem .3rem; border-radius: var(--radius); line-height: 1; }
+.mc-sec-head[data-af="closed"] .mc-linkbtn .bi { font-size: 1rem; }
+.mc-sec-head[data-af="closed"] .mc-linkbtn:hover { background: var(--sheet); }

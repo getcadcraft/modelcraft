@@ -11,6 +11,7 @@
  * zooms at the pointer, middle or right drag pans. Each move is one undo step (the mesh's).
  */
 import { uvIslands } from './uv.js';
+import { PadDetector } from '../wheel-pad.js';   // D7.56: a trackpad's two-finger swipe pans
 
 const token = (name, fb) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fb;
 
@@ -22,6 +23,7 @@ export class UVEditor {
     this.cv.tabIndex = 0;
     this.cv.setAttribute('aria-label', host.t('app.uv.editor'));
     box.append(this.cv);
+    Object.defineProperty(this.cv, 'uvView', { configurable: true, get: () => ({ ox: this.ox, oy: this.oy, z: this.z }) });   // for tests: the pan and zoom, read-only (uv → screen below)
     this.z = 300; this.ox = 20; this.oy = 320;   // uv → screen: x = ox + u·z, y = oy − v·z
     this.drag = null; this.op = null; this.hover = false; this.stretch = null; this._raf = 0;
     const on = (n, f, o) => this.cv.addEventListener(n, f, o);
@@ -31,7 +33,9 @@ export class UVEditor {
     on('pointerenter', () => { this.hover = true; });
     on('pointerleave', () => { this.hover = false; });
     on('dblclick', (e) => { const f = this.faceAt(this.local(e)); if (f >= 0) this.selectIsland(f, e.shiftKey); });
-    on('wheel', (e) => { e.preventDefault(); const p = this.local(e), k = Math.exp(-e.deltaY * 0.0015); this.ox = p[0] - (p[0] - this.ox) * k; this.oy = p[1] - (p[1] - this.oy) * k; this.z *= k; this.draw(); }, { passive: false });
+    const pad = new PadDetector();
+    on('wheel', (e) => { e.preventDefault(); if (pad.isSwipe(e)) { this.ox -= e.deltaX; this.oy -= e.deltaY; this.draw(); return; }   // D7.56: two fingers pan, a pinch and a mouse wheel zoom
+      const p = this.local(e), k = Math.exp(-e.deltaY * 0.0015); this.ox = p[0] - (p[0] - this.ox) * k; this.oy = p[1] - (p[1] - this.oy) * k; this.z *= k; this.draw(); }, { passive: false });
     on('contextmenu', (e) => e.preventDefault());
     this.ro = new ResizeObserver(() => { this.size(); this.draw(); });
     this.ro.observe(box);

@@ -55,15 +55,15 @@ Click anywhere other than a grip to scale evenly about a point of your own. It t
 
 ### Scale to an exact size
 
-To make something an exact length, work out the factor: new length divided by current length. The value box does not do arithmetic, so work it out first: to make a 3.6 m wall 4.2 m long, 4.2 divided by 3.6 is about 1.1667, so type `1.1667`. Select the edge first to read its current length in {{ui:Entity info}}.
+To make something an exact length, work out the factor: new length divided by current length. In the three-click mode the value box does arithmetic, so type `4.2/3.6` to make a 3.6 m wall 4.2 m long. A grip's value box takes plain numbers only: work the factor out first (4.2 divided by 3.6 is about 1.1667). Select the edge first to read its current length in {{ui:Entity info}}.
 
 ### Fix an import that came in the wrong size
 
-OBJ files have no unit, so a model drawn in millimeters comes in 1000 times too big. Select the imported group, press {{key:S}}, click a corner, click any other point, and type `0.001`. For a model drawn in inches, type `0.0254`.
+OBJ files have no unit, so a model drawn in millimeters comes in 1000 times too big. Select the imported group, press {{key:S}}, click a corner grip, and type `0.001` and press {{key:Enter}}. For a model drawn in inches, type `0.0254`.
 
 ## Things to know
 
-- Scale is uniform only: there is no stretching in one direction and no grips on a box around the selection. To make a box longer in one direction, push/pull its end, or move its end face.
+- Scaling about a point with the three clicks is uniform. To stretch in one direction only, use a side or edge grip (see above).
 - Scaling a group or component changes the copy you scaled; other copies of a component keep their size.
 - Press {{key:Esc}} before the last click to cancel.
 

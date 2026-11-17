@@ -27,6 +27,7 @@ import { apply, applyDir, det3, norm, len } from '../vec.js';
 import { sniffImage } from './gltf-read.js';
 import { tgaToPng } from './tga.js';
 import { t } from '../i18n.js';
+import { decodeParts, linesOf, isParts, lengthOf } from '../textin.js';   // 0.10 PERF.20: the text is read a line at a time, never as one string
 
 const MAX = 2000000;
 const MAX_TEXT = 64 * 1048576;
@@ -81,8 +82,13 @@ function mapOption(rest) {
 }
 
 export async function readObj(input, { resolve = null } = {}) {
-  const text = typeof input === 'string' ? input : new TextDecoder().decode(input);
-  if (text.length > MAX_TEXT) throw new Error(t('obj.too_big'));
+  // 0.10 PERF.7: a file's bytes are checked before they are decoded (a 177 MB OBJ took 1.1 s and 0.5 GB to be refused); OBJ is
+  // ASCII, so bytes and characters are the same count
+  if (typeof input !== 'string' && input.byteLength > MAX_TEXT) throw new Error(t('obj.too_big'));
+  // 0.10 PERF.20: bytes are decoded in parts and read a line at a time; a string or the parts of a text are read the same way
+  const textLen = typeof input === 'string' ? input.length : isParts(input) ? lengthOf(input) : 0;
+  if (textLen > MAX_TEXT) throw new Error(t('obj.too_big'));
+  const lines = linesOf(typeof input === 'string' || isParts(input) ? input : decodeParts(input), { crlf: false })[Symbol.iterator]();
   const P = [];
   const C = [];
   let colours = false;
@@ -97,16 +103,18 @@ export async function readObj(input, { resolve = null } = {}) {
   const note = (k, n = 1) => { notes[k] = (notes[k] || 0) + n; };
   const start = (name) => { cur = { name, faces: [] }; objects.push(cur); };
   let faces = 0;
-  let pos = 0;
-  const L = text.length;
   let lineNo = 0;
-  while (pos < L) {
-    let end = text.indexOf('\n', pos);
-    if (end < 0) end = L;
-    let line = text.slice(pos, end);
-    pos = end + 1;
+  let ahead = null;   // one line read ahead (a trailing backslash joins the next line only when text follows it)
+  const pull = () => { if (ahead) { const a = ahead; ahead = null; return a; } return lines.next(); };
+  for (let step = pull(); !step.done; step = pull()) {
+    let line = step.value;
     lineNo++;
-    while (line.endsWith('\\') && pos < L) { let e2 = text.indexOf('\n', pos); if (e2 < 0) e2 = L; line = line.slice(0, -1) + ' ' + text.slice(pos, e2); pos = e2 + 1; }
+    while (line.endsWith('\\')) {
+      const more = pull();
+      if (more.done) break;
+      if (more.value === '') { const after = pull(); if (after.done) break; ahead = after; }   // the empty piece after the file's last newline is not text
+      line = line.slice(0, -1) + ' ' + more.value;
+    }
     const s = line.trim();
     if (!s || s[0] === '#') continue;
     const parts = s.split(/\s+/);

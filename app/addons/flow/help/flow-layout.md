@@ -22,7 +22,7 @@ Press {{ui:Place with mouse}} and click in the 3D view: the chosen item lands on
 
 Drag any item to move it: it slides over the ground at its own height and snaps onto a free port within 0.6 m when you let go. **Hold Shift** to drag it together with everything joined to it (belts, ports, AGV paths and the photo-eyes on them), so a whole line moves as one. Untick {{ui:Move and place with the mouse}} to leave the 3D view to ModelCraft's own tools. {{ui:Undo}} and {{ui:Redo}} step back through the changes you made here (the last 60).
 
-The layout is saved in the `.modelcraft` file with the model, and opens with it. Where the add-on is off, or not installed, the file still keeps the layout untouched.
+The layout is saved in the `.modelcraft` file with the model, and opens with it. Where the add-on is off, or not added, the file still keeps the layout untouched.
 
 Choose {{ui:Nothing (place it free)}} to place an item on its own; then set its {{ui:X}}, {{ui:Y}}, {{ui:Height}} and {{ui:Turn}} and press {{ui:Snap}}: it jumps onto the nearest free port within 0.6 m.
 

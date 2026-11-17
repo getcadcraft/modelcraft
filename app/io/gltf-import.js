@@ -190,8 +190,12 @@ function buildMesh(gm, { paintOf, materials, weights, skin, skip, report }) {
   }
   if (!corners) return null;
 
-  // weld: one mesh vertex per distinct point (and skin data, when there is any)
-  const keyOf = new Map();
+  // weld: one mesh vertex per distinct point (and skin data, when there is any). Without skin data the points go through a
+  // hash table of numbers (0.10 PERF.7: a string key per vertex was 0.25 to 0.5 s at 500k faces); same rule as the string
+  // key it replaces: equal coordinates weld, 0 and −0 count as one, as does every NaN.
+  const skinned = prims.some((pr) => pr.p.joints[0]);
+  const keyOf = skinned ? new Map() : null;
+  const table = skinned ? null : new Int32Array(tableSize(corners)).fill(-1);
   const vp = [];
   const vSrc = [];   // [prim index, vertex] that made each mesh vertex
   const cornerV = new Int32Array(corners);
@@ -205,10 +209,22 @@ function buildMesh(gm, { paintOf, materials, weights, skin, skip, report }) {
     for (const i of pr.tri) {
       if (ids[i] < 0) {
         const x = P[i * 3]; const y = P[i * 3 + 1]; const z = P[i * 3 + 2];
-        let k = x + ',' + y + ',' + z;
-        if (J) k += '|' + J[i * 4] + ',' + J[i * 4 + 1] + ',' + J[i * 4 + 2] + ',' + J[i * 4 + 3] + '|' + W[i * 4] + ',' + W[i * 4 + 1] + ',' + W[i * 4 + 2] + ',' + W[i * 4 + 3];
-        let v = keyOf.get(k);
-        if (v === undefined) { v = vp.length / 3; keyOf.set(k, v); vp.push(x, -z, y); vSrc.push(pi, i); }
+        let v;
+        if (table) {
+          const mask = table.length - 1;
+          let at = hash3(x, y, z) & mask;
+          for (;;) {
+            const w = table[at];
+            if (w < 0) { v = vp.length / 3; table[at] = v; vp.push(x, -z, y); vSrc.push(pi, i); break; }
+            if (sameKey(vp[w * 3], x) && sameKey(vp[w * 3 + 2], y) && sameKey(-vp[w * 3 + 1], z)) { v = w; break; }
+            at = (at + 1) & mask;
+          }
+        } else {
+          let k = x + ',' + y + ',' + z;
+          if (J) k += '|' + J[i * 4] + ',' + J[i * 4 + 1] + ',' + J[i * 4 + 2] + ',' + J[i * 4 + 3] + '|' + W[i * 4] + ',' + W[i * 4 + 1] + ',' + W[i * 4 + 2] + ',' + W[i * 4 + 3];
+          v = keyOf.get(k);
+          if (v === undefined) { v = vp.length / 3; keyOf.set(k, v); vp.push(x, -z, y); vSrc.push(pi, i); }
+        }
         ids[i] = v;
       }
       cornerV[c] = ids[i];
@@ -312,6 +328,15 @@ function buildMesh(gm, { paintOf, materials, weights, skin, skip, report }) {
   }
   return mesh;
 }
+
+/** The weld's hash table: a power of two at least twice the corners (every corner may be its own point). */
+const tableSize = (n) => { let s = 16; while (s < n * 2) s *= 2; return s; };
+const F64 = new Float64Array(1), U32 = new Uint32Array(F64.buffer);
+/** One number's bits, with 0 = −0 and one NaN (as String(x) would make them, the key the weld used before). */
+function bits(x) { F64[0] = x === 0 ? 0 : x !== x ? NaN : x; return Math.imul(U32[0] ^ Math.imul(U32[1], 0x9e3779b1), 0x85ebca6b); }
+const hash3 = (x, y, z) => (Math.imul(bits(x) ^ Math.imul(bits(y), 0xc2b2ae35), 0x27d4eb2f) ^ bits(z)) >>> 0;
+/** Equal as the old string key saw them: === (so 0 and −0 too), and NaN with NaN. */
+const sameKey = (a, b) => a === b || (a !== a && b !== b);
 
 /** KHR_texture_transform: offset · rotation · scale, applied to [u, v]. */
 function uvTransform({ offset, rotation, scale }, u, v) {

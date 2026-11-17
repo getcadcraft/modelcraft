@@ -1,0 +1,110 @@
+---
+title: Noutăți în versiunea 0.7 (anterioară)
+summary: Plase cu modificatori, sculptare, UV-uri și obiecte curbe, trasare de cale pe placa grafică și un spațiu de lucru Randare, o vedere live în timp real cu împrăștiere și panorame, materiale cu noduri, un spațiu de lucru Animație cu oase și fizică, fișiere USD, FBX, STEP și .3dm, și unelte de imprimare cu stilul Începător.
+keywords: noutăți 0.7, versiune anterioară, note de lansare, jurnal de modificări, modificări, 0.7, versiune, funcții noi, plasă, plase, spațiu de lucru plasă, modificatori, subdiviziune, crestare, uv, desfășurare, cusături, curbe, obiecte curbe, nurbs, bezier, sculptare, remeshare, retopologie, divizare, calcul, trasare de cale, webgpu, spațiu de lucru randare, coada de randare, mp4, exr, reducere zgomot, cer fizic, hdri, ies, adâncime de câmp, amestecare lumini, ceață, caustice, vedere live, timp real, plimbare, împrăștiere, panoramă, tur, vizualizator, umbrire, noduri, materiale cu noduri, bibliotecă de materiale, materialx, decale, pictare pe textură, coacere, animație, clipuri, chei de forme, drivere, armătură, oase, ik, constrângeri, fizică, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, solide 3D, suporturi, grosimea peretelui, golire, reparare, începător, asistenți, calculator, unități, portugheză
+from: fa562a09
+---
+
+Aceasta este lista modificărilor din ModelCraft 0.7, comparativ cu 0.6. ModelCraft modelează acum și plase, pe lângă geometria de tip împinge/trage, randează pe placa grafică și are un spațiu de lucru pentru fiecare tip de lucru: alegeți-l din lista {{ui:Spațiu de lucru}} din stânga barei de instrumente.
+
+## Noutăți
+
+### Plase
+
+- **Plase.** Selectați un grup sau o componentă și faceți clic pe {{ui:Convertire în plasă}} din {{ui:Informații entitate}}: devine o plasă, cu fețe care pot avea orice număr de colțuri și pot purta coordonate de textură, normale, culori și ponderi. {{ui:Convertire în geometrie}} o transformă înapoi. Anularea pe o plasă păstrează doar ce a schimbat fiecare pas. Un fișier care conține o plasă are nevoie de ModelCraft 0.7 ca să se deschidă. Vezi [Plase](topic:meshes).
+- **Spațiul de lucru Plasă.** Faceți dublu clic pe o plasă sau alegeți {{ui:Plasă}} din lista {{ui:Spațiu de lucru}} ca să editați vârfurile, muchiile și fețele: bucle și inele, editare proporțională, extrudare, retragere, teșire, tăiere cu buclă, cuțit, bisectare, rotire, îmbinare, dizolvare, umplere, umplere cu grilă, pod și glisare; setările ultimei operații se pot schimba ulterior în panou. Porniți de la un plan, un cub, o sferă, un tor și altele. Tastele de împingere/tragere și tastele modelatorului funcționează amândouă. Vezi [Editarea unei plase în spațiul de lucru Plasă](topic:mesh-edit).
+- **Modificatori.** Oglindirea, matricea, suprafața de subdiviziune, teșirea, solidificarea, booleanul, deplasarea, sudarea, reducerea, netezirea, zăbrelele, deformarea pe curbă și înfășurarea schimbă ce arată o plasă fără să o modifice. Le stivuiți, activați sau dezactivați fiecare pentru vedere și pentru randări și {{ui:Aplicare}} unul atunci când îl vreți definitiv. Vezi [Modificatori pe o plasă](topic:modifiers).
+- **Subdiviziune cu crestături.** {{ui:Crestare}} din spațiul de lucru Plasă păstrează ascuțite muchiile alese sub o suprafață de subdiviziune. Randările pot folosi mai multe niveluri decât vederea, iar pe o plasă mare vederea arată un nivel mai mic și spune asta. Vezi [Suprafața de subdiviziune](topic:modifiers#subdivision-surface).
+- **Obiecte curbe.** Curbe Bézier, NURBS și cu segmente drepte, care fac un tub, o bandă, o formă care se îngustează sau o placă umplută, precum și text ca o curbă. Editați-le punctele în spațiul de lucru {{ui:Curbă}}; {{ui:În plasă}} când forma este cea corectă. Vezi [Obiecte curbe](topic:curves).
+- **Spațiul de lucru UV.** Marcați cusături (sau lăsați ModelCraft să le marcheze la muchiile ascuțite), {{ui:Desfășurare}} și {{ui:Împachetare}}, sau proiectați pe cutie, cilindru, sferă sau vedere. Un editor UV lângă vederea 3D mută, rotește și scalează bucățile, iar o tablă de șah și culorile de întindere arată rezultatul. Vezi [Aranjarea UV-urilor unei plase](topic:uv).
+- **Sculptare.** Spațiul de lucru {{ui:Sculptare}} are pensule de desen, argilă, netezire, apucare, umflare, crestare, strângere, aplatizare și mască, oglindire pe axa X și {{ui:Detaliu}}, care adaugă triunghiuri acolo unde sculptați. Presiunea unui stilou stabilește dimensiunea și intensitatea pensulei. Fiecare traseu este un singur pas de anulare. Vezi [Sculptarea unei plase](topic:sculpt).
+- **Remeshare și retopologie.** {{ui:Remeshare}} refac o plasă întreagă din triunghiuri egale, închizând găurile și unind bucățile care se suprapun. Ca să construiți o plasă curată peste una detaliată, alegeți-o la {{ui:Retopologie}}: punctele pe care le mutați ajung pe suprafața ei. Vezi [Remeshare](topic:mesh-edit#remesh).
+
+### Desen
+
+- **Împărțirea unei muchii sau a unei curbe.** Unealta {{ui:Divizare}} marchează tăieturile pe măsură ce vă mutați pe o muchie și împarte cu un clic sau cu un număr scris; cu o muchie, un arc sau un cerc selectat, scrieți `/5`; {{ui:Informații entitate}} › {{ui:Divizare…}} cere numărul, pentru tablete. Un arc sau un cerc se împarte în unghiuri egale pe arcul adevărat. Vezi [Împărțirea unei muchii sau a unei curbe în părți egale](topic:divide).
+- **Calcule în caseta de valori.** Scrieți `2.5/3`, `12'6"+3/4"`, `(24'-0")/3` sau `2*450mm` pentru orice lungime și `90/2` pentru un unghi. Un calcul care nu poate fi făcut spune ce nu este în regulă și unde. Vezi [Calcule](topic:value-box#calculations).
+
+### Randare
+
+- **Trasarea de cale pe placa grafică.** {{ui:Randare imagine…}} › {{ui:Calitate înaltă (trasare de cale)}} rulează trasatorul de cale propriu al CadCraft pe placa grafică acolo unde browserul are WebGPU; linia de sub imagine spune ce motor a făcut-o. {{ui:Oprire}} păstrează imaginea, iar {{ui:Reluare}} continuă de acolo. Fără WebGPU, imaginea este trasată cu WebGL, ca înainte. Vezi [Calitate înaltă](topic:render#high-quality).
+- **Randarea în vedere.** Spațiul de lucru {{ui:Randare}} trasează chiar vederea și începe din nou când orbitați sau editați: randați o {{ui:Regiune}}, faceți clic ca să {{ui:Focalizare}}, setați {{ui:Detaliu}}. Are nevoie de WebGPU. Vezi [Randarea în vedere](topic:render#render-in-the-view).
+- **Materiale, lumini și cer.** Imaginile de calitate înaltă umbresc fiecare suprafață cu modelul de material OpenPBR (straturi, puf, pelicule subțiri, sticlă colorată, strălucire). Cu WebGPU există și un {{ui:Cer fizic}} cu {{ui:Ceață}}, o {{ui:Imagine de cer (HDRI)}} și profile de lumină IES ale producătorilor pentru lămpi. Vezi [Cerurile și profilele de lumină](topic:render#skies-and-light-profiles-on-the-graphics-card).
+- **O cameră ca de fotograf.** Expunerea din diafragmă, obturator și ISO în fiecare mod; cu WebGPU și adâncime de câmp, perspectivă cu două puncte, balans de alb, panorame de 360° (și în stereo) și hărți cubice. Vezi [Camera](topic:render#the-camera).
+- **Terminarea imaginii după randare.** Gradați-o ({{ui:ACES filmic}}, {{ui:AgX}}, {{ui:Filmic}} sau {{ui:Standard}}, contrast, strălucire (bloom), glare, vignetare, o tabelă de culori `.cube`), amestecați cerul, soarele și fiecare grup de lămpi și priviți elementele de randare unul câte unul, fără a randa din nou. Zgomotul rămas este curățat de un reductor de zgomot pe calculator. Vezi [Terminarea imaginii](topic:render#finish-the-picture) și [Amestecarea luminilor după randare](topic:render#mix-the-lights-after-the-render).
+- **Mai multe moduri de a salva o randare.** PNG pe 16 biți, un EXR cu mai multe straturi cu fiecare element de randare și grup de lumini, și un fișier de randare (`.ccrender`) care se deschide din nou cu amestecul și gradarea lui. Vezi [Salvarea imaginii](topic:render#save-the-picture).
+- **Ceață, fum și caustice.** Ceață și abur luminate de soare și lămpi, cu fascicule de lumină; o coloană sau un nor de fum; caustice sub sticlă și oglinzi; eșantionare adaptivă care se oprește pe pixelii deja curați. Doar pe placa grafică. Vezi [Ceață, fum, zgomot și caustice](topic:render#fog-smoke-noise-and-caustics).
+- **Coadă de randare și MP4.** Adăugați imagini de calitate înaltă și animații întregi la {{ui:Coada de randare}}; se randează una după alta, iar coada supraviețuiește închiderii paginii. Are nevoie de WebGPU. Videoclipurile pot fi salvate și ca MP4 acolo unde browserul poate să-l scrie. Vezi [Coada de randare](topic:render#the-render-queue) și [Randarea videoclipului](topic:animation#render-the-video).
+
+### Vedere live și prezentări
+
+- **Vedere live.** {{ui:Exportare}} › {{ui:Vedere live}} arată modelul într-un aspect în timp real lângă vedere, urmărind fiecare modificare și camera: umbre de soare, materiale, lămpi și lumină reflectată de pereți. {{ui:Plimbare}} prin ea, trageți {{ui:Oră}} și {{ui:Lună}} ca să mutați soarele sau mutați-o într-o {{ui:Fereastră nouă}}. Folosește WebGPU acolo unde browserul îl are, altfel WebGL 2. Vezi [Vederea live](topic:live-view).
+- **Împrăștiere.** Răspândiți iarbă, flori, pietre, copaci și oameni pe fețe sau cu o pensulă, din șapte elemente noi de ambianță și restul bibliotecii; seturile sunt salvate în fișier. Vezi [Împrăștierea plantelor, pietrelor și oamenilor](topic:live-view#scatter-plants-rocks-and-people).
+- **Distribuire.** O panoramă de 360°, un tur de panorame cu săgeți între puncte, un vizualizator independent (o pagină web care se deschide offline și nu încarcă nimic de pe internet) și un videoclip al traseului camerei, toate în aspectul în timp real. Vezi [Distribuirea](topic:live-view#share-panoramas-tours-a-viewer-a-video).
+- **VR în aspectul în timp real.** {{ui:Revizuire în VR}} arată modelul cu materialele, cerul, umbra soarelui, lămpile, elementele împrăștiate și lumina reflectată. Vezi [Cum arată](topic:vr-review#what-it-looks-like).
+
+### Materiale
+
+- **Materiale făcute cu noduri.** Spațiul de lucru {{ui:Umbrire}} construiește materialele fișierului ca grafuri de noduri: imagini, zgomot și table de șah, celule Voronoi, valuri, cărămizi, plăci, lemn, marmură, gradienți, murdărie și uzură pe muchii, lucru cu culori, matematică, hărți de relief și de normale, până la materialul OpenPBR complet. Vederea arată fiecare modificare imediat. Vezi [Realizarea materialelor cu noduri](topic:shading).
+- **O bibliotecă de materiale și propriile seturi de texturi.** Panoul Umbrire listează materialele bibliotecii: șaisprezece seturi de texturi CC0, fiecare cu creditul ei. Faceți clic pe unul ca să-l folosiți sau trageți-l pe o față. {{ui:Imagini sau un zip…}} sau {{ui:Un dosar…}} face un material din propriile hărți, recunoscute după numele fișierelor. Vezi [Materiale din bibliotecă](topic:shading#materials-from-the-library).
+- **MaterialX la intrare și la ieșire.** Exportați un material ca MaterialX (OpenPBR Surface sau Standard Surface, texturi ca PNG) și importați fișiere MaterialX cu imaginile lor. Vezi [MaterialX](topic:shading#materialx).
+- **Decale și pictură pe textură.** Puneți o imagine pe o suprafață ca decal, cu un material propriu, și pictați pe imaginea unui material cu o pensulă rotundă. Vezi [Decale](topic:shading#decals) și [Pictura pe textură](topic:shading#paint-on-the-texture).
+- **Coacerea texturilor.** Coaceți ocluzia ambientală, curbura, iluminarea și normalele unui obiect detaliat în imagini de-a lungul UV-urilor unei plase, pe nucleele procesorului. Vezi [Coacerea texturilor](topic:shading#bake-textures).
+
+### Animație
+
+- **Spațiul de lucru Animație.** Animați locul, rotirea și dimensiunea unui obiect, luminozitatea, răspândirea și culoarea fiecărei lămpi și unghiul lentilei, chiar în panou. Cronologia primește o vedere {{ui:Curbe}} (mânere Bézier, repetări) și o vedere {{ui:Clipuri}}, care salvează cadrele-cheie ca acțiuni de plasat din nou și de amestecat; cadrele-cheie de pe mai multe rânduri pot fi mutate, întinse, copiate și lipite. Vezi [Animarea oricărei proprietăți](topic:animate).
+- **Chei de forme și drivere.** O plasă conține alte forme ale sale, amestecate prin glisoare care pot fi animate sau setate din alte valori printr-o expresie mică. Vezi [Chei de forme](topic:animate#shape-keys-morphs) și [Drivere](topic:animate#drivers).
+- **Armături.** Puneți oase într-o plasă, lăsați {{ui:Ponderi automate}} să împartă punctele între ele sau pictați ponderile, iar oasele se poziționează și se animă; skinning liniar sau cu cuaternioni duali. Vezi [Armături](topic:animate#armatures-bones-that-bend-a-mesh).
+- **IK și constrângeri.** Atingere (IK) cu un pol, orientare spre, copiere de transformări, limite, copil al și urmărire de traseu, pentru oase și obiecte. Vezi [IK și constrângeri](topic:animate#ik-and-constraints).
+- **Fizică.** Grupurile și componentele cad, se stivuiesc și se ciocnesc ca cutii sau bile, iar {{ui:Calculare fizică}} păstrează rezultatul ca chei. Vezi [Fizică](topic:animate#physics-drop-stack-and-collide).
+
+### Fișiere
+
+- **USD.** {{ui:Salvare ca}} ({{key:Mod+Shift+S}}) salvează modelul ca `.usda`, `.usdc` sau `.usdz`, iar un fișier USD salvat de ModelCraft se deschide din nou fără nicio pierdere. Fișierele USD de la alte programe se deschid sau se importă ca plase, grupuri, componente, lămpi și camere. {{ui:Salvare}} scrie în continuare `.modelcraft`. Vezi [Salvarea, deschiderea și exportul USD](topic:usd).
+- **glTF, complet.** Fișierele glTF intră ca plase editabile cu normalele, UV-urile, culorile de vârf și texturile lor, nodurile ca grupuri, luminile ca lămpi și camerele ca scene; fișierele Draco și meshopt sunt incluse; un `.gltf` se deschide când este tras împreună cu fișierele lui. Exportul scrie plase, texturi, lămpi și camere. Vezi [glTF](topic:formats#gltf-glb-gltf).
+- **Importuri FBX, PLY, STL și Alembic.** FBX 2011 și mai nou (plase, seturi UV, materiale, texturi încorporate, lumini, camere), PLY și STL cu culorile lor și cache-uri Alembic la primul cadru. OBJ intră cu fișierul `.mtl` și imaginile lui când le trageți împreună. Vezi [Formate de fișiere în detaliu](topic:formats).
+- **Exporturi suplimentare.** PLY cu culori, STL cu culorile fețelor pictate și OBJ cu texturile lui într-un zip. Vezi [Formate de fișiere în detaliu](topic:formats).
+- **Fișiere STEP.** {{ui:Import}} citește piese și ansambluri STEP (AP203, AP214, AP242) ca plase închise la mărimea lor reală, fiecare piesă acolo unde o așază fișierul. Vezi [STEP](topic:formats#step-step-stp).
+- **Fișiere .3dm.** {{ui:Import}} citește modele `.3dm`: plase, polisuprafețe și extrudări (din plasele salvate în fișier, altfel triangulate de ModelCraft), curbe ca muchii, blocuri ca componente și straturi ca etichete. Vezi [Aducerea unui model .3dm](topic:import-3dm-files).
+- **Solide 3D din DWG și DXF.** Importul unui desen aduce acum și solidele 3D, regiunile și corpurile lui, fiecare ca propriul grup, iar cele închise ca solide. Vezi [Model pe un plan de amplasament](topic:site-plan#what-comes-in).
+
+### Imprimare 3D
+
+- **Unelte de imprimare.** {{ui:Verificare pentru imprimare 3D (STL sau 3MF)…}} › **Unelte de imprimare** are o {{ui:Previzualizare suporturi}} (porțiuni în consolă, coloane sau suporturi de arbore, cât material), {{ui:Grosimea peretelui}} (pereți prea subțiri de imprimat, listați cu {{ui:Afișare}}), {{ui:Golire}} (pereți de grosimea pe care o dați, cu găuri de scurgere) și {{ui:Reparare}} (fiecare corecție listată; piesele care se suprapun se unesc doar când cereți). Golirea și repararea dau un grup ale cărui fețe plate sunt fețe unice, sau o plasă când rezultatul nu s-ar închide ori are prea multe fețe; linia de stare spune care. Vezi [Suporturi, grosimea peretelui, golirea și repararea](topic:print-tools).
+- **Stilul Începător.** {{ui:Setări}} › {{ui:ModelCraft}} › {{ui:Meniuri, taste și mouse}} › {{ui:Începător}}: butoane mari ca să puneți forme și găuri, să mutați, să aliniați și să {{ui:Grup}}, ca găurile să taie, apoi verificați modelul pentru imprimare. Vezi [Stilul Începător](topic:beginner).
+
+### Asistenți și calculatorul meu
+
+- **Mai multe pentru asistenții AI.** Un asistent poate acum să listeze fețe și materiale, să împingă sau să tragă, să picteze, să creeze grupuri, să adauge și să arate scene, să adauge plase, să editeze stivele de modificatori, să exporte USD, să randeze o imagine și să umple coada de randare. Vezi [Utilizarea ModelCraft cu un asistent AI](topic:use-with-ai-assistants).
+- **Calculatorul meu.** {{ui:Setări}} › {{ui:ModelCraft}} › {{ui:Randare}} › {{ui:Acest calculator}} arată placa grafică, nucleele procesorului și memoria pe care acest browser le lasă aplicației, precum și nivelul care stabilește de unde pornește vederea live. Vezi [Cu ce randează calculatorul](topic:your-machine).
+
+## Corectate
+
+- {{ui:Solide}} › {{ui:Reuniune}}, {{ui:Scădere}} și {{ui:Intersecție}} puteau returna un grup care nu era închis, la orice mărime. Acum se închid.
+- {{ui:Solide}} › {{ui:Scădere}} era estompat cu nimic selectat, deși alege cele două piese pe rând după ce l-ați ales.
+- În cronologia de animație, tastele scrise nu ajungeau nicăieri, nici {{key:Mod+S}}. {{key:Mod+Z}} și {{key:Mod+Y}} acolo sunt anularea și refacerea proprii ale cronologiei; celelalte taste {{key:Mod}} ajung la aplicație.
+
+## În fiecare aplicație
+
+- **Unități.** {{ui:Setări}} › {{ui:General}} › {{ui:Unități}} are câte o listă pentru lungime, arie, volum, unghi și pantă, cu mărimile exacte pe care le dau definițiile unităților (piciorul de anchetă american este o unitate separată). Dezactivați unitățile pe care nu le folosiți și ies din liste; marcați una cu steluță și lucrările noi încep în ea. Un fișier păstrează mereu propria unitate. În ModelCraft, lista de unități de lângă caseta de valori urmează comutatoarele (unitatea proprie a modelului rămâne mereu în ea), steluța stabilește unitatea unui model nou (când ModelCraft are acea unitate), iar o lungime scrisă cu semnul oricărei unități este citită în acea unitate. Vezi [Unități, valori scrise și listele de unități](common:unit-lists).
+- **Un aspect mai dens și panouri care se ascund.** {{ui:Setări}} › {{ui:General}} › {{ui:Densitatea aspectului}} › {{ui:Compactă}} încape mai mult pe ecran (ecranele tactile și telefoanele păstrează butoanele mari). Fiecare panou lateral are o bară de titlu subțire: trageți-o ca să ancorați sau să detașați panoul, lăsați-l pe bara altui panou ca să împărțiți un cadru ca file, fixați-l ca să alunece spre margine sau ascundeți-l și aduceți-l înapoi de la margine. Vezi [Aranjarea panourilor](common:arrange-panels#make-the-layout-denser).
+- **Casetele de dialog se mută.** Trageți o casetă de dialog după bara de titlu ca s-o scoateți din calea desenului; revine unde ați lăsat-o. Faceți dublu clic pe bara de titlu ca s-o centrați din nou. Vezi [Mutarea unei casete de dialog](common:arrange-panels#move-a-dialog).
+- **Rețete pentru asistenții AI.** Zece cereri lucrate pentru un asistent propriu (ordonarea unui desen, trasarea unui set, verificarea desenelor, întrebări despre un model, totalizarea unei extrageri de cantități, încercarea unei variante a unei piese…), fiecare cu uneltele pe care le apelează și permisiunile de care are nevoie, și fiecare reluată de testele noastre. Aplicațiile nu conțin AI. Vezi [Rețete pentru asistenții AI](common:assistants-recipes).
+- **Limbi.** **Português (Portugal)** este nou în {{ui:Setări}} › {{ui:General}} › {{ui:Limbă}}. Acesta, **Português (Brasil)**, **Español (México)** și **Bahasa Indonesia** au acum fiecare cuvânt din aplicații, ca ciorne neverificate de un vorbitor nativ. Subiectele de ajutor sunt în engleză.
+- **CadCraft Studio** arată de ce a eșuat verificarea unei actualizări (nu există încă fișier pentru sistemul dumneavoastră, lipsă de rețea, semnătură greșită) în loc să scrie doar „Gata”, și nu mai aduce înapoi un card Noutăți pe care l-ați închis până când există o versiune nouă.
+
+## Neincluse în această versiune
+
+- **0.7 nu este semnată cu cod.** Semnarea și pachetul Microsoft Store au trecut în 0.8, pentru că validarea certificatului nu a sosit încă. Verificați SHA-256 de lângă fiecare fișier pe getcadcraft.com/download. Pe Windows, dacă SmartScreen oprește programul de instalare, alegeți {{ui:Mai multe informații}}, apoi {{ui:Rulare oricum}}. Pe Mac, prima dată, faceți clic dreapta pe CadCraft Studio și alegeți {{ui:Deschidere}}. CadCraft Studio nu este încă într-un magazin de aplicații, iar nu există încă o versiune pentru iPad sau iPhone.
+- Lista de unghiuri și pante din {{ui:Unități}} se salvează, dar niciun câmp nu le citește încă.
+- Randarea pe placa grafică (WebGPU) a fost testată aici doar cu un substitut software, nu încă pe plăci grafice reale, deci randați ceva mic pe calculator mai întâi. La fel pentru vederea live, iar VR a fost încercat doar cu un emulator de cască.
+- Fără WebGPU nu există spațiu de lucru Randare sau coadă de randare, iar imaginile de calitate înaltă nu au adâncime de câmp, cer fizic, imagine de cer, ceață, fum, caustice sau amestecare a luminilor.
+- {{ui:Randare imagine…}} nu desenează încă elementele împrăștiate; acestea apar în vederea live, în panoramele, vizualizatorul și videoclipul ei.
+- Lămpile se animează în vedere, dar un videoclip randat folosește lămpile așa cum sunt când pornește.
+- Oasele și animația nu sunt citite sau scrise în fișiere glTF, FBX sau USD încă (modelele cu schelet intră în repaus, cu ponderile lor), iar materialele glTF și FBX dincolo de culoarea de bază sau textură nu sunt păstrate încă.
+- Culorile STEP și numele pieselor din ansamblu nu sunt citite încă. Importul `.3dm` a fost testat cu fișiere scrise de setul de unelte al formatului, nu încă cu fișiere din programul de modelare; obiectele SubD, textul și cotele sunt lăsate afară.
+- Biblioteca de plante din CivilCraft este în ModelCraft, dar plasarea plantelor din ea nu este încă realizată.
+- Pictarea unei texturi pe fețele împinse sau trase se repetă cu dala materialului; ca să pictați o singură față, transformați-o în plasă și desfășurați-o.
+
+Restul se află în [Încă nerealizat](topic:not-built-yet).

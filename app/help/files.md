@@ -76,7 +76,7 @@ Click {{ui:New}}. If there are unsaved changes, ModelCraft asks first. A new mod
 
 ### If the browser closes before you save
 
-ModelCraft keeps a copy of unsaved work in your browser a couple of seconds after each change. If the tab or the browser closes before you save, the next time you open ModelCraft it asks "Recover your work?". Recovering opens the model as it was, not yet saved to a file: save it to keep it. See [Recover your work](common:recover).
+ModelCraft keeps a copy of unsaved work in your browser a couple of seconds after each change. The copy is written in the background, so a big model does not hold you up while it is kept. If the tab or the browser closes before you save, the next time you open ModelCraft it asks "Recover your work?". Recovering opens the model as it was, not yet saved to a file: save it to keep it. See [Recover your work](common:recover).
 
 ### From CadCraft: Open in ModelCraft
 
@@ -97,14 +97,14 @@ Some things to know:
 
 - **Size and up direction:** Collada files say their unit and which axis is up, and ModelCraft converts them. glTF is always in meters. OBJ files carry no unit: ModelCraft reads them as meters, with Y up. If an OBJ comes in 1000 times too big or too small, use [Scale](topic:rotate-scale) with a factor such as `0.001` or `1000`.
 - **DWG and DXF** come in as lines (edges) on the ground, not as faces. If the drawing does not say its unit, a dialog titled "Drawing units" asks what one drawing unit is. See [Model on a site plan](topic:site-plan).
-- **Limits:** files over 300 MB are refused for import, and over 200 MB for opening. Files with more than 2 million vertices or faces are refused as too big.
+- **Limits:** files over 300 MB are refused for import, and over 200 MB for opening. Files with more than 2 million vertices or faces are refused as too big. An OBJ over 64 MB is refused before it is read. Text files (Collada, OBJ, ASCII STL, USD text) are read a piece at a time, about 4 MB, so no single block of text holds a whole file; a 16 MB OBJ used about 0.5 GB of memory while it opened in our test.
 
 ## Export
 
 1. Click {{ui:Export}} in the {{ui:File}} group.
 2. Choose a format: {{ui:glTF binary (.glb)}}, {{ui:Collada (.dae)}}, {{ui:OBJ (.obj)}}, {{ui:STL for printing (.stl, millimeters)}}, {{ui:PLY with colours (.ply)}}, {{ui:USD (.usda, .usdc, .usdz)…}}, {{ui:IFC for BimCraft (.ifc)}}, {{ui:DWG for CAD (.dwg, 2004)}} or {{ui:DXF for CAD (.dxf, R12)}}.
 
-The browser downloads the file, named like the model. The whole model is exported, not just the selection. An empty model is not exported: "The model is empty: draw something first." See [Export a model for other programs](topic:export-model).
+The browser downloads the file, named like the model. The whole model is exported, not just the selection. glTF, Collada and OBJ files are written in the background, so ModelCraft keeps working while a big model exports; the download starts when the file is ready. An empty model is not exported: "The model is empty: draw something first." See [Export a model for other programs](topic:export-model).
 
 ## Online and offline
 

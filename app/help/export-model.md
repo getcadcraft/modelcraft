@@ -41,7 +41,9 @@ The status bar confirms each export, for example "Exported House.stl (millimeter
 2. Choose {{ui:Export}}, then {{ui:IFC for BimCraft (.ifc)}}.
 3. Open the downloaded `.ifc` file in BimCraft.
 
-There is no direct link between the two apps yet. The IFC has one storey, and every element is a generic building element proxy with no type or properties: it carries shape and name only. Closed groups become solid shapes; open ones become surfaces.
+For concept massing, use {{ui:Export}} › {{ui:Massing to BimCraft…}} instead: each group goes as a massing option with floors, floor areas and volume. See [Send massing to BimCraft](topic:massing-to-bimcraft).
+
+The plain IFC export has no direct link between the two apps. The IFC has one storey, and every element is a generic building element proxy with no type or properties: it carries shape and name only. Closed groups become solid shapes; open ones become surfaces.
 
 ## Lines without faces
 

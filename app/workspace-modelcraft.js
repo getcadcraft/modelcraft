@@ -158,6 +158,8 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
       go: (id) => go(id),
       empty: (c) => { const b = c.el('button', { type: 'button', className: 'btn-line btn-sm-cc' }, t('app.lay.empty.open')); b.addEventListener('click', () => c.open('3d')); return b; },
     },
+    // 0.9 RH.1: the Rhino layout asks for four views (Top, Perspective, Front, Right); leaving a layout gives the single view back
+    viewports: { set: (layout) => { mc.viewports.set(layout); root.querySelector('[data-views4]')?.setAttribute('aria-checked', String(layout === 'four')); } },
     entered(c) {
       ctx = c; lastView = '3d'; freeCam = null; seenScene = mc.sceneIndex;   // the layout starts on the 3D view (views.initial)
       if (c.has('palettes')) {

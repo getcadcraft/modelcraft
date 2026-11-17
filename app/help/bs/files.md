@@ -1,134 +1,134 @@
 ---
 title: Otvaranje, spašavanje, uvoz i izvoz
-summary: Datoteka ModelCraft, šta se može uvesti i poslati van, gdje idu datoteke i šta se mijenja van mreže i između preglednika.
-keywords: otvori, spasi, uvezi, izvezi, datoteka, 3dm, skp, oporavi, automatsko spašavanje, nedavno, desktop, otvori u 3D, predaja, preuzmi, datoteka modelcraft, dae, collada, obj, gltf, glb, stl, step, stp, ifc, dwg, dxf, formati, van mreže, spasi kao
-from: 0b4896d1
+summary: ModelCraft datoteka, šta možete uvesti i poslati van, gdje idu datoteke i šta se mijenja van mreže i između pregledača.
+keywords: otvori, spasi, uvezi, izvezi, datoteka, oporavi, automatsko spašavanje, nedavno, desktop, otvori u 3D, predaja, preuzimanje, modelcraft datoteka, dae, collada, obj, gltf, glb, stl, step, stp, ifc, dwg, dxf, 3dm, skp, formati, van mreže, spasi kao
+from: 3f09ab72
 ---
 
-ModelCraft čita i zapisuje datoteke na računaru. Ništa se ne otprema: datoteka koja se otvori čita se unutar preglednika, a datoteka koja se spasi je preuzimanje. Pogledaj [Gdje idu datoteke](common:your-files).
+ModelCraft čita i piše datoteke na vašem računaru. Ništa se ne otprema: datoteka koju otvorite čita se unutar vašeg pregledača, a datoteka koju spasite je preuzimanje. Pogledajte [Gdje idu vaše datoteke](common:your-files).
 
 ## Formati ukratko
 
 | Format | Otvori | Uvezi | Izvezi | Čemu služi |
 |---|---|---|---|---|
-| ModelCraft (`.modelcraft`) | da | ne | {{ui:Spasi}} | Radna datoteka. Čuva sve. |
-| USD (`.usd`, `.usda`, `.usdc`, `.usdz`) | da | da | {{ui:Spasi kao}}, {{ui:Izvezi}} | Programi za renderovanje i sastavljanje scena. USD koji pravi ModelCraft čuva sve. Pogledaj [Spašavanje, otvaranje i izvoz USD-a](topic:usd). |
-| SketchUp (`.skp`) | ne | da | ne | Uvoz modela iz SketchUp-a. Čuva grupe, komponente, boje, teksture na plohama, oznake i meke ivice. Pogledaj [Uvoz SKP modela](topic:import-sketchup-files). |
-| Collada (`.dae`) | ne | da | da | Razmjena modela s drugim alatima za 3D modeliranje. Čuva grupe, komponente i boje. |
+| ModelCraft (`.modelcraft`) | da | ne | {{ui:Save}} | Vaša radna datoteka. Čuva sve. |
+| USD (`.usd`, `.usda`, `.usdc`, `.usdz`) | da | da | {{ui:Save as}}, {{ui:Export}} | Programi za renderovanje i sastavljanje scena. ModelCraftov USD čuva sve. Pogledajte [Spasi, otvori i izvezi USD](topic:usd). |
+| SketchUp (`.skp`) | ne | da | ne | Uvoz modela iz SketchUp-a. Čuva grupe, komponente, boje, teksture na površinama, oznake i meke ivice. Pogledajte [Uvezi SKP model](topic:import-sketchup-files). |
+| Collada (`.dae`) | ne | da | da | Razmjena modela s drugim 3D modelarima. Čuva grupe, komponente i boje. |
 | OBJ (`.obj`) | ne | da | da | Programi za renderovanje i vizualizaciju. |
-| glTF (`.glb`, `.gltf`) | ne | da | samo `.glb` | Web pregledači, motori za igre, AR. |
+| glTF (`.glb`, `.gltf`) | ne | da | samo `.glb` | Web pregledači, pogonski sistemi za igre, AR. |
 | STL (`.stl`) | ne | da | da | 3D štampanje (u milimetrima). |
-| PLY (`.ply`) | ne | da | da | Mreže s bojama: skeniranja, štampanje u boji. |
+| PLY (`.ply`) | ne | da | da | Mreže s bojama: skenovi, štampanje u boji. |
 | FBX (`.fbx`) | ne | da | ne | Modeli iz programa za animaciju i igre (FBX 2011 i noviji). |
 | Alembic (`.abc`) | ne | da | ne | Keš geometrije, na prvom uzorku. |
-| STEP (`.step`, `.stp`) | ne | da | ne | Dijelovi iz alata za modeliranje dijelova i od dobavljača, kao zatvorene mreže u pravoj veličini. Pogledaj [Formati datoteka](topic:formats). |
-| `.3dm` | ne | da | ne | NURBS modeli: poliplohe, mreže, krive, blokovi i slojevi, kao mreže, ivice, komponente i oznake. Pogledaj [Uvoz .3dm modela](topic:import-3dm-files). |
-| 3MF (`.3mf`) | ne | ne | da | 3D štampanje, s bojama (u milimetrima). Iz {{ui:Provjeri za 3D štampanje (STL ili 3MF)…}}: pogledaj [Pripremi model za 3D štampanje](topic:print-3d). |
+| STEP (`.step`, `.stp`) | ne | da | ne | Dijelovi iz programa za modelovanje dijelova i od dobavljača, kao zatvorene mreže u pravoj veličini. Pogledajte [Formati datoteka](topic:formats). |
+| `.3dm` | ne | da | ne | NURBS modeli: polipovršine, mreže, krive, blokovi i slojevi, kao mreže, ivice, komponente i oznake. Pogledajte [Uvezi .3dm model](topic:import-3dm-files). |
+| 3MF (`.3mf`) | ne | ne | da | 3D štampanje, s bojama (u milimetrima). Iz {{ui:Check for 3D printing (STL or 3MF)…}}: pogledajte [Pripremi model za 3D štampanje](topic:print-3d). |
 | IFC (`.ifc`) | ne | ne | da | BIM programi i BimCraft. |
-| DWG (`.dwg`) | ne | da | da | Situacioni ili tlocrtni plan na kojem se modelira; slanje modela u CAD program. |
+| DWG (`.dwg`) | ne | da | da | Situacioni plan ili plan sprata za modelovanje; slanje modela u CAD program. |
 | DXF (`.dxf`) | ne | da | da | Isto, za bilo koji CAD program. |
 
-[Formati datoteka detaljno](topic:formats) navodi tačno šta svaki format čuva, a šta izostavlja.
+[Formati datoteka detaljno](topic:formats) navodi tačno šta svaki format čuva, a šta ispušta.
 
-## Datoteka ModelCraft
+## ModelCraft datoteka
 
-Datoteka `.modelcraft` čuva cijeli model: geometriju, grupe, komponente, vodilice, scene, jedinice, te kameru i stil koji su bili aktivni pri spašavanju. Ne čuva historiju poništavanja.
+Datoteka `.modelcraft` čuva cijeli model: geometriju, grupe, komponente, vodilice, scene, jedinice, te kameru i stil koje ste koristili kad ste spasili. Ne čuva historiju poništavanja.
 
-### Otvori model
+### Otvaranje modela
 
-1. Klikni {{ui:Otvori}} u grupi {{ui:Datoteka}}, ili pritisni {{key:Mod+O}}.
-2. Ako model na ekranu ima nespašene promjene, ModelCraft pita: „Ovaj model ima promjene koje nisu spašene. Prvo spasiti kopiju?“ Odaberi {{ui:Spasi kopiju}}, {{ui:Odbaci promjene}} ili {{ui:Otkaži}}.
-3. Odaberi datoteku `.modelcraft`.
+1. Kliknite {{ui:Open}} u grupi {{ui:File}}, ili pritisnite {{key:Mod+O}}.
+2. Ako model na ekranu ima nespašene promjene, ModelCraft pita: "Ovaj model ima promjene koje nisu spašene. Želite li prvo spasiti kopiju?" Odaberite {{ui:Save a copy}}, {{ui:Discard changes}} ili {{ui:Cancel}}.
+3. Odaberite datoteku `.modelcraft`.
 
-Model se otvara u jedinicama u kojima je spašen, s kamerom s kojom je spašen. Datoteka `.modelcraft` može se i prevući na 3D pogled, ili kliknuti na listi nedavnih datoteka na početnoj kartici (preglednici koji mogu ponovo otvoriti datoteku i desktop aplikacija).
-
-:::desktop
-U desktop aplikaciji, dvoklik na datoteku `.modelcraft` otvara je u ModelCraftu, a isto to radi i **Otvori pomoću** na datoteci Collada, OBJ, glTF, DWG ili DXF (uvozi se u novi model).
-:::
-
-### Spasi model
-
-Klikni {{ui:Spasi}} ili pritisni {{key:Mod+S}}. Preglednik preuzima `<name>.modelcraft`, gdje je ime ime otvorene datoteke, ili `Untitled` za novi model.
+Model se otvara u jedinicama u kojima je spašen, s kamerom s kojom je spašen. Također možete prevući datoteku `.modelcraft` na 3D prikaz, ili kliknuti jednu na listi nedavnih datoteka na početnoj kartici (pregledači koji mogu ponovo otvoriti datoteku, i desktop aplikacija).
 
 :::desktop
-U desktop aplikaciji, {{ui:Spasi}} zapisuje otvorenu datoteku na istom mjestu. Novi model pita gdje da se spasi.
+U desktop aplikaciji, dvoklik na datoteku `.modelcraft` otvara je u ModelCraft-u, a isto radi i **Otvori pomoću** na Collada, OBJ, glTF, DWG ili DXF datoteci (uvozi se u novi model).
 :::
 
-- {{ui:Spasi kao}} ({{key:Mod+Shift+S}}) spašava kopiju kao datoteku `.modelcraft` ili kao [USD](topic:usd); gdje preglednik može, traži ime i mjesto. Inače preimenuj preuzetu datoteku: sljedeće spašavanje nakon otvaranja preimenovane datoteke koristi novo ime.
-- Svako spašavanje je novo preuzimanje. Zavisno od postavki preglednika, ide direktno u folder za preuzimanja ili pita gdje da se spasi. Ako datoteka tog imena već postoji, većina preglednika dodaje broj, kao `Untitled (1).modelcraft`.
+### Spašavanje modela
+
+Kliknite {{ui:Save}} ili pritisnite {{key:Mod+S}}. Pregledač preuzima `<name>.modelcraft`, gdje je ime datoteka koju ste otvorili, ili "Bez naziva" za novi model.
+
+:::desktop
+U desktop aplikaciji, {{ui:Save}} upisuje datoteku koju ste otvorili na njeno mjesto. Novi model pita gdje da se spasi.
+:::
+
+- {{ui:Save as}} ({{key:Mod+Shift+S}}) spasi kopiju kao datoteku `.modelcraft` ili kao [USD](topic:usd); gdje pregledač to može, pita za ime i mjesto. Inače preimenujte preuzetu datoteku: sljedeće spašavanje nakon što otvorite preimenovanu datoteku koristi novo ime.
+- Svako spašavanje je novo preuzimanje. Zavisno od postavki pregledača, ide direktno u folder za preuzimanja ili pita gdje da spasi. Ako datoteka s tim imenom već postoji, većina pregledača dodaje broj, na primjer `Untitled (1).modelcraft`.
 
 :::chromium
-Da bi svaki put birao folder, otvori postavke preglednika, potraži „preuzimanja“ i uključi „Pitaj gdje da spasi svaku datoteku prije preuzimanja“.
+Da svaki put birate folder, otvorite postavke pregledača, potražite "preuzimanja" i uključite "Pitaj gdje da se spasi svaka datoteka prije preuzimanja".
 :::
 
 :::firefox
-Da bi svaki put birao folder, otvori **Postavke**, zatim **Opšte**, pa pod „Preuzimanja“ odaberi „Uvijek pitaj gdje da se datoteke spašavaju“.
+Da svaki put birate folder, otvorite **Postavke**, zatim **Općenito**, i pod "Preuzimanja" izaberite "Uvijek pitaj gdje da spasim datoteke".
 :::
 
 :::safari
-Da promijeniš gdje idu preuzimanja, otvori **Safari**, zatim **Postavke**, pa **Opšte**, i postavi „Lokacija za preuzimanje datoteka“.
+Da promijenite gdje idu preuzimanja, otvorite **Safari**, zatim **Postavke**, zatim **Općenito**, i podesite "Lokacija za preuzimanje datoteka".
 :::
 
-### Počni novi model
+### Pokretanje novog modela
 
-Klikni {{ui:Novo}}. Ako ima nespašenih promjena, ModelCraft prvo pita. Novi model počinje prazan, u jedinici lokalnih postavki (stope i inči u SAD-u, milimetri drugdje), bez scena.
+Kliknite {{ui:New}}. Ako ima nespašenih promjena, ModelCraft prvo pita. Novi model počinje prazan, u jedinici vašeg jezika (stope i inči u Sjedinjenim Državama, milimetri drugdje), bez scena.
 
-### Ako se preglednik zatvori prije spašavanja
+### Ako se pregledač zatvori prije spašavanja
 
-ModelCraft čuva kopiju nespašenog rada u pregledniku nekoliko sekundi nakon svake promjene. Ako se kartica ili preglednik zatvore prije spašavanja, sljedeći put kad se otvori ModelCraft, pita „Oporaviti rad?“. Oporavak otvara model kakav je bio, još nespašen u datoteku: spasi ga da bi ostao sačuvan. Pogledaj [Oporavak rada](common:recover).
+ModelCraft čuva kopiju nespašenog rada u vašem pregledaču nekoliko sekundi nakon svake promjene. Kopija se piše u pozadini, pa veliki model ne čeka dok se čuva. Ako se kartica ili pregledač zatvore prije spašavanja, sljedeći put kad otvorite ModelCraft pita: "Oporaviti vaš rad?". Oporavak otvara model kakav je bio, još nespašen u datoteku: spasite ga da ga zadržite. Pogledajte [Oporavak rada](common:recover).
 
-### Iz CadCraft-a: Otvori u ModelCraftu
+### Iz CadCraft: Otvori u ModelCraft
 
-U aplikaciji za crtanje CadCraft, **Pogled**, zatim **Više**, pa **Otvori u ModelCraftu** predaje otvoreni crtež ModelCraftu u novoj kartici, kao DWG. Stiže onako kako stiže uvezeni DWG: linije na tlu, u grupi, spremne za modeliranje. Ništa se ne otprema; datoteka prolazi kroz lokalnu pohranu preglednika.
+U aplikaciji za crtanje CadCraft, **Pogled**, zatim **Više**, zatim **Otvori u ModelCraft** prosljeđuje otvoreni crtež ModelCraftu u novoj kartici, kao DWG. Stiže na isti način kao uvezeni DWG: linije na tlu, u grupi, spremne za modelovanje. Ništa se ne otprema; datoteka prolazi kroz vlastitu pohranu vašeg pregledača.
 
 ## Uvoz
 
-Uvoz dodaje datoteku u model koji je otvoren; ne zamjenjuje ga.
+Uvoz dodaje datoteku modelu koji imate otvoren; ne zamjenjuje ga.
 
-1. Klikni {{ui:Uvezi}} u grupi {{ui:Datoteka}}, ili prevuci datoteku na 3D pogled.
-2. Odaberi datoteku SketchUp, Collada, OBJ, glTF, FBX, PLY, STL, Alembic, STEP, `.3dm`, USD, DWG ili DXF.
+1. Kliknite {{ui:Import}} u grupi {{ui:File}}, ili prevucite datoteku na 3D prikaz.
+2. Odaberite SketchUp, Collada, OBJ, glTF, FBX, PLY, STL, Alembic, STEP, `.3dm`, USD, DWG ili DXF datoteku.
 
-   Datoteka stiže kao **jedna grupa**, odabrana, a pogled se zumira da je prikaže. Statusna traka kaže šta je stiglo i navodi sve što nije moglo da se uveze, npr. „Nije uvezeno: 2 teksture“.
+   Datoteka stiže kao **jedna grupa**, odabrana, i prikaz se zumira da je pokaže. Statusna traka kaže šta je stiglo i navodi šta nije moglo da se uveze, npr. "Nije uvezeno: 2 teksture".
 
-3. Da bi radio direktno na njenoj geometriji, dvaput klikni grupu da uđeš u uređivanje, ili klikni {{ui:Rastavi}}.
+3. Da radite direktno na njenoj geometriji, dvaput kliknite grupu da uđete u nju, ili kliknite {{ui:Explode}}.
 
-Nekoliko stvari za znati:
+Neke stvari treba znati:
 
-- **Veličina i smjer gore:** Collada datoteke navode svoju jedinicu i koja osa je gore, a ModelCraft ih pretvara. glTF je uvijek u metrima. OBJ datoteke ne nose jedinicu: ModelCraft ih čita kao metre, s Y prema gore. Ako OBJ dođe 1000 puta prevelik ili premali, koristi [Skaliraj](topic:rotate-scale) s faktorom kao `0.001` ili `1000`.
-- **DWG i DXF** stižu kao linije (ivice) na tlu, a ne kao plohe. Ako crtež ne navodi svoju jedinicu, dijaloški okvir naslovljen „Jedinice crteža“ pita šta je jedna jedinica crteža. Pogledaj [Modeliranje na situacionom planu](topic:site-plan).
-- **Ograničenja:** datoteke veće od 300 MB ne uvoze se, a veće od 200 MB ne otvaraju se. Datoteke s više od 2 miliona vrhova ili ploha odbijaju se kao prevelike.
+- **Veličina i smjer gore:** Collada datoteke navode svoju jedinicu i koja osa je gore, a ModelCraft ih pretvara. glTF je uvijek u metrima. OBJ datoteke ne nose jedinicu: ModelCraft ih čita kao metre, s Y osom gore. Ako OBJ dođe 1000 puta prevelik ili premali, koristite [Skaliraj](topic:rotate-scale) s faktorom kao `0.001` ili `1000`.
+- **DWG i DXF** stižu kao linije (ivice) na tlu, a ne kao površine. Ako crtež ne navodi svoju jedinicu, dijalog pod nazivom "Jedinice crteža" pita šta je jedna jedinica crteža. Pogledajte [Modelovanje na situacionom planu](topic:site-plan).
+- **Ograničenja:** datoteke veće od 300 MB se odbijaju za uvoz, a veće od 200 MB za otvaranje. Datoteke s više od 2 miliona vrhova ili površina se odbijaju kao prevelike. OBJ veći od 64 MB se odbija prije čitanja. Tekstualne datoteke (Collada, OBJ, ASCII STL, USD tekst) čitaju se dio po dio, oko 4 MB, tako da nijedan blok teksta ne drži cijelu datoteku; OBJ od 16 MB koristio je oko 0.5 GB memorije dok se otvarao u našem testu.
 
 ## Izvoz
 
-1. Klikni {{ui:Izvezi}} u grupi {{ui:Datoteka}}.
-2. Odaberi format: {{ui:glTF binarno (.glb)}}, {{ui:Collada (.dae)}}, {{ui:OBJ (.obj)}}, {{ui:STL za štampanje (.stl, milimetri)}}, {{ui:PLY s bojama (.ply)}}, {{ui:USD (.usda, .usdc, .usdz)…}}, {{ui:IFC za BimCraft (.ifc)}}, {{ui:DWG za CAD (.dwg, 2004)}} ili {{ui:DXF za CAD (.dxf, R12)}}.
+1. Kliknite {{ui:Export}} u grupi {{ui:File}}.
+2. Odaberite format: {{ui:glTF binary (.glb)}}, {{ui:Collada (.dae)}}, {{ui:OBJ (.obj)}}, {{ui:STL for printing (.stl, millimeters)}}, {{ui:PLY with colours (.ply)}}, {{ui:USD (.usda, .usdc, .usdz)…}}, {{ui:IFC for BimCraft (.ifc)}}, {{ui:DWG for CAD (.dwg, 2004)}} ili {{ui:DXF for CAD (.dxf, R12)}}.
 
-Preglednik preuzima datoteku, nazvanu kao model. Izvozi se cijeli model, a ne samo odabir. Prazan model se ne izvozi: „Model je prazan: prvo nacrtaj nešto.“ Pogledaj [Izvoz modela za druge programe](topic:export-model).
+Pregledač preuzima datoteku, nazvanu kao model. Izvozi se cijeli model, ne samo odabir. glTF, Collada i OBJ datoteke se pišu u pozadini, pa ModelCraft radi dalje dok se veliki model izvozi; preuzimanje počinje kad je datoteka spremna. Prazan model se ne izvozi: "Model je prazan: prvo nešto nacrtajte." Pogledajte [Izvezi model za druge programe](topic:export-model).
 
 ## Na mreži i van mreže
 
-Sve u ModelCraftu radi na računaru, pa modeliranje, otvaranje, spašavanje, uvoz i izvoz rade bez veze čim se aplikacija učita.
+ModelCraft radi na vašem računaru, pa modelovanje, otvaranje, spašavanje, uvoz i izvoz rade bez veze kad se aplikacija učita.
 
-Da bi ModelCraft otvorio bez ikakve veze, spasi ga za rad van mreže dok si na mreži:
+Da otvorite ModelCraft bez ikakve veze, spasite ga za rad van mreže dok ste na mreži:
 
-1. Klikni {{ui:Spasi za rad van mreže}} na gornjoj traci aplikacije.
-2. Dugme broji („Spašavanje 40 od 212“) dok spašava. ModelCraft spašava svoje datoteke (među njima i čitač DWG-a), ovu pomoć i 3D biblioteku, pa može potrajati.
-3. Kad dugme pokaže {{ui:Spremno za rad van mreže}}, ModelCraft se otvara s iste adrese bez veze, a uvoz DWG-a radi i van mreže.
+1. Kliknite {{ui:Save for offline}} u traci aplikacije na vrhu.
+2. Dugme broji ("Spašavanje 40 od 212") dok se čuva. ModelCraft spašava svoje datoteke (među njima i čitač DWG-a), ovu pomoć i biblioteku 3D objekata, pa može potrajati.
+3. Kad dugme pokaže {{ui:Offline ready}}, ModelCraft se otvara s iste adrese bez veze, a uvoz DWG-a radi i van mreže.
 
-Kasnije klikni {{ui:Spremno za rad van mreže}} za {{ui:Spasi ponovo (preuzmi najnoviju verziju)}} ili {{ui:Ukloni kopiju za rad van mreže}}. Ako dugme pokaže {{ui:Nije moguće spasiti}}, neke datoteke nisu preuzete: provjeri vezu i klikni ponovo da pokušaš. {{ui:Rad van mreže nije dostupan}} znači da ovaj prozor preglednika ne može čuvati kopiju (privatni prozori i neki upravljani računari). Pogledaj [Rad van mreže](common:offline).
+Kliknite {{ui:Offline ready}} kasnije za {{ui:Save again (get the newest version)}} ili {{ui:Remove the offline copy}}. Ako dugme pokaže {{ui:Could not save}}, neke datoteke nisu preuzete: provjerite vezu i kliknite ponovo. {{ui:Offline not available}} znači da ovaj prozor pregledača ne može zadržati kopiju (privatni prozori i neki upravljani računari). Pogledajte [Rad van mreže](common:offline).
 
-Spašavanje u oblaku još nije dostupno. Svaki model ostaje tamo gdje ga spasiš.
+Oblak za spašavanje još nije dostupan. Svaki model se nalazi tamo gdje ga spasite.
 
 :::offline
-Nema veze s mrežom. Možeš nastaviti modeliranje i spašavanje. Osim ako gornja traka ne prikazuje {{ui:Spremno za rad van mreže}}, nemoj osvježavati ovu karticu dok ponovo ne bude mreže.
+Van ste mreže. Možete nastaviti modelovanje i spašavanje. Osim ako traka aplikacije ne pokazuje {{ui:Offline ready}}, ne osvježavajte ovu karticu dok ponovo ne budete na mreži.
 :::
 
 ## Desktop aplikacija
 
 :::desktop
-ModelCraft radi u CadCraft Studiu, desktop aplikaciji sa svih osam aplikacija. Datoteke se otvaraju i spašavaju tamo gdje se odabere.
+Koristite ModelCraft u CadCraft Studio, desktop aplikaciji sa svih osam aplikacija. Datoteke se otvaraju i spašavaju tamo gdje izaberete.
 :::
 
 :::web
-ModelCraft radi u pregledniku na Macu, Windowsu i Linuxu, a i u CadCraft Studiu, desktop aplikaciji sa svih osam aplikacija u jednoj instalaciji, s getcadcraft.com/download.
+ModelCraft radi u pregledaču na Mac, Windows i Linux, i u CadCraft Studio, desktop aplikaciji sa svih osam aplikacija u jednoj instalaciji, sa getcadcraft.com/download.
 :::

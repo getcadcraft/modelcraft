@@ -112,6 +112,7 @@ export const COMMANDS = [
   C('export.print3d', 'export', 'bi-printer', X('print3d')),
   C('export.ifc', 'export', 'bi-building', X('ifc')),
   C('export.storeys', 'export', 'bi-layers', A('storeys')),
+  C('export.massing', 'export', 'bi-buildings', A('massing')),   // 0.10 BK.44: push / pull massing as options for BimCraft (massing-mc.js)
   C('export.dwg', 'export', 'bi-file-earmark-ruled', X('dwg')),
   C('export.dxf', 'export', 'bi-file-earmark-ruled', X('dxf')),
   C('export.png', 'export', 'bi-image', X('png')),
@@ -211,6 +212,7 @@ export const COMMANDS = [
   C('camera.left', 'camera', 'bi-layout-sidebar', '.mc-tools [data-view="left"]'),
   C('camera.bottom', 'camera', 'bi-square', '.mc-tools [data-view="bottom"]'),
   C('camera.persp', 'camera', 'bi-camera', '.mc-tools [data-persp]'),
+  C('camera.views4', 'camera', 'bi-grid', '.mc-tools [data-views4]'),   // 0.9 RH.1: Top, Perspective, Front and Right at once
   C('camera.present', 'camera', 'bi-easel', '.mc-tools [data-present]', { defKeys: ['Shift+P'] }),
   C('camera.sec-planes', 'camera', 'bi-slash-square', '.mc-tools [data-sec-planes]'),
   C('camera.sec-cuts', 'camera', 'bi-scissors', '.mc-tools [data-sec-cuts]'),
@@ -285,7 +287,7 @@ export const KEYSETS = {
 };
 
 const m = (label, items) => ({ label: 'input.m.' + label, items });
-const EXPORTS = ['export.glb', 'export.dae', 'export.obj', 'export.stl', 'export.ply', 'export.usd', 'export.ifc', 'export.storeys', 'export.dwg', 'export.dxf'];
+const EXPORTS = ['export.glb', 'export.dae', 'export.obj', 'export.stl', 'export.ply', 'export.usd', 'export.ifc', 'export.storeys', 'export.massing', 'export.dwg', 'export.dxf'];
 const IMAGES = ['export.png', 'export.png2', 'export.pdf', 'export.print', 'export.print3d', 'export.render', 'export.video'];
 const FLIPS = ['edit.flip-x', 'edit.flip-y', 'edit.flip-z', 'edit.flipcopy-x', 'edit.flipcopy-y', 'edit.flipcopy-z'];
 const VIEWS = ['camera.iso', 'camera.top', 'camera.front', 'camera.right', 'camera.back', 'camera.left', 'camera.bottom'];
@@ -315,6 +317,29 @@ function beginnerRest() {
   return ['draw', 'modify', 'organize', 'edit', 'camera', 'aids', 'export'].map((g) => ['b-' + g, rest.filter((c) => c.group === g).map((c) => ({ id: c.id, size: 'sm' }))]).filter(([, items]) => items.length);
 }
 
+// 0.9 RH.1 (2026-11-09): the Rhino key set. Rhino is driven from a command line, so single letters are NOT bound: they start typing a
+// command (the profile has commandLine: true). Only keys the program itself gives are bound here; a key without a ModelCraft command is left out.
+const RHINO_KEYS = {
+  ...CTRL_KEYS, ...NAV_KEYS,
+  'organize.group': ['Ctrl+G'], 'organize.explode': ['Ctrl+Shift+G'], 'edit.hide': ['Ctrl+H'], 'edit.unhide-all': ['Ctrl+Alt+H'],
+  'aids.snap': ['F9'], 'camera.views4': ['Ctrl+M'], 'camera.extents': ['Ctrl+Shift+E'],
+};
+// Rhino's own command names → the ModelCraft command that does the closest thing (at most 4 words each, 16 characters)
+const RHINO_TYPED = {
+  'file.new': ['New'], 'file.open': ['Open'], 'file.save': ['Save'], 'file.saveas': ['SaveAs'], 'file.import': ['Import'], 'file.preferences': ['Options'],
+  'edit.undo': ['Undo'], 'edit.redo': ['Redo'], 'edit.copy': ['Copy'], 'edit.cut': ['Cut'], 'edit.paste': ['Paste'], 'edit.duplicate': ['Duplicate'],
+  'edit.delete': ['Delete', 'Erase'], 'edit.hide': ['Hide'], 'edit.unhide-all': ['Show', 'ShowAll'], 'edit.isolate': ['Isolate'],
+  'edit.select-all': ['SelAll'], 'edit.select-none': ['SelNone', 'Unselect'],
+  'draw.line': ['Line', 'Polyline'], 'draw.rect': ['Rectangle'], 'draw.circle': ['Circle'], 'draw.arc': ['Arc'], 'draw.polygon': ['Polygon'], 'draw.curve': ['Curve', 'InterpCrv'], 'draw.text3d': ['Text'],
+  'modify.move': ['Move'], 'modify.rotate': ['Rotate'], 'modify.scale': ['Scale'], 'modify.offset': ['Offset'], 'modify.push': ['Extrude', 'PushPull', 'ExtrudeSrf'],
+  'modify.tape': ['Distance', 'Length'], 'modify.protractor': ['Angle'], 'modify.dim': ['Dim', 'DimAligned'], 'modify.select': ['Select'], 'modify.paint': ['Paint'],
+  'organize.group': ['Group'], 'organize.explode': ['Ungroup', 'Explode'], 'organize.union': ['BooleanUnion'], 'organize.subtract': ['BooleanDiff'], 'organize.intersect': ['BooleanInter'],
+  'beginner.box': ['Box'], 'beginner.sphere': ['Sphere'], 'beginner.cylinder': ['Cylinder'], 'beginner.cone': ['Cone'],
+  'camera.orbit': ['RotateView', 'Orbit'], 'camera.pan': ['Pan'], 'camera.zoom': ['Zoom'], 'camera.extents': ['ZoomExtents', 'ZE'],
+  'camera.top': ['Top'], 'camera.front': ['Front'], 'camera.right': ['Right'], 'camera.left': ['Left'], 'camera.back': ['Back'], 'camera.bottom': ['Bottom'], 'camera.persp': ['Perspective'],
+  'camera.views4': ['4View', 'Maximize'], 'aids.snap': ['Snap', 'Osnap'], 'app.help': ['Help'],
+};
+
 export const STYLES = {
   modelcraft: {
     format: 'cadcraft-input', version: 1, id: 'modelcraft', name: 'input.style.modelcraft', builtin: true, layout: 'toolbar',
@@ -327,7 +352,7 @@ export const STYLES = {
       m('file', ['file.new', 'file.open', 'file.save', 'file.saveas', '-', 'file.import', 'file.import-sketch', '-', ...EXPORTS, '-', ...IMAGES, '-', 'file.model-info', 'file.preferences', '-', ...APP]),
       m('edit', ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.paste-in-place', 'edit.duplicate', 'edit.delete', '-', 'edit.select-all', 'edit.select-none', '-', 'edit.hide', 'edit.isolate', 'edit.unhide-all', 'edit.delete-guides', '-', 'organize.component', 'organize.group', 'organize.explode', 'organize.furnish', '-', 'edit.intersect-model', 'edit.intersect-sel']),
       m('view', ['camera.present', '-', 'camera.xray', 'camera.hide-rest', 'camera.hidden-objects', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.ar', 'camera.guide', '-', 'export.live', 'export.live-window']),
-      m('camera', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp']),
+      m('camera', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp', 'camera.views4']),
       m('draw', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.arc-3p', 'draw.arc-sce', 'draw.arc-sca', 'draw.arc-scl', 'draw.arc-sea', 'draw.arc-sed', 'draw.arc-ser', 'draw.arc-cse', 'draw.arc-csa', 'draw.arc-csl', 'draw.curve', '-', 'draw.rect', 'draw.circle', 'draw.polygon']),
       m('tools', ['modify.select', 'modify.erase', 'modify.paint', '-', 'modify.move', 'modify.push', 'modify.rotate', 'modify.follow', 'modify.scale', 'modify.scale-by', 'modify.offset', 'modify.divide', '-', 'organize.union', 'organize.subtract', 'organize.intersect', '-', ...FLIPS, '-', 'modify.tape', 'modify.dim', 'modify.protractor', 'draw.text3d', 'edit.axes-place', 'edit.axes-face', 'edit.axes-reset', '-', 'camera.section', '-', 'edit.terrain-contours', 'edit.terrain-grid', 'edit.sculpt']),
       ...WS_MENUS,   // 0.7.1
@@ -342,7 +367,7 @@ export const STYLES = {
     menus: [
       m('file', ['file.new', 'file.open', 'file.save', 'file.saveas', '-', 'file.import', 'file.import-sketch', '-', ...EXPORTS, '-', ...IMAGES, '-', 'file.model-info', 'file.preferences', '-', ...APP]),
       m('edit', ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.paste-in-place', '-', 'aids.snap', 'aids.collide', '-', 'edit.keys-pushpull', 'edit.keys-modeler']),
-      m('view', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp', 'camera.present', '-', 'camera.xray', 'camera.hide-rest', 'camera.hidden-objects', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.ar', 'camera.guide', '-', 'export.live', 'export.live-window']),
+      m('view', ['camera.orbit', 'camera.pan', 'camera.zoom', 'camera.extents', '-', ...VIEWS, '-', 'camera.persp', 'camera.views4', 'camera.present', '-', 'camera.xray', 'camera.hide-rest', 'camera.hidden-objects', '-', 'camera.sec-planes', 'camera.sec-cuts', '-', 'camera.timeline', 'camera.vr', 'camera.ar', 'camera.guide', '-', 'export.live', 'export.live-window']),
       m('select', ['modify.select', 'edit.select-all', 'edit.select-none', '-', 'edit.hide', 'edit.isolate', 'edit.unhide-all', '-', 'edit.delete-guides']),
       m('add', ['draw.line', 'draw.arc', 'draw.arcc', 'draw.arc-3p', 'draw.arc-sce', 'draw.arc-sca', 'draw.arc-scl', 'draw.arc-sea', 'draw.arc-sed', 'draw.arc-ser', 'draw.arc-cse', 'draw.arc-csa', 'draw.arc-csl', 'draw.curve', 'draw.rect', 'draw.circle', 'draw.polygon', 'draw.text3d', '-', 'modify.tape', 'modify.protractor', 'modify.dim', 'camera.section']),
       m('object', ['modify.move', 'modify.rotate', 'modify.scale', 'modify.scale-by', '-', 'edit.duplicate', 'edit.delete', '-', ...FLIPS, '-', 'organize.group', 'organize.component', 'organize.explode', 'organize.furnish', '-', 'organize.union', 'organize.subtract', 'organize.intersect', '-', 'edit.axes-place', 'edit.axes-face', 'edit.axes-reset']),
@@ -356,6 +381,13 @@ export const STYLES = {
     // opens the context menu (0.7.1; it did nothing)
     mouse: { wheel: 1, zoomSpeed: 1, pan2d: ['middle'], orbit3d: { left: 'none', middle: 'orbit', right: 'menu' } },
   },
+  // 0.9 RH.1: for people who model from a command line (see RHINO_KEYS); the app's own toolbar stays, the Rhino layout brings the menus
+  rhino: {
+    format: 'cadcraft-input', version: 1, id: 'rhino', name: 'input.style.rhino', builtin: true, layout: 'toolbar', commandLine: true,
+    keys: RHINO_KEYS, typed: Object.fromEntries(Object.entries(RHINO_TYPED).map(([id, w]) => [id, w.map((x) => x.toUpperCase())])),
+    // the right button turns the view (Shift pans, the wheel zooms); the middle button pans
+    mouse: { wheel: 1, zoomSpeed: 1, pan2d: ['middle', 'right'], orbit3d: { left: 'none', middle: 'pan', right: 'orbit' } },
+  },
   beginner: {
     format: 'cadcraft-input', version: 1, id: 'beginner', name: 'input.style.beginner', builtin: true, layout: 'ribbon',
     menus: [m('file', BEGINNER_FILE)],
@@ -366,7 +398,7 @@ export const STYLES = {
     mouse: { wheel: 1, zoomSpeed: 1, pan2d: ['middle', 'right'], orbit3d: { left: 'none', middle: 'pan', right: 'orbit' } },
   },
 };
-export const STYLE_ORDER = ['modelcraft', 'pushpull', 'modeler', 'beginner'];
+export const STYLE_ORDER = ['modelcraft', 'pushpull', 'modeler', 'rhino', 'beginner'];
 
 /** IP.4: each style's family. Push-pull is the menu-bar member; Modeler has no counterpart in the other apps (no family:
  *  "Use this style in every app" is off for it). */

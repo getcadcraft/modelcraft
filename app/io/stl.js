@@ -18,11 +18,12 @@ import { Mesh } from '../mesh.js';
 import { markSharp } from './obj.js';
 import { worldFaces, paintFromLinear, srgbToLin } from './ply.js';
 import { t } from '../i18n.js';
+import { decodeParts, partsOf, isParts } from '../textin.js';   // 0.10 PERF.20: ASCII STL is read a part at a time
 
 const MAX_TRIS = 20000000;
 const UNIT = { mm: 0.001, cm: 0.01, m: 1, in: 0.0254, ft: 0.3048 };
 
-export function readStl(input) {
+export function readStl(input, opts = {}) {
   const b = input instanceof Uint8Array ? input : new Uint8Array(input);
   if (b.length < 15) throw new Error(t('stl.bad', { why: t('stl.why.short') }));
   const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
@@ -30,7 +31,7 @@ export function readStl(input) {
   const startsSolid = String.fromCharCode(...b.subarray(0, 5)).toLowerCase() === 'solid';
   // binary when the size matches the count exactly (many binary files start with "solid" in the header too)
   if (n >= 0 && 84 + n * 50 === b.length) return readBinary(b, dv, n);
-  if (startsSolid) return readAscii(b);
+  if (startsSolid) return readAscii(b, opts);
   if (n >= 0 && 84 + n * 50 > b.length) throw new Error(t('stl.bad', { why: t('stl.why.short') }));
   if (n >= 0) return readBinary(b, dv, n);
   throw new Error(t('stl.not_stl'));
@@ -66,20 +67,33 @@ function readBinary(b, dv, n) {
   return { ascii: false, name, triangles: n, positions, colors: any ? colors : null, convention: any ? (magics ? 'magics' : 'viscam') : null };
 }
 
-function readAscii(b) {
-  const text = new TextDecoder().decode(b);
-  const name = (text.match(/^solid[ \t]*([^\r\n]*)/i)?.[1] || '').trim().slice(0, 80);
+function readAscii(b, opts = {}) {
+  // 0.10 PERF.20: the text is read in parts of about 4 MB (a part ends at a line end); the corners go straight into a growing
+  // Float32Array, not a JS array of doubles. A "vertex" statement split over lines at a part's end is carried to the next part.
+  const parts = partsOf(isParts(b) ? b : decodeParts(b, { partBytes: opts.partBytes }));
+  const first = parts[0] || '';
+  const name = (first.match(/^solid[ \t]*([^\r\n]*)/i)?.[1] || '').trim().slice(0, 80);
+  let pos = new Float32Array(1 << 16), n = 0;
   const re = /vertex\s+(\S+)\s+(\S+)\s+(\S+)/gi;
-  const pts = [];
-  let m;
-  while ((m = re.exec(text))) {
-    const x = +m[1]; const y = +m[2]; const z = +m[3];
-    if (![x, y, z].every((v) => Math.abs(v) < 1e9)) throw new Error(t('stl.bad', { why: t('stl.why.number') }));
-    pts.push(x, y, z);
-    if (pts.length > MAX_TRIS * 9) throw new Error(t('stl.too_big'));
+  let carry = '';
+  for (let pi = 0; pi < parts.length; pi++) {
+    const buf = carry ? carry + parts[pi] : parts[pi];
+    re.lastIndex = 0;
+    let m, end = 0;
+    while ((m = re.exec(buf))) {
+      const x = +m[1]; const y = +m[2]; const z = +m[3];
+      if (![x, y, z].every((v) => Math.abs(v) < 1e9)) throw new Error(t('stl.bad', { why: t('stl.why.number') }));
+      if (n + 3 > pos.length) { const g = new Float32Array(pos.length * 2); g.set(pos); pos = g; }
+      pos[n++] = x; pos[n++] = y; pos[n++] = z;
+      if (n > MAX_TRIS * 9) throw new Error(t('stl.too_big'));
+      end = re.lastIndex;
+    }
+    const rest = buf.slice(end);
+    const k = rest.toLowerCase().lastIndexOf('vertex');
+    carry = k >= 0 ? rest.slice(k) : '';
   }
-  if (!pts.length || pts.length % 9) throw new Error(t('stl.bad', { why: t('stl.why.short') }));
-  return { ascii: true, name, triangles: pts.length / 9, positions: Float32Array.from(pts), colors: null, convention: null };
+  if (!n || n % 9) throw new Error(t('stl.bad', { why: t('stl.why.short') }));
+  return { ascii: true, name, triangles: n / 9, positions: pos.slice(0, n), colors: null, convention: null };
 }
 
 export function importStl(model, stl, name, { unit = 'mm' } = {}) {

@@ -1,0 +1,21 @@
+---
+title: Tomar un emplazamiento desde CivilCraft
+summary: Abra el archivo de dirección a emplazamiento que crea CivilCraft y añada los edificios y la parcela de alrededor como volúmenes y una línea de emplazamiento, solo los que marque.
+keywords: emplazamiento, civilcraft, dirección, parcela, edificios vecinos, volúmenes, contexto, ccsite, datos abiertos, openstreetmap
+from: f28e4a3b
+---
+
+CivilCraft puede buscar una dirección y guardar lo que las fuentes de datos abiertos saben a su alrededor: edificios vecinos, la parcela, y los contornos de inundación, zonificación y suelo. ModelCraft toma ese archivo como sugerencias. No se añade nada hasta que usted lo indique.
+
+## Traer el archivo
+
+1. En CivilCraft, envíe el emplazamiento a ModelCraft o guarde el archivo (termina en `.ccsite.json`).
+2. En ModelCraft, abra o suelte el archivo. Se abre una lista con una casilla para cada edificio y para la parcela.
+3. Escriba una altura para los edificios a los que la fuente no dio ninguna. Junto a cada uno aparece una línea que indica de dónde viene su altura: su número de plantas, de 3 m cada una, o la altura que escribió.
+4. Pulse {{ui:Añada los marcados}}.
+
+Los edificios marcados se convierten en volúmenes extruidos dentro de un componente, y la parcela se convierte en una línea alrededor del emplazamiento. Todo es un solo paso de deshacer. El punto de la dirección queda en el origen, en metros al este y al norte de él.
+
+Los contornos de inundación, zonificación y suelo se listan solo a título informativo; no se dibujan.
+
+Los datos proceden de fuentes abiertas y llevan su atribución al final de la lista. Las alturas que no se dieron son supuestos, así que compruébelas antes de fiarse de ellas.

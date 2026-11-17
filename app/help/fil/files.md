@@ -1,49 +1,49 @@
 ---
 title: Buksan, i-save, i-import at i-export
-summary: Ang file ng ModelCraft, ang maaari mong i-import at i-export, kung saan napupunta ang mga file, at ang nagbabago offline at sa pagitan ng mga browser.
-keywords: buksan, open, save, i-save, import, i-import, export, i-export, file, 3dm, skp, ibalik, autosave, kamakailan, desktop, buksan sa 3D, ilipat, download, modelcraft file, dae, collada, obj, gltf, glb, stl, step, stp, ifc, dwg, dxf, format, offline, i-save bilang
-from: 0b4896d1
+summary: Ang file ng ModelCraft, ang maaari mong dalhin at ipadala, kung saan pupunta ang mga file, at kung ano ang nagbabago offline at sa pagitan ng mga browser.
+keywords: buksan, i-save, i-import, i-export, file, 3dm, skp, i-recover, autosave, kamakailan, desktop, buksan sa 3d, ipasa, i-download, modelcraft file, dae, collada, obj, gltf, glb, stl, step, stp, ifc, dwg, dxf, formats, offline, i-save bilang
+from: 3f09ab72
 ---
 
-Binabasa at isinusulat ng ModelCraft ang mga file sa iyong computer. Walang ina-upload: ang file na bubuksan mo ay binabasa sa loob ng iyong browser, at ang file na sine-save mo ay isang download. Tingnan ang [Saan napupunta ang iyong mga file](common:your-files).
+Nagbabasa at nagsusulat ang ModelCraft ng mga file sa iyong computer. Walang ina-upload: ang file na binubuksan mo ay binabasa sa loob ng iyong browser, at ang file na sine-save mo ay isang download. Tingnan ang [Saan pupunta ang iyong mga file](common:your-files).
 
-## Mga format sa isang tingin
+## Mga format sa isang sulyap
 
-| Format | Buksan | I-import | I-export | Para saan ito |
+| Format | Buksan | I-import | I-export | Para saan |
 |---|---|---|---|---|
-| ModelCraft (`.modelcraft`) | oo | hindi | {{ui:I-save}} | Ang iyong working file. Nag-iingat ng lahat. |
-| USD (`.usd`, `.usda`, `.usdc`, `.usdz`) | oo | oo | {{ui:I-save bilang}}, {{ui:I-export}} | Para sa mga program ng rendering at pag-assemble ng scene. Nag-iingat ng lahat ang sariling USD ng ModelCraft. Tingnan ang [I-save, buksan at i-export ang USD](topic:usd). |
-| SketchUp (`.skp`) | hindi | oo | hindi | Pag-import ng mga model mula sa SketchUp. Nag-iingat ng mga group, component, kulay, texture sa mga face, tag at soft edge. Tingnan ang [Mag-import ng SKP model](topic:import-sketchup-files). |
-| Collada (`.dae`) | hindi | oo | oo | Pagpapalitan ng mga model sa ibang 3D modeler. Nag-iingat ng mga group, component at kulay. |
-| OBJ (`.obj`) | hindi | oo | oo | Mga program ng rendering at visualization. |
-| glTF (`.glb`, `.gltf`) | hindi | oo | `.glb` lang | Web viewer, game engine, AR. |
-| STL (`.stl`) | hindi | oo | oo | 3D printing (sa millimeters). |
-| PLY (`.ply`) | hindi | oo | oo | Mesh na may kulay: scan, color printing. |
-| FBX (`.fbx`) | hindi | oo | hindi | Mga model mula sa animation at game program (FBX 2011 pataas). |
-| Alembic (`.abc`) | hindi | oo | hindi | Geometry cache, sa unang sample nito. |
-| STEP (`.step`, `.stp`) | hindi | oo | hindi | Mga piyesa mula sa part modeler at supplier, bilang saradong mesh sa tunay nilang laki. Tingnan ang [Mga file format](topic:formats). |
-| `.3dm` | hindi | oo | hindi | Mga NURBS model: polysurface, mesh, curve, block at layer, bilang mesh, edge, component at tag. Tingnan ang [Mag-import ng .3dm model](topic:import-3dm-files). |
-| 3MF (`.3mf`) | hindi | hindi | oo | 3D printing, may kulay (sa millimeters). Mula sa {{ui:Suriin para sa 3D printing (STL o 3MF)…}}: tingnan ang [Ihanda ang model para sa 3D printing](topic:print-3d). |
-| IFC (`.ifc`) | hindi | hindi | oo | Mga BIM program, at BimCraft. |
-| DWG (`.dwg`) | hindi | oo | oo | Site plan o floor plan na pagmomodelan; pagpapadala ng model sa CAD program. |
-| DXF (`.dxf`) | hindi | oo | oo | Pareho, para sa anumang CAD program. |
+| ModelCraft (`.modelcraft`) | Oo | Hindi | {{ui:I-save}} | Ang iyong working file. Iniingatan ang lahat. |
+| USD (`.usd`, `.usda`, `.usdc`, `.usdz`) | Oo | Oo | {{ui:I-save bilang}}, {{ui:I-export}} | Mga program para sa rendering at pag-assemble ng eksena. Iniingatan ng sariling USD ng ModelCraft ang lahat. Tingnan ang [I-save, buksan at i-export ang USD](topic:usd). |
+| SketchUp (`.skp`) | Hindi | Oo | Hindi | Pagdadala ng mga model mula sa SketchUp. Iniingatan ang mga group, component, kulay, texture sa mga face, tag at soft edge. Tingnan ang [Mag-import ng SKP model](topic:import-sketchup-files). |
+| Collada (`.dae`) | Hindi | Oo | Oo | Pagpapalitan ng model sa ibang 3D modeler. Iniingatan ang mga group, component at kulay. |
+| OBJ (`.obj`) | Hindi | Oo | Oo | Mga program para sa rendering at visualization. |
+| glTF (`.glb`, `.gltf`) | Hindi | Oo | `.glb` lang | Web viewer, game engine, AR. |
+| STL (`.stl`) | Hindi | Oo | Oo | 3D printing (sa millimeters). |
+| PLY (`.ply`) | Hindi | Oo | Oo | Mga mesh na may kulay: scan, color printing. |
+| FBX (`.fbx`) | Hindi | Oo | Hindi | Mga model mula sa animation at game program (FBX 2011 pataas). |
+| Alembic (`.abc`) | Hindi | Oo | Hindi | Mga geometry cache, sa unang sample nito. |
+| STEP (`.step`, `.stp`) | Hindi | Oo | Hindi | Mga part mula sa part modeler at supplier, bilang closed mesh sa tunay nilang laki. Tingnan ang [Mga format ng file](topic:formats). |
+| `.3dm` | Hindi | Oo | Hindi | Mga NURBS model: polysurface, mesh, curve, block at layer, bilang mesh, edge, component at tag. Tingnan ang [Mag-import ng .3dm model](topic:import-3dm-files). |
+| 3MF (`.3mf`) | Hindi | Hindi | Oo | 3D printing, may kulay (sa millimeters). Mula sa {{ui:Suriin para sa 3D printing (STL o 3MF)…}}: tingnan ang [Ihanda ang model para sa 3D printing](topic:print-3d). |
+| IFC (`.ifc`) | Hindi | Hindi | Oo | Mga BIM program, at BimCraft. |
+| DWG (`.dwg`) | Hindi | Oo | Oo | Site plan o floor plan na pagmomodelohan; pagpapadala ng model sa CAD program. |
+| DXF (`.dxf`) | Hindi | Oo | Oo | Pareho, para sa anumang CAD program. |
 
-Nakalista sa [Mga file format nang detalyado](topic:formats) kung ano mismo ang iniingatan at iniiwan ng bawat format.
+[Mga format ng file nang detalyado](topic:formats) ay naglilista nang eksakto kung ano ang iniingatan at iniiiwan ng bawat format.
 
-## Ang file ng ModelCraft
+## Ang ModelCraft file
 
-Iniingatan ng file na `.modelcraft` ang buong model: geometry, group, component, guide, scene, ang mga unit, at ang camera at istilong ginagamit mo noong i-save mo. Hindi nito iniingatan ang undo history.
+Ang `.modelcraft` file ay nag-iingat ng buong model: geometry, group, component, guide, scene, ang units, at ang camera at style na ginagamit mo noong i-save mo. Hindi nito iniingatan ang undo history.
 
-### Buksan ang model
+### Magbukas ng model
 
-1. I-click ang {{ui:Buksan}} sa group na {{ui:File}}, o pindutin ang {{key:Mod+O}}.
-2. Kung may hindi pa nai-save na pagbabago ang model sa screen, magtatanong ang ModelCraft: "May mga pagbabago sa model na ito na hindi pa naii-save. I-save muna ang kopya?" Piliin ang {{ui:I-save ang kopya}}, {{ui:Itapon ang mga pagbabago}} o {{ui:Kanselahin}}.
-3. Piliin ang file na `.modelcraft`.
+1. I-click ang {{ui:Buksan}} sa grupong {{ui:File}}, o pindutin ang {{key:Mod+O}}.
+2. Kung may hindi pa na-save na pagbabago ang model sa screen, magtatanong ang ModelCraft: "May mga pagbabago ang model na ito na hindi pa na-save. I-save muna ang kopya?" Piliin ang {{ui:I-save ang kopya}}, {{ui:Itapon ang mga pagbabago}} o {{ui:Kanselahin}}.
+3. Piliin ang `.modelcraft` file.
 
-Bubukas ang model sa mga unit na ginamit noong i-save ito, kasama ang camera na naka-save dito. Maaari mo ring i-drop ang file na `.modelcraft` sa 3D view, o i-click ang isa sa listahan ng mga kamakailang file sa start card (mga browser na kayang buksang muli ang file, at ang desktop app).
+Bubuksan ang model sa units na na-save nito, kasama ang camera na na-save nito. Maaari mo ring i-drop ang `.modelcraft` file sa 3D view, o i-click ito sa listahan ng mga kamakailang file sa start card (mga browser na kayang magbukas muli ng file, at ang desktop app).
 
 :::desktop
-Sa desktop app, ang pag-double-click sa file na `.modelcraft` ay binubuksan ito sa ModelCraft, at gayon din ang **Open with** sa file na Collada, OBJ, glTF, DWG o DXF (ini-import ito sa bagong model).
+Sa desktop app, ang pag-double-click sa `.modelcraft` file ay bubuksan ito sa ModelCraft, at gayundin ang **Buksan gamit ang** sa Collada, OBJ, glTF, DWG o DXF file (ii-import ito sa bagong model).
 :::
 
 ### I-save ang model
@@ -51,76 +51,76 @@ Sa desktop app, ang pag-double-click sa file na `.modelcraft` ay binubuksan ito 
 I-click ang {{ui:I-save}} o pindutin ang {{key:Mod+S}}. Dina-download ng browser ang `<name>.modelcraft`, kung saan ang pangalan ay ang file na binuksan mo, o "Untitled" para sa bagong model.
 
 :::desktop
-Sa desktop app, isinusulat ng {{ui:I-save}} ang file na binuksan mo sa mismong lugar nito. Ang bagong model ay nagtatanong kung saan ito ise-save.
+Sa desktop app, isinusulat ng {{ui:I-save}} ang file na binuksan mo sa lugar nito. Ang bagong model ay nagtatanong kung saan ito ise-save.
 :::
 
-- {{ui:I-save bilang}} ({{key:Mod+Shift+S}}) ay nagse-save ng kopya bilang file na `.modelcraft` o bilang [USD](topic:usd); kung kaya ng browser, nagtatanong ito ng pangalan at lugar. Kung hindi, palitan ng pangalan ang na-download na file: ang susunod na save pagkatapos mong buksan ang pinalitan ng pangalan na file ay gagamit ng bagong pangalan.
-- Bawat save ay bagong download. Depende sa setting ng browser, diretso ito sa iyong downloads folder o nagtatanong kung saan ise-save. Kung may file na may ganoong pangalan na, karamihan sa browser ay nagdaragdag ng numero, gaya ng `Untitled (1).modelcraft`.
+- {{ui:I-save bilang}} ({{key:Mod+Shift+S}}) ay nagsa-save ng kopya bilang `.modelcraft` file o bilang [USD](topic:usd); kung kaya ng browser, nagtatanong ito ng pangalan at lugar. Kung hindi, palitan ang pangalan ng na-download na file: ang susunod na save pagkatapos mong buksan ang pinalitang file ay gagamit ng bagong pangalan.
+- Bawat save ay bagong download. Depende sa setting ng browser, dederetso ito sa iyong downloads folder o magtatanong kung saan i-save. Kung may file na may ganoong pangalan na roon, karamihan ng browser ay magdadagdag ng numero, gaya ng `Untitled (1).modelcraft`.
 
 :::chromium
-Para pumili ng folder sa bawat pagkakataon, buksan ang settings ng browser, hanapin ang "downloads" at i-on ang "Ask where to save each file before downloading".
+Para piliin ang folder sa bawat pagkakataon, buksan ang settings ng browser, hanapin ang "downloads" at i-on ang "Ask where to save each file before downloading".
 :::
 
 :::firefox
-Para pumili ng folder sa bawat pagkakataon, buksan ang **Settings**, saka ang **General**, at sa ilalim ng "Downloads" piliin ang "Always ask you where to save files".
+Para piliin ang folder sa bawat pagkakataon, buksan ang **Mga setting**, pagkatapos **General**, at sa ilalim ng "Downloads" piliin ang "Always ask you where to save files".
 :::
 
 :::safari
-Para baguhin kung saan napupunta ang mga download, buksan ang **Safari**, saka ang **Settings**, saka ang **General**, at itakda ang "File download location".
+Para baguhin kung saan pupunta ang mga download, buksan ang **Safari**, pagkatapos **Mga setting**, pagkatapos **General**, at itakda ang "File download location".
 :::
 
 ### Magsimula ng bagong model
 
-I-click ang {{ui:Bago}}. Kung may hindi pa nai-save na pagbabago, magtatanong muna ang ModelCraft. Nagsisimulang walang laman ang bagong model, sa unit ng iyong locale (feet at inches sa United States, millimeters sa iba pang lugar), at walang scene.
+I-click ang {{ui:Bago}}. Kung may hindi pa na-save na pagbabago, magtatanong muna ang ModelCraft. Magsisimula ang bagong model na walang laman, sa unit ng iyong locale (feet at inches sa United States, millimeters sa ibang lugar), na walang scene.
 
 ### Kung magsara ang browser bago ka mag-save
 
-Nag-iingat ang ModelCraft ng kopya ng hindi pa nai-save na gawa sa iyong browser ilang segundo pagkatapos ng bawat pagbabago. Kung magsara ang tab o ang browser bago ka mag-save, sa susunod mong pagbukas ng ModelCraft ay magtatanong ito ng "Ibalik ang iyong gawa?". Ang pagbawi ay magbubukas ng model gaya ng dati, hindi pa naka-save sa file: i-save ito para mapanatili. Tingnan ang [Ibalik ang iyong gawa](common:recover).
+Nag-iingat ang ModelCraft ng kopya ng hindi pa na-save na gawa mo sa iyong browser ilang segundo pagkatapos ng bawat pagbabago. Isinusulat ang kopya sa background, kaya hindi ka napipigilan ng malaking model habang iniingatan ito. Kung magsara ang tab o browser bago ka mag-save, sa susunod na buksan mo ang ModelCraft ay magtatanong ito ng "I-recover ang iyong gawa?". Ang pag-recover ay magbubukas ng model gaya ng dati, hindi pa na-save sa file: i-save ito para mapanatili. Tingnan ang [I-recover ang iyong gawa](common:recover).
 
 ### Mula sa CadCraft: Buksan sa ModelCraft
 
-Sa CadCraft drafting app, ang **View**, saka ang **More**, saka ang **Open in ModelCraft** ay ipinapasa ang bukas na drawing sa ModelCraft sa bagong tab, bilang DWG. Dumarating ito gaya ng isang na-import na DWG: mga linya sa lupa, nasa isang group, handa nang pagmodelan. Walang ina-upload; dumadaan ang file sa sariling storage ng browser mo.
+Sa CadCraft drafting app, **View**, pagkatapos **Iba pa**, pagkatapos **Buksan sa ModelCraft**, ibinibigay ang bukas na drawing sa ModelCraft sa bagong tab, bilang DWG. Dumarating ito na gaya ng na-import na DWG: mga linya sa lupa, nasa group, handang pagmodelohan. Walang ina-upload; dumadaan ang file sa sariling storage ng browser.
 
-## I-import
+## Import
 
-Idinadagdag ng pag-import ang file sa model na bukas mo; hindi nito pinapalitan ito.
+Ang pag-import ay nagdadagdag ng file sa model na bukas mo; hindi nito pinapalitan ang model.
 
-1. I-click ang {{ui:I-import}} sa group na {{ui:File}}, o i-drop ang file sa 3D view.
-2. Piliin ang file na SketchUp, Collada, OBJ, glTF, FBX, PLY, STL, Alembic, STEP, `.3dm`, USD, DWG o DXF.
+1. I-click ang {{ui:I-import}} sa grupong {{ui:File}}, o i-drop ang file sa 3D view.
+2. Pumili ng SketchUp, Collada, OBJ, glTF, FBX, PLY, STL, Alembic, STEP, `.3dm`, USD, DWG o DXF file.
 
-   Dumarating ang file bilang **isang group**, napili, at nag-zo-zoom ang view para ipakita ito. Sinasabi ng status bar kung ano ang pumasok, at inililista ang anumang hindi ma-import, gaya ng "Hindi na-import: 2 texture".
+   Dumarating ang file bilang **isang group**, napili, at nag-zoom ang view para ipakita ito. Sinasabi ng status bar kung ano ang pumasok, at inililista ang anumang hindi na-import, gaya ng "Hindi na-import: 2 texture".
 
-3. Para direktang gawin ang geometry nito, i-double-click ang group para i-edit sa loob nito, o i-click ang {{ui:Explode}}.
+3. Para gumana nang direkta sa geometry nito, i-double-click ang group para mag-edit sa loob nito, o i-click ang {{ui:Explode}}.
 
 Ilang bagay na dapat malaman:
 
-- **Laki at direksyon pataas:** Sinasabi ng mga file na Collada ang kanilang unit at kung aling axis ang pataas, at kino-convert ito ng ModelCraft. Laging nasa meters ang glTF. Walang dalang unit ang mga file na OBJ: binabasa ito ng ModelCraft bilang meters, na may Y pataas. Kung 1000 beses na mas malaki o mas maliit ang OBJ kaysa dapat, gamitin ang [Scale](topic:rotate-scale) na may factor na gaya ng `0.001` o `1000`.
-- **DWG at DXF** ay pumapasok bilang mga linya (edge) sa lupa, hindi bilang face. Kung hindi sinasabi ng drawing ang unit nito, magtatanong ang dialog na may pamagat na "Drawing units" kung ano ang isang unit ng drawing. Tingnan ang [Mag-model sa site plan](topic:site-plan).
-- **Limitasyon:** tinatanggihan sa pag-import ang mga file na lampas 300 MB, at sa pagbubukas ang lampas 200 MB. Tinatanggihan bilang sobrang laki ang mga file na may higit sa 2 milyong vertex o face.
+- **Laki at pataas na direksyon:** Sinasabi ng Collada file ang unit nito at aling axis ang pataas, at kino-convert ito ng ModelCraft. Palaging nasa meters ang glTF. Walang unit ang OBJ file: binabasa ito ng ModelCraft bilang meters, na may Y pataas. Kung 1000 beses na mas malaki o mas maliit ang pumasok na OBJ, gamitin ang [Scale](topic:rotate-scale) na may factor gaya ng `0.001` o `1000`.
+- **DWG at DXF** ay pumapasok bilang mga linya (edge) sa lupa, hindi bilang face. Kung hindi sinasabi ng drawing ang unit nito, magtatanong ang dialog na pinamagatang "Drawing units" kung ano ang isang drawing unit. Tingnan ang [Mag-model sa site plan](topic:site-plan).
+- **Mga limitasyon:** tinatanggihan ang mga file na higit sa 300 MB para sa import, at higit sa 200 MB para sa pagbubukas. Tinatanggihan bilang sobrang laki ang mga file na may higit sa 2 milyong vertex o face. Tinatanggihan ang OBJ na higit sa 64 MB bago pa ito mabasa. Binabasa nang isang piraso sa bawat pagkakataon ang mga text file (Collada, OBJ, ASCII STL, USD text), mga 4 MB, kaya walang iisang bloke ng text ang humahawak sa buong file; ang 16 MB na OBJ ay gumamit ng mga 0.5 GB ng memory habang nagbubukas sa aming test.
 
-## I-export
+## Export
 
-1. I-click ang {{ui:I-export}} sa group na {{ui:File}}.
+1. I-click ang {{ui:I-export}} sa grupong {{ui:File}}.
 2. Pumili ng format: {{ui:glTF binary (.glb)}}, {{ui:Collada (.dae)}}, {{ui:OBJ (.obj)}}, {{ui:STL para sa pag-print (.stl, millimeters)}}, {{ui:PLY na may kulay (.ply)}}, {{ui:USD (.usda, .usdc, .usdz)…}}, {{ui:IFC para sa BimCraft (.ifc)}}, {{ui:DWG para sa CAD (.dwg, 2004)}} o {{ui:DXF para sa CAD (.dxf, R12)}}.
 
-Dina-download ng browser ang file, na pinangalanan gaya ng model. Ang buong model ang ie-export, hindi lang ang pinili. Hindi ie-export ang walang lamang model: "Walang laman ang model: gumuhit muna ng isang bagay." Tingnan ang [I-export ang model para sa ibang program](topic:export-model).
+Dina-download ng browser ang file, pinangalanan ayon sa model. Ang buong model ang ini-export, hindi lang ang napili. Isinusulat sa background ang glTF, Collada at OBJ na file, kaya patuloy na gumagana ang ModelCraft habang nag-e-export ng malaking model; magsisimula ang download kapag handa na ang file. Hindi na-export ang walang lamang model: "Walang laman ang model: gumuhit muna ng isang bagay." Tingnan ang [I-export ang model para sa ibang program](topic:export-model).
 
 ## Online at offline
 
-Lahat ng nasa ModelCraft ay tumatakbo sa iyong computer, kaya gumagana nang walang koneksyon ang pagmomodelo, pagbubukas, pag-save, pag-import at pag-export kapag na-load na ang app.
+Ang lahat sa ModelCraft ay tumatakbo sa iyong computer, kaya gumagana ang pagmomodelo, pagbubukas, pag-save, pag-import at pag-export nang walang koneksyon kapag na-load na ang app.
 
-Para buksan ang ModelCraft nang walang koneksyon, i-save ito para sa offline na paggamit habang online ka:
+Para mabuksan ang ModelCraft nang walang anumang koneksyon, i-save ito para magamit offline habang online ka:
 
 1. I-click ang {{ui:I-save para sa offline}} sa app bar sa itaas.
-2. Bumibilang paitaas ang button ("Saving 40 of 212") habang nagse-save ito. Sine-save ng ModelCraft ang sarili nitong mga file (kasama ang DWG reader nito), ang help na ito at ang 3D library, kaya maaari itong tumagal.
-3. Kapag nakasulat na {{ui:Handa offline}} ang button, bubukas ang ModelCraft mula sa parehong address nang walang koneksyon, at gumagana rin offline ang pag-import ng DWG.
+2. Binibilang ng button ang progreso ("Sine-save 40 sa 212") habang nagse-save. Sine-save ng ModelCraft ang sarili nitong mga file (kasama ang DWG reader nito), ang help na ito at ang 3D library, kaya maaaring magtagal ito.
+3. Kapag nagbabasa na ang button ng {{ui:Handa offline}}, magbubukas ang ModelCraft mula sa parehong address nang walang koneksyon, at gumagana rin ang DWG import offline.
 
-I-click ang {{ui:Handa offline}} mamaya para sa {{ui:I-save ulit (kunin ang pinakabagong bersyon)}} o {{ui:Alisin ang offline copy}}. Kung nakasulat na {{ui:Hindi na-save}} ang button, may ilang file na hindi na-download: suriin ang koneksyon at i-click ito para subukang muli. Ang {{ui:Hindi available ang offline}} ay nangangahulugang hindi kayang magtago ng kopya ng browser window na ito (mga private window at ilang managed computer). Tingnan ang [Pagtatrabaho offline](common:offline).
+I-click ang {{ui:Handa offline}} mamaya para sa {{ui:I-save ulit (kunin ang pinakabagong bersyon)}} o {{ui:Alisin ang offline copy}}. Kung nagbabasa ang button ng {{ui:Hindi na-save}}, may ilang file na hindi na-download: suriin ang koneksyon at i-click ito para subukan muli. Ang {{ui:Hindi available ang offline}} ay nangangahulugang hindi kayang magtago ng kopya ng window ng browser na ito (mga private window at ilang managed computer). Tingnan ang [Pagtatrabaho offline](common:offline).
 
 Hindi pa available ang cloud saving. Nasa lugar kung saan mo ito i-save ang bawat model.
 
 :::offline
-Offline ka. Maaari mong ipagpatuloy ang pagmomodelo at pag-save. Maliban kung nakasulat sa app bar ang {{ui:Handa offline}}, huwag i-reload ang tab na ito hangga't hindi ka online ulit.
+Offline ka. Maaari kang magpatuloy sa pagmomodelo at pag-save. Maliban kung nagpapakita ang app bar ng {{ui:Handa offline}}, huwag i-reload ang tab na ito hanggang makakonekta ka ulit.
 :::
 
 ## Desktop app
