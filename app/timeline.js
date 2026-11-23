@@ -102,11 +102,11 @@ export function mountTimeline(o) {
   const ruler = el('div', { className: 'mc-tl-ruler' }, el('span', { className: 'mc-tl-name' }, ''), el('div', { className: 'mc-tl-scrubwrap' }, scrub, el('div', { className: 'mc-tl-ticks', dataset: { tlTicks: '' } })));
   const lanes = el('div', { className: 'mc-tl-lanes' }, ruler, rows, el('div', { className: 'mc-tl-playhead', dataset: { tlPlayhead: '' }, 'aria-hidden': 'true' }));
   const curves = mountCurves({
-    t, anim: () => preview || anim, commit: (next, msg) => commit(next, msg), time: () => time, setTime: (s) => setTime(s),
-    label: (track, comp) => chanLabel(track, comp), preview: (p) => { preview = p; apply({ camera: true }); },
+    t, anim: () => preview || anim, commit, time: () => time, setTime: (s) => setTime(s),
+    label: chanLabel, preview: (p) => { preview = p; apply({ camera: true }); },
     onPick: (sel) => { picked = sel.map((p) => ({ track: p.track, t: p.t })); markCurrent(); },
   });
-  const clips = mountClips({ t, anim: () => anim, commit: (next, msg) => commit(next, msg), time: () => time, setTime: (s) => setTime(s),
+  const clips = mountClips({ t, anim: () => anim, commit, time: () => time, setTime: (s) => setTime(s),
     askName: async (def) => (o.askText ? o.askText(t('app.an.clip.name.h'), t('app.an.clip.name'), def) : def) });
   box.replaceChildren(head, lanes, curves.el, clips.el);
   box.dataset.tlMode = mode;

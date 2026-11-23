@@ -26,13 +26,8 @@
  */
 import { compose, decompose, slerp, eulerToQuat, quatToEuler, pathKey } from '../render/anim.js';
 import { mul, inv, point, boneRest, order } from './rig.js';
+import { add3 as add, cross3 as cross, dot3 as dot, len3 as len, scale3 as scl, sub3 as sub } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const scl = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const len = (a) => Math.hypot(a[0], a[1], a[2]);
 const norm = (a) => { const l = len(a); return l > 1e-12 ? scl(a, 1 / l) : [0, 0, 0]; };
 const AXIS = { '+x': [1, 0, 0], '-x': [-1, 0, 0], '+y': [0, 1, 0], '-y': [0, -1, 0], '+z': [0, 0, 1], '-z': [0, 0, -1] };
 const col = (m, c) => [m[c * 4], m[c * 4 + 1], m[c * 4 + 2]];

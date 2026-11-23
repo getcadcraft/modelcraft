@@ -3,3 +3,4 @@
 - Supports and a raft, from the overhang angle you set
 - Islands (pieces with nothing under them) marked on the layer preview
 - Time, resin and cost before you print
+- A suggested tilt, a warning for cavities that open only toward the film (suction cups), cross braces on tall supports, and the largest layer you pull off the film. All of it is estimated from the shape; none has been tried on a printer

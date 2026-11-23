@@ -2,7 +2,7 @@
 title: Nouveautés de la version 0.7 (antérieure)
 summary: Maillages avec modificateurs, sculpture, UV et objets courbes, path tracing sur la carte graphique et un espace de travail Rendu, une vue en direct en temps réel avec répartition et panoramas, matériaux par nœuds, un espace Animation avec os et physique, fichiers USD, FBX, STEP et .3dm, et outils d'impression avec un style Débutant.
 keywords: nouveautés 0.7, version antérieure, notes de version, journal des modifications, changements, 0.7, version, nouvelles fonctionnalités, maillage, maillages, espace Maillage, modificateurs, subdivision, pli, uv, déplier, coutures, courbes, objets courbes, nurbs, bézier, sculpture, remaillage, retopologie, diviser, calcul, path tracing, webgpu, espace Rendu, file de rendu, mp4, exr, débruitage, ciel physique, hdri, ies, profondeur de champ, mélange des lumières, brouillard, caustiques, vue en direct, temps réel, marche, répartition, panorama, visite, lecteur, ombrage, nœuds, matériaux à nœuds, bibliothèque de matériaux, materialx, décalques, peinture de texture, cuisson, animation, éditeur de courbes, séquences, clés de forme, pilotes, armature, os, skinning, cinématique inverse, contraintes, physique, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, solides 3D, supports, épaisseur de paroi, évidement, réparation, débutant, assistants, votre machine, unités, portugais
-from: fa562a09
+from: 16d52810
 ---
 
 Voici ce qui a changé dans ModelCraft 0.7, par rapport à la 0.6. ModelCraft modélise désormais les maillages en plus de la géométrie par pousser/tirer, calcule les rendus sur la carte graphique, et dispose d'un espace de travail pour chaque type de travail : choisissez-le dans la liste {{ui:Espace de travail}} à gauche de la barre d'outils.

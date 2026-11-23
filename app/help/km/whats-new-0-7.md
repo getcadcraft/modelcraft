@@ -2,7 +2,7 @@
 title: អ្វីថ្មីក្នុង 0.7 (មុន)
 summary: ម៉ែសជាមួយកម្មវិធីកែប្រែ ការចម្លាក់ UV និងវត្ថុខ្សែកោង ការតាមដានពន្លឺលើកាតក្រាហ្វិក ទិដ្ឋភាពផ្ទាល់ជាមួយការខ្ចាត់ខ្ចាយ និងពានរូប សម្ភារៈជាមួយថ្នាំង តំបន់ Animate ជាមួយឆ្អឹង និងរូបវិទ្យា ឯកសារ USD FBX STEP និង .3dm ហើយឧបករណ៍បោះពុម្ពជាមួយរចនាបថអ្នកចាប់ផ្តើម។
 keywords: whats new 0.7, កំណែមុន, កំណត់ហេតុកំណែ, release notes, changelog, ការផ្លាស់ប្ដូរ, 0.7, កំណែ, មុខងារថ្មី, mesh, ម៉ែស, តំបន់ការងារម៉ែស, កម្មវិធីកែប្រែ, subdivision, crease, uv, unwrap, ថ្នេរ, curves, វត្ថុខ្សែកោង, nurbs, bezier, sculpt, remesh, retopology, divide, ការគណនា, path tracing, webgpu, តំបន់រេនឌ័រ, ជួររេនឌ័រ, mp4, exr, denoise, មេឃរូបវិទ្យា, hdri, ies, depth of field, light mixing, fog, caustics, ទិដ្ឋភាពផ្ទាល់, real time, ដើរ, scatter, panorama, tour, viewer, shading, nodes, node materials, បណ្ណាល័យសម្ភារៈ, materialx, decals, texture painting, baking, animate, graph editor, clips, shape keys, drivers, armature, bones, skinning, ik, constraints, physics, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d solids, supports, កម្រាស់ជញ្ជាំង, hollow, repair, beginner, ជំនួយការ, ម៉ាស៊ីនរបស់អ្នក, ឯកតា, portuguese
-from: fa562a09
+from: 16d52810
 ---
 
 នេះជាអ្វីដែលបានផ្លាស់ប្ដូរក្នុង ModelCraft 0.7 បើធៀបនឹង 0.6។ ឥឡូវ ModelCraft ធ្វើម៉ែស ព្រមទាំងធរណីមាត្រ push/pull ផងដែរ ធ្វើរេនឌ័រលើកាតក្រាហ្វិក ហើយមានតំបន់ការងារសម្រាប់ប្រភេទការងារនីមួយៗ៖ ជ្រើសរើសវានៅក្នុងបញ្ជី {{ui:តំបន់ការងារ}} នៅខាងឆ្វេងរបារឧបករណ៍។

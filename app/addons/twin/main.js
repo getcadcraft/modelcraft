@@ -12,7 +12,7 @@ import { MeshPicker } from '../../mesh/pick.js';
 import { partsOf, regionsOf } from './parts.js';
 import { TwinView } from '../../twin/view3d.js';
 import { Sim, simulate } from '../../flow/sim.js';
-import { buildGraph, cleanLayout, newLayout, addAfter } from '../../flow/layout.js';
+import { buildGraph, cleanLayout, newLayout, addAfter, connect } from '../../flow/layout.js';
 import { defaults } from '../../flow/catalog.js';
 import { makePlayer } from '../../flow/playback.js';
 import * as ANIM from '../../render/anim.js';
@@ -110,6 +110,8 @@ export function activate(api) {
   const behaviours = {
     parts: () => partList().map((p) => ({ key: p.key, name: p.name })),
     faces: (key) => { const p = partList().find((q) => q.key === key); return p ? regionsFor(p).faces : []; },
+    /** The part's triangles in its own frame (metres) for a copy drawn in a joint's pose: { positions, tris } | null. */
+    soup: (key) => { const p = partList().find((q) => q.key === key); if (!p) return null; const r = regionsFor(p).regions.soup; return { positions: r.positions, tris: r.tris }; },
     matrix: (key) => { const p = partList().find((q) => q.key === key); return p ? p.M : null; },
     stopPick,
     pick(cb) {
@@ -130,7 +132,7 @@ export function activate(api) {
 
   let ui = null, el0 = null;
   const host = {
-    t: (k, v) => api.t(k, v), flow: { Sim, simulate, buildGraph, cleanLayout, newLayout, addAfter, defaults, makePlayer },
+    t: (k, v) => api.t(k, v), flow: { Sim, simulate, buildGraph, cleanLayout, newLayout, addAfter, connect, defaults, makePlayer },
     layout, setLayout, onLayout: (f) => listeners.add(f), flowOn: () => !!window.ccFlow, load, save, view, model, timeline,
     video: { support: videoSupport, sink: createVideoSink }, behaviours, download, pickFile, confirm: (q) => window.confirm(q),
   };

@@ -13,10 +13,10 @@
 import { readContext, proposals, pick, buildSite as buildSiteRecord } from './site-context.js';
 import { addPolygon, addEdge, pushPull } from './model.js';
 import { ident } from './vec.js';
+import { ringArea as area } from './geom2d.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 export const isSiteFile = (file) => /\.ccsite\.json$/i.test(file?.name || '');
 
-const area = (P) => { let s = 0; for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length]; s += a[0] * b[1] - a[1] * b[0]; } return s / 2; };
 const ccw = (P) => (area(P) < 0 ? P.slice().reverse() : P);
 
 /** Build the accepted proposals into the model. Returns the placed instances. Call inside model.change. */

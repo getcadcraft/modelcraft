@@ -23,13 +23,14 @@ import { Mesh, FL_SHARP } from '../mesh.js';
 import * as O from './ops.js';
 import { subdivide, limitPositions } from './subdiv.js';
 import { BoxTree } from '../bvh.js';
+import { add3 as add, cross3 as cross, dot3 as dot, len3 as len, scale3 as mul, sub3 as sub } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 const num = (x, lo, hi, d) => (typeof x === 'number' && Number.isFinite(x) ? Math.max(lo, Math.min(hi, x)) : d);
 const int = (x, lo, hi, d) => Math.round(num(x, lo, hi, d));
 const bool = (x, d) => (typeof x === 'boolean' ? x : d);
 const one = (x, list, d) => (list.includes(x) ? x : d);
 const vec3 = (x, d) => (Array.isArray(x) && x.length === 3 && x.every((y) => typeof y === 'number' && Number.isFinite(y) && Math.abs(y) < 1e6) ? x.slice() : d.slice());
-const REF_RE = /^(d\d{1,9}|root)(\/(arc|circle|polygon|curve):\d{1,9})?$/;
+const REF_RE = /^(d\d{1,16}|root)(\/(arc|circle|polygon|curve):\d{1,16})?$/;
 const ref = (x) => (typeof x === 'string' && REF_RE.test(x) ? x : '');
 
 const facs = (x, d) => (Array.isArray(x) && x.length === 3 && x.every((y) => typeof y === 'number' && Number.isFinite(y) && y >= 1e-4 && y <= 1e4) ? x.slice() : d.slice());
@@ -82,12 +83,6 @@ export function refsOf(mods) {
 
 // ---- helpers ----
 const P3 = (m, v) => [m.P[v * 3], m.P[v * 3 + 1], m.P[v * 3 + 2]];
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const len = (a) => Math.hypot(a[0], a[1], a[2]);
 const norm = (a) => { const l = len(a); return l > 0 ? mul(a, 1 / l) : [0, 0, 0]; };
 const AX = { x: 0, y: 1, z: 2 };
 

@@ -2,7 +2,7 @@
 title: Wat is nuut in 0.7 (vroeër)
 summary: Mase met modifiseerders, beeldhouwerk, UV's en kurwe-voorwerpe, padopsporing op die grafiekkaart en 'n Weergee-werkruimte, 'n intydse lewe-aansig met verspreiding en panorama's, materiale met nodusse, 'n Animeer-werkruimte met bene en fisika, USD-, FBX-, STEP- en .3dm-lêers, en drukgereedskap met 'n Beginner-styl.
 keywords: wat is nuut 0.7, vroeër weergawe, vrystellingsnotas, veranderlys, veranderinge, 0.7, weergawe, nuwe kenmerke, maas, mase, maaswerkruimte, modifiseerders, onderverdeling, vou, uv, ontvou, naatlyne, kurwes, kurwe-voorwerpe, nurbs, bezier, beeldhou, hermesh, verdeel, berekening, padopsporing, webgpu, weergeewerkruimte, renderreeks, mp4, exr, ruisverlaagder, fisiese lug, hdri, ies, skerptediepte, ligmenging, mis, kaustiek, lewe-aansig, intyds, stap, verspreiding, panorama, toer, besigtiger, skakering, nodusse, materiaalbiblioteek, materialx, decals, teksturverfwerk, bak, animeer, grafiekredigeerder, klippe, vormsleutels, aandrywers, geraamte, bekleding, ik, beperkings, fisika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D-soliede, steunsels, muurdikte, hol maak, herstel, beginner, assistente, jou masjien, eenhede, portugees
-from: fa562a09
+from: 16d52810
 ---
 
 Dit is wat in ModelCraft 0.7 verander het, vergeleke met 0.6. ModelCraft modelleer nou mase sowel as stoot/trek-meetkunde, teken op die grafiekkaart, en het 'n werkruimte vir elke soort werk: kies dit in die {{ui:Werkruimte}}-lys links op die gereedskapbalk.

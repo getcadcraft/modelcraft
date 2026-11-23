@@ -2,7 +2,7 @@
 title: Novità nella 0.7 (precedente)
 summary: Mesh con modificatori, scultura, UV e oggetti curva, path tracing sulla scheda grafica e un'area di lavoro Render, una vista live in tempo reale con dispersione e panorami, materiali a nodi, un'area di lavoro Animate con ossa e fisica, file USD, FBX, STEP e .3dm, e strumenti di stampa con uno stile Principiante.
 keywords: novità 0.7, versione precedente, note di rilascio, changelog, modifiche, 0.7, versione, nuove funzionalità, mesh, area di lavoro mesh, modificatori, suddivisione, piega, uv, srotolare, cuciture, curve, oggetti curva, nurbs, bezier, scultura, ricostruisci mesh, retopologia, dividi, calcolo, path tracing, webgpu, area di lavoro render, coda di render, mp4, exr, riduzione del rumore, cielo fisico, hdri, ies, profondità di campo, miscela delle luci, nebbia, caustiche, vista live, tempo reale, cammina, scatter, panorama, tour, visualizzatore, shading, nodi, materiali a nodi, libreria dei materiali, materialx, decalcomanie, pittura sulla texture, baking, animate, editor delle curve, clip, shape key, driver, armatura, ossa, skinning, ik, vincoli, fisica, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, solidi 3D, supporti, spessore delle pareti, svuota, ripara, principiante, assistenti, questo computer, unità, portoghese
-from: fa562a09
+from: 16d52810
 ---
 
 Questo è ciò che è cambiato in ModelCraft 0.7, rispetto alla 0.6. ModelCraft ora modella anche le mesh oltre alla geometria per spinta e trazione, esegue il render sulla scheda grafica e ha un'area di lavoro per ogni tipo di lavoro: si sceglie nell'elenco {{ui:Area di lavoro}} a sinistra della barra degli strumenti.

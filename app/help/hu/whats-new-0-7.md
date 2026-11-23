@@ -2,7 +2,7 @@
 title: Újdonságok a 0.7-ben (korábbi)
 summary: Hálók módosítókkal, szobrászat, UV-k és görbeobjektumok, útkövetés a grafikus kártyán és egy Renderelés munkaterület, valós idejű élő nézet szórással és panorámákkal, csomóponti anyagok, egy Animálás munkaterület csontokkal és fizikával, USD, FBX, STEP és .3dm fájlok, valamint nyomtatási eszközök Kezdő stílussal.
 keywords: újdonságok 0.7, korábbi kiadás, kiadási jegyzetek, változásnapló, változások, 0.7, verzió, új funkciók, háló, hálók, háló munkaterület, módosítók, felosztás, redő, uv, kibontás, varratok, görbék, görbeobjektumok, nurbs, bezier, szobrászat, újrahálózás, retopológia, osztás, számítás, útkövetés, webgpu, renderelés munkaterület, renderelési sor, mp4, exr, zajszűrés, fizikai ég, hdri, ies, élességmélység, fénykeverés, köd, kausztika, élő nézet, valós idő, séta, szórás, panoráma, túra, megjelenítő, árnyalás, csomópontok, csomóponti anyagok, anyagkönyvtár, materialx, matricák, textúrafestés, sütés, animálás, grafikonszerkesztő, klipek, alakkulcsok, meghajtók, csontváz, csontok, bőrözés, ik, kényszerek, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d testek, támaszok, falvastagság, kiüregelés, javítás, kezdő, asszisztensek, a gépe, mértékegységek, portugál
-from: fa562a09
+from: 16d52810
 ---
 
 Ez változott a ModelCraft 0.7-ben, a 0.6-hoz képest. A ModelCraft mostantól hálókat is modellez a nyomás/húzás geometria mellett, a grafikus kártyán renderel, és minden munkatípushoz van munkaterület: a {{ui:Munkaterület}} listából válassza ki az eszköztár bal oldalán.

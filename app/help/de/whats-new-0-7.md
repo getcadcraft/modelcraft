@@ -2,7 +2,7 @@
 title: Neuheiten in 0.7 (früher)
 summary: Netze mit Modifikatoren, Bildhauerei, UVs und Kurvenobjekte, Path Tracing auf der Grafikkarte und ein Render-Arbeitsbereich, eine Echtzeit-Live-Ansicht mit Streuung und Panoramen, Materialien aus Knoten, ein Animations-Arbeitsbereich mit Knochen und Physik, USD-, FBX-, STEP- und .3dm-Dateien sowie Drucktools mit einem Einsteiger-Stil.
 keywords: neuheiten 0.7, früherer release, versionshinweise, änderungsprotokoll, änderungen, 0.7, version, neue funktionen, netz, netze, netz-arbeitsbereich, modifikatoren, unterteilung, falte, uv, abwickeln, nähte, kurven, kurvenobjekte, nurbs, bezier, bildhauen, neu vernetzen, retopologie, teilen, berechnung, path tracing, webgpu, render-arbeitsbereich, renderwarteschlange, mp4, exr, entrauschen, physikalischer himmel, hdri, ies, schärfentiefe, lichtmischung, nebel, kaustik, live-ansicht, echtzeit, rundgang, betrachter, schattierung, knoten, materialbibliothek, materialx, decals, texturmalerei, backen, animieren, graph-editor, clips, formschlüssel, treiber, armatur, knochen, skinning, ik, zwangsbedingungen, physik, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D-Volumenkörper, stützen, wandstärke, aushöhlen, reparieren, einsteiger, assistenten, ihr rechner, einheiten, portugiesisch
-from: fa562a09
+from: 16d52810
 ---
 
 Das hat sich in ModelCraft 0.7 gegenüber 0.6 geändert. ModelCraft modelliert jetzt Netze ebenso wie Drücken/Ziehen-Geometrie, rendert auf der Grafikkarte und hat für jede Art von Arbeit einen Arbeitsbereich: Wählen Sie ihn in der Liste {{ui:Arbeitsbereich}} links in der Symbolleiste.

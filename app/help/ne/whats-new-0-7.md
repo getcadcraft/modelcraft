@@ -2,7 +2,7 @@
 title: 0.7 मा के नयाँ छ (पहिले)
 summary: मोडिफायरसहितका मेसहरू, स्कल्प्टिङ, UV र वक्र वस्तुहरू, ग्राफिक्स कार्डमा पाथ ट्रेसिङ र Render कार्यक्षेत्र, scatter र panorama सहितको वास्तविक-समय प्रत्यक्ष दृश्य, नोड सामग्री, हड्डी र फिजिक्ससहितको Animate कार्यक्षेत्र, USD, FBX, STEP र .3dm फाइलहरू, र Beginner शैलीसहितका प्रिन्ट उपकरणहरू।
 keywords: whats new 0.7, पहिलेको रिलिज, रिलिज नोट, चेंजलग, परिवर्तनहरू, 0.7, संस्करण, नयाँ सुविधाहरू, mesh, meshes, mesh कार्यक्षेत्र, मोडिफायरहरू, subdivision, crease, uv, unwrap, सिमहरू, वक्रहरू, curve objects, nurbs, bezier, स्कल्प्ट, remesh, retopology, विभाजन, गणना, पाथ ट्रेसिङ, webgpu, render कार्यक्षेत्र, render कतार, mp4, exr, denoise, physical sky, hdri, ies, गहिराइको फोकस, प्रकाश मिश्रण, कुहिरो, caustics, प्रत्यक्ष दृश्य, वास्तविक समय, हिँड्नुहोस्, scatter, panorama, tour, viewer, शेडिङ, नोड, node materials, सामग्री पुस्तकालय, materialx, decals, टेक्सचर पेन्टिङ, baking, animate, graph editor, clips, shape keys, drivers, armature, हड्डीहरू, skinning, ik, constraints, फिजिक्स, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D सोलिड, सपोर्ट, पर्खालको मोटाई, खोक्लो, मर्मत, beginner, सहायकहरू, तपाईंको मेसिन, एकाइहरू, पोर्चुगिज
-from: fa562a09
+from: 16d52810
 ---
 
 यो ModelCraft 0.7 मा के परिवर्तन भयो, 0.6 सँग तुलना गर्दा। ModelCraft ले अब पुश/पुल ज्यामितिसँगै मेसहरू पनि मोडेल गर्छ, ग्राफिक्स कार्डमा रेन्डर गर्छ, र हरेक प्रकारको कामका लागि एउटा कार्यक्षेत्र छ: यसलाई टुलबारको बायाँ तिरको {{ui:Workspace}} सूचीबाट छान्नुहोस्।

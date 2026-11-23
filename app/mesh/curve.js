@@ -21,17 +21,12 @@
  */
 import { Mesh } from '../mesh.js';
 import { earcut } from '../earcut.js';
+import { add3 as add, cross3 as cross, dot3 as dot, len3 as len, lerp3 as lerp, scale3 as mul, sub3 as sub } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
+import { ringArea as area2 } from '../geom2d.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 const TYPES = ['bezier', 'nurbs', 'poly'], HANDLES = ['auto', 'vector', 'free'];
 const LIMITS = { splines: 500, points: 20000, resolution: 64 };
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const len = (a) => Math.hypot(a[0], a[1], a[2]);
 const norm = (a) => { const l = len(a); return l > 0 ? mul(a, 1 / l) : [0, 0, 0]; };
-const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 
 // ---- data ----
 const fin = (x, d, lim = 1e7) => (typeof x === 'number' && Number.isFinite(x) && Math.abs(x) <= lim ? x : d);
@@ -270,7 +265,6 @@ function sweep(S, curve, P, F) {
   }
 }
 const ccw = (f, a, b, c) => (f[b * 2] - f[a * 2]) * (f[c * 2 + 1] - f[a * 2 + 1]) - (f[c * 2] - f[a * 2]) * (f[b * 2 + 1] - f[a * 2 + 1]);
-const area2 = (L) => { let a = 0; for (let i = 0; i < L.length; i++) { const p = L[i], q = L[(i + 1) % L.length]; a += p[0] * q[1] - q[0] * p[1]; } return a / 2; };
 const inside = (p, L) => { let c = false; for (let i = 0, j = L.length - 1; i < L.length; j = i++) { const a = L[i], b = L[j]; if (a[1] > p[1] !== b[1] > p[1] && p[0] < ((b[0] - a[0]) * (p[1] - a[1])) / (b[1] - a[1]) + a[0]) c = !c; } return c; };
 /** Each vertex of a loop moved d along its outward side (mitred, limited to 4 × d at sharp corners). */
 function offsetLoop(L, d) {

@@ -2,7 +2,7 @@
 title: Kipya katika 0.7 (cha awali)
 summary: Matundu yenye virekebishaji, uchongaji, UV na vitu vya mkunjo, ufuatiliaji wa njia kwenye kadi ya picha na eneo kazi la Tengeneza picha, mwonekano wa moja kwa moja wa wakati halisi wenye kutawanya na mionekano ya panorama, nyenzo za nodi, eneo kazi la Uhuishaji lenye mifupa na fizikia, faili za USD, FBX, STEP na .3dm, na zana za uchapishaji zenye mtindo wa Mwanzilishi.
 keywords: mpya katika 0.7, toleo la awali, maelezo ya toleo, mabadiliko, 0.7, toleo, vipengele vipya, matundu, eneo kazi la matundu, virekebishaji, subdivision, crease, uv, unwrap, mishono, mikunjo, vitu vya mkunjo, nurbs, bezier, uchongaji, remesh, retopology, gawanya, hesabu, ufuatiliaji wa njia, webgpu, eneo kazi la tengeneza picha, mp4, exr, kuondoa kelele, anga halisi, hdri, ies, kina cha uga, kuchanganya mwanga, ukungu, caustics, mwonekano wa moja kwa moja, wakati halisi, tembea, kutawanya, panorama, ziara, kitazamaji, ushadi, nodi, nyenzo za nodi, maktaba ya nyenzo, materialx, decals, kupaka umbile, kuoka, uhuishaji, mhariri wa grafu, klipu, funguo za umbo, viendeshi, kiunzi, mifupa, ngozi, ik, vizuizi, fizikia, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, vigumu vya 3d, misaada, unene wa ukuta, tupu, rekebisha, mwanzilishi, wasaidizi, kompyuta yako, vitengo, kireno
-from: fa562a09
+from: 16d52810
 ---
 
 Haya ndiyo yaliyobadilika katika ModelCraft 0.7, ikilinganishwa na 0.6. ModelCraft sasa inaunda matundu pamoja na jiometri ya kusukuma na kuvuta, inatengeneza picha kwenye kadi ya picha, na ina eneo kazi kwa kila aina ya kazi: lichague kwenye orodha ya {{ui:Eneo kazi}} upande wa kushoto wa upau wa zana.

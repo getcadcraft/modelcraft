@@ -121,6 +121,8 @@ $__views = ['iso', 'top', 'front', 'right', 'back', 'left', 'bottom'];   // labe
                 <button type="button" role="menuitem" data-export="ifc"><?= Lang::e('ui.export.ifc') ?></button>
                 <button type="button" role="menuitem" data-act="storeys"><?= Lang::e('ui.export.storeys') ?></button>
                 <button type="button" role="menuitem" data-act="massing"><?= Lang::e('ui.export.massing') ?></button>
+                <?php /* 0.11 SU.1814 (su-finish-11): part-link-mc.js. Works only for a group that came from BimCraft's Part links. */ ?>
+                <button type="button" role="menuitem" data-act="link-save-back" title="<?= Lang::e('partlink.mc.menu_title') ?>"><?= Lang::e('partlink.mc.menu') ?></button>
                 <button type="button" role="menuitem" data-export="dwg"><?= Lang::e('ui.export.dwg') ?></button>
                 <button type="button" role="menuitem" data-export="dxf"><?= Lang::e('ui.export.dxf') ?></button>
                 <hr>

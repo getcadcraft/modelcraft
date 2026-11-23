@@ -3,7 +3,7 @@ title: Slice for a resin printer
 summary: Slice the print stage's bed for a resin printer, hollow and support the part, look through the layers, save the printer's file, and find your exposure with the exposure test.
 section: tasks
 order: 108
-keywords: resin, resin printing, sla, msla, dlp, slicer, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, hollow, vent hole, raft, supports, exposure test, exposure ladder, calibration, layers, add-on
+keywords: resin, suggest a tilt, suction cup, peel force, bracing, resin printing, sla, msla, dlp, slicer, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, hollow, vent hole, raft, supports, exposure test, exposure ladder, calibration, layers, add-on
 ---
 
 The resin add-ons slice what is on the print bed into layer pictures for your printer's screen, and save the file your printer reads. They are free, with nothing locked, and are off until you switch them on.
@@ -27,6 +27,15 @@ Slice a part for resin, check the layers, save the file and copy it to your prin
 7. Pick the **File format**. If the card says none is added yet, press the button that reads Add and the format's name.
 8. Press {{ui:Preview layers}} and move the **Layer** slider. Floating pieces are ringed. The line under it gives the layers, time and the resin in mL, grams and cost.
 9. Press {{ui:Save the print file}}, check the summary and press {{ui:Save}}. Copy the file to your printer.
+
+## Tilt, suction cups, braces and the peel figure
+
+These four are estimates from the shape of the part. None has been tried on a real printer, so treat each as a hint and look at the layers.
+
+1. Press {{ui:Suggest a tilt}} under **Tilt (degrees)**. CadCraft tries tilts from 0 to 60 degrees and picks the one with the smallest largest layer, the least overhanging surface and no suction cup. It sets **Tilt (degrees)** and says what it found. The scoring weights are ours, not a printer maker's.
+2. After {{ui:Preview layers}}, a warning names cavities that open only toward the film. A cavity like that can hold suction when a layer peels. Tilt the part or add a hole. Pockets narrower than the cell size in the warning are not seen.
+3. With **Supports and a raft** on, tick **Brace tall supports** to add cross braces between tall thin pillars.
+4. The line under the preview gives the largest layer in cm2. It shows a force only if you enter a **Peel stress you measured** under **Bottom layers, lift and speeds**. Without your own measured number it shows the area alone.
 
 ## Find your exposure
 

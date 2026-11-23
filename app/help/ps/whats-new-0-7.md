@@ -2,7 +2,7 @@
 title: په 0.7 کې نوي شیان (پخوانی)
 summary: مشونه د ماډیفایرونو سره، سکلپټ کول، UVs او منحنۍ شیان، د ګرافیک کارت پر سر د رڼا لارې ټریسینګ او د رنډر کاري ساحه، ریل‌ټایم ژوندی لید د سکیټر او پانورامو سره، نوډ مواد، د Animate کاري ساحه د هډوکو او فزیک سره، USD، FBX، STEP او .3dm فایلونه، او د چاپ وسایل د پیل کوونکي سټایل سره.
 keywords: whats new 0.7, پخوانۍ خپرونه, د خپرونې یادښتونه, بدلونونه, 0.7, نسخه, نوي ځانګړتیاوې, مش, مشونه, د مش کاري ساحه, ماډیفایرونه, سب‌ډیویژن, ځړېدنه, uv, unwrap, درزونه, منحنۍ, د منحني شیان, nurbs, bezier, مجسمه کول, remesh, retopology, ویشل, محاسبه, path tracing, webgpu, د رنډر کاري ساحه, د رنډر کتار, mp4, exr, denoise, physical sky, hdri, ies, depth of field, د رڼا مخلوط, fog, caustics, ژوندی لید, real time, ګرځېدنه, scatter, panorama, tour, viewer, shading, nodes, د نوډ مواد, د موادو کتابتون, materialx, decals, texture painting, baking, animate, graph editor, clips, shape keys, drivers, armature, bones, skinning, ik, constraints, physics, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d solids, supports, د دیوال ضخامت, تش کول, ترمیم, پیل کوونکی, ماډلونه, ستاسو ماشین, واحدونه, پرتګالي
-from: fa562a09
+from: 16d52810
 ---
 
 دا هغه څه دي چې په ModelCraft 0.7 کې د 0.6 په پرتله بدل شول. ModelCraft اوس مشونه هم ماډلوي او هم فشارول/کشول جیومیټري، په ګرافیک کارت رنډر کوي، او د هرې ډول کار لپاره کاري ساحه لري: یې په د وسیلو بار کیڼ خوا کې د {{ui:کاري ساحه}} لیست کې وټاکئ.

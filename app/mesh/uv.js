@@ -23,6 +23,7 @@
  * `faces` = an array of face indices; missing or empty = every face that shows.
  */
 import { FL_SEAM, FL_HIDE, FL_SHARP } from '../mesh.js';
+import { cross3 as crs, dot3 as dt3, len3 as ln3, sub3 as sub, unit3 as norm3 } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 const TAU = Math.PI * 2;
 const live = (m, f) => !m.faceDead(f) && !(m.fFl[f] & FL_HIDE);
@@ -285,10 +286,6 @@ function pcg(A, b, Minv, n, { iters = 2000, tol = 1e-14 } = {}) {
 }
 
 // ---- unwrap ----
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const crs = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const dt3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const ln3 = (a) => Math.hypot(a[0], a[1], a[2]);
 const pos = (m, h) => { const v = m.hV[h] * 3; return [m.P[v], m.P[v + 1], m.P[v + 2]]; };
 /** Corner angles of a 3-D triangle. */
 function angles3(A, B, C) {
@@ -372,7 +369,6 @@ function pinsAndGuess(nW, wp) {
   for (let w = 0; w < nW; w++) { const p = sub([wp[w * 3], wp[w * 3 + 1], wp[w * 3 + 2]], A); init[w * 2] = dt3(p, e1); init[w * 2 + 1] = dt3(p, e2); }
   return { pins: [[a, 0, 0], [b, d, 0]], init };
 }
-const norm3 = (a) => { const l = ln3(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
 
 // ---- projections ----
 function bounds(m, list) {

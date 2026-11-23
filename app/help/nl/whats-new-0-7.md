@@ -2,7 +2,7 @@
 title: Wat is er nieuw in 0.7 (eerder)
 summary: Meshes met modifiers, boetseren, UV's en krommeobjecten, padtracing op de videokaart en een werkomgeving Renderen, een realtime live-weergave met verspreiding en panorama's, nodemateriaal, een werkomgeving Animeren met botten en fysica, USD-, FBX-, STEP- en .3dm-bestanden, en printtools met een Beginner-stijl.
 keywords: wat is er nieuw 0.7, eerdere uitgave, uitgavenotities, wijzigingslogboek, wijzigingen, 0.7, versie, nieuwe functies, mesh, meshes, mesh-werkomgeving, modifiers, subdivisie, kreuk, uv, ontvouwen, naden, krommen, krommeobjecten, nurbs, bézier, boetseren, opnieuw meshen, retopologie, verdelen, berekening, padtracing, webgpu, renderwerkomgeving, renderwachtrij, mp4, exr, denoise, fysieke lucht, hdri, ies, scherptediepte, lichtmenging, mist, caustics, live-weergave, realtime, lopen, verspreiden, panorama, tour, viewer, shading, nodes, nodemateriaal, materiaalbibliotheek, materialx, decals, texturen schilderen, bakken, animeren, grafiekeditor, clips, vormsleutels, drivers, armatuur, botten, skinning, ik, beperkingen, fysica, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d-volumes, steunen, wanddikte, uitholling, repareren, beginner, assistenten, uw computer, eenheden, portugees
-from: fa562a09
+from: 16d52810
 ---
 
 Dit is wat er in ModelCraft 0.7 is veranderd, vergeleken met 0.6. ModelCraft modelleert nu meshes naast geometrie van duwen en trekken, rendert op de videokaart, en heeft een werkomgeving voor elke soort werk: kies er een in de lijst {{ui:Werkomgeving}} links in de werkbalk.

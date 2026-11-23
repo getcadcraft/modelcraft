@@ -113,6 +113,7 @@ export const COMMANDS = [
   C('export.ifc', 'export', 'bi-building', X('ifc')),
   C('export.storeys', 'export', 'bi-layers', A('storeys')),
   C('export.massing', 'export', 'bi-buildings', A('massing')),   // 0.10 BK.44: push / pull massing as options for BimCraft (massing-mc.js)
+  C('file.link-save-back', 'file', 'bi-box-arrow-up-right', A('link-save-back'), { label: 'partlink.mc.menu' }),   // 0.11 SU.1814: File › Export › Save back to BimCraft (part-link-mc.js; same id as PartCraft's)
   C('export.dwg', 'export', 'bi-file-earmark-ruled', X('dwg')),
   C('export.dxf', 'export', 'bi-file-earmark-ruled', X('dxf')),
   C('export.png', 'export', 'bi-image', X('png')),
@@ -287,7 +288,7 @@ export const KEYSETS = {
 };
 
 const m = (label, items) => ({ label: 'input.m.' + label, items });
-const EXPORTS = ['export.glb', 'export.dae', 'export.obj', 'export.stl', 'export.ply', 'export.usd', 'export.ifc', 'export.storeys', 'export.massing', 'export.dwg', 'export.dxf'];
+const EXPORTS = ['export.glb', 'export.dae', 'export.obj', 'export.stl', 'export.ply', 'export.usd', 'export.ifc', 'export.storeys', 'export.massing', 'file.link-save-back', 'export.dwg', 'export.dxf'];
 const IMAGES = ['export.png', 'export.png2', 'export.pdf', 'export.print', 'export.print3d', 'export.render', 'export.video'];
 const FLIPS = ['edit.flip-x', 'edit.flip-y', 'edit.flip-z', 'edit.flipcopy-x', 'edit.flipcopy-y', 'edit.flipcopy-z'];
 const VIEWS = ['camera.iso', 'camera.top', 'camera.front', 'camera.right', 'camera.back', 'camera.left', 'camera.bottom'];

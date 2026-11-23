@@ -51,25 +51,33 @@ export function mountPlcUi({ api, t, getGraph, getLive, docApi, download }) {
 
   const style = el('style', { 'data-addon': 'flow-plcmode', text: CSS });
   document.head.append(style);
-  api.onDeactivate(() => { detach(); clearInterval(timer); style.remove(); });
+  api.onDeactivate(() => { detach(); style.remove(); });
 
   const say = (m, isBad = false) => { msg = m; bad = isBad; };
   const io = () => (engines ? engines.commission.ioList(getGraph()) : null);
   const map = () => setup.map || (io() ? defaultMap(io()) : []);
 
+  // PERF.75: the 50 ms scan and the 500 ms stats poll run only while a controller is attached (they did nothing but ask
+  // getLive() 20 times a second while idle); started by attachSoft / connectReal, stopped by detach.
+  let poll = 0;
   function detach() {
     if (link) { link.stop(); link = null; }
     soft = null;
+    clearInterval(timer); timer = 0; clearInterval(poll); poll = 0;
+  }
+  function running() {
+    if (!timer) timer = setInterval(scan, 50);
+    if (link && !poll) poll = setInterval(stats, 500);
   }
   // a live run that ends takes the controller with it; the soft PLC scans with the model's clock
-  timer = setInterval(() => {
+  function scan() {
     const live = getLive();
     if ((link || soft) && (!live || (link && link.bridge.sim !== live.sim) || (soft && soft.sim !== live.sim))) {
       const wasReal = !!link; detach(); say(t(wasReal ? 'plcmode.real.ended' : 'plcmode.soft.ended')); render(); return;
     }
     if (link && link.state === 'lost') { const why = link.lastError; detach(); say(t('plcmode.real.lost', { why }), true); render(); return; }
     if (soft && live) soft.tick();
-  }, 50);
+  }
 
   async function runFast() {
     if (!engines) return;
@@ -85,7 +93,7 @@ export function mountPlcUi({ api, t, getGraph, getLive, docApi, download }) {
     const prog = setup.program.trim() || engines.commission.starterProgram(getGraph());
     const s = new SoftLive({ engines, sim: live.sim, io: io(), program: prog, cycleMs: setup.cycleMs });
     if (!s.ok) { say(t('plcmode.soft.bad') + ' ' + s.problems.map((p) => p.text || p.message || '').slice(0, 2).join(' '), true); render(); return; }
-    soft = s; say(t('plcmode.soft.attached')); render();
+    soft = s; running(); say(t('plcmode.soft.attached')); render();
   }
   async function connectReal() {
     const live = getLive();
@@ -95,7 +103,7 @@ export function mountPlcUi({ api, t, getGraph, getLive, docApi, download }) {
     const c = conn();
     const l = new RealLink({ transport, bridge: new TagBridge({ sim: live.sim, io: io() }), map: map(), io: io(), unit: setup.unit, wordSwap: setup.wordSwap, host: c.host, port: c.port, cycleMs: setup.cycleMs });
     try { await l.connect(); } catch (e) { say(t('plcmode.real.refused', { why: String((e && e.message) || e).slice(0, 160) }), true); render(); return; }
-    link = l; l.start(); say(t('plcmode.real.on', { host: c.host, port: c.port })); render();
+    link = l; l.start(); running(); say(t('plcmode.real.on', { host: c.host, port: c.port })); render();
   }
 
   function mapEditor(rows, probs) {
@@ -178,8 +186,7 @@ export function mountPlcUi({ api, t, getGraph, getLive, docApi, download }) {
   }
   api.ui.panelSection({ id: 'flow-plcmode', title: t('plcmode.title'), side: 'right', render(e) { root = e; render(); } });
   // the status line of a running link follows the stats a few times a second
-  const poll = setInterval(() => { if (link && root && root.isConnected) { const m = root.querySelector('[data-plcstats]'); if (m && link) { const s = link.stats; m.textContent = t('plcmode.real.stats', { cycles: s.cycles, errors: s.errors, last: link.lastError || t('plcmode.res.none') }); } } }, 500);
-  api.onDeactivate(() => clearInterval(poll));
+  function stats() { if (link && root && root.isConnected) { const m = root.querySelector('[data-plcstats]'); if (m && link) { const s = link.stats; m.textContent = t('plcmode.real.stats', { cycles: s.cycles, errors: s.errors, last: link.lastError || t('plcmode.res.none') }); } } }
   return {
     refresh: render,
     state: () => ({ mode: setup.mode, real: !!link, soft: !!soft, available: transport.available }),

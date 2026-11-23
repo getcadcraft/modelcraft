@@ -2,7 +2,7 @@
 title: Co nowego w 0.7 (wcześniej)
 summary: Siatki z modyfikatorami, rzeźbienie, UV i obiekty krzywych, śledzenie promieni na karcie graficznej i obszar Render, widok na żywo w czasie rzeczywistym z rozrzutem i panoramami, materiały z węzłów, obszar Animacja z kośćmi i fizyką, pliki USD, FBX, STEP i .3dm oraz narzędzia druku ze stylem Początkujący.
 keywords: co nowego 0.7, wcześniejsze wydanie, informacje o wydaniu, dziennik zmian, zmiany, 0.7, wersja, nowe funkcje, siatka, siatki, obszar siatki, modyfikatory, podział powierzchni, zagięcie, uv, rozwijanie, szwy, krzywe, obiekty krzywych, nurbs, bezier, rzeźba, przebudowa siatki, retopologia, podział, obliczenia, śledzenie promieni, webgpu, obszar render, kolejka renderowania, mp4, exr, odszumianie, niebo fizyczne, hdri, ies, głębia ostrości, mieszanie świateł, mgła, kaustyka, widok na żywo, czas rzeczywisty, spacer, rozrzut, panorama, wycieczka, przeglądarka, cieniowanie, węzły, materiały węzłowe, biblioteka materiałów, materialx, naklejki, malowanie tekstur, zapiekanie, animacja, edytor wykresów, klipy, klucze kształtu, sterowniki, szkielet, kości, skinning, ik, ograniczenia, fizyka, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, bryły 3d, podpory, grubość ścianek, drążenie, naprawa, początkujący, asystenci, twój komputer, jednostki, portugalski
-from: fa562a09
+from: 16d52810
 ---
 
 To jest to, co zmieniło się w ModelCraft 0.7 w porównaniu z 0.6. ModelCraft modeluje teraz siatki oraz geometrię push/pull, renderuje na karcie graficznej i ma obszar pracy dla każdego rodzaju pracy: wybierz go na liście {{ui:Obszar roboczy}} po lewej stronie paska narzędzi.

@@ -2,7 +2,7 @@
 title: Hvað er nýtt í 0.7 (eldra)
 summary: Möskvar með breytingum, móta, UV- og ferilhlutir, geislarakning á skjákorti og myndgerðarvinnusvæði, rauntímasýn með dreifingu og víðmyndum, hnútaefni, hreyfivinnusvæði með beinum og eðlisfræði, USD-, FBX-, STEP- og .3dm-skrár, og prentverkfæri með byrjendastíl.
 keywords: hvað er nýtt 0.7, eldri útgáfa, útgáfuskýringar, breytingaskrá, breytingar, 0.7, útgáfa, nýir eiginleikar, möskvi, möskvar, möskvavinnusvæði, breytingar, undirskipting, fald, uv, afvefja, saumar, ferlar, ferilhlutir, nurbs, bezier, móta, endurmöskva, endurtopólógía, skipta, reikningur, geislarakning, webgpu, myndgerðarvinnusvæði, myndgerðarröð, mp4, exr, afhávaðun, eðlisfræðilegur himinn, hdri, ies, dýptarskerpa, ljósablöndun, þoka, caustics, lifandi sýn, rauntími, ganga, dreifing, víðmynd, sýnari, skygging, hnútar, hnútaefni, efnasafn, materialx, límmiðar, áferðarmálun, bökun, hreyfing, ferilritill, bútar, lykilsnið, drif, beinagrind, bein, skinning, ik, þvinganir, eðlisfræði, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, föst form, stoðir, veggþykkt, holað, lagfæring, byrjandi, aðstoðarmenn, þín tölva, einingar, portúgalska
-from: fa562a09
+from: 16d52810
 ---
 
 Þetta er það sem breyttist í ModelCraft 0.7, borið saman við 0.6. ModelCraft líkir nú eftir möskvum sem og rúmfræði með ýtingu og togi, myndgerir á skjákortinu og hefur vinnusvæði fyrir hverja tegund vinnu: veldu það í listanum {{ui:Vinnusvæði}} vinstra megin á tækjastikunni.

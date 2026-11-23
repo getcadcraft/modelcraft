@@ -2,7 +2,7 @@
 title: Mis on uut versioonis 0.7 (varasem)
 summary: Võrgud modifikaatoritega, skulptuur, UV-d ja kõveraobjektid, kiirte jälgimine graafikakaardil ja renderdamise tööruum, reaalajavaade hajutuse ja panoraamidega, sõlmematerjalid, animatsiooni tööruum luude ja füüsikaga, USD, FBX, STEP ja .3dm-failid ning printimise tööriistad algaja stiiliga.
 keywords: mis on uut 0.7, varasem versioon, versioonimärkused, muudatuste logi, muudatused, 0.7, versioon, uued funktsioonid, võrk, võrgud, võrgu tööruum, modifikaatorid, alajaotus, vagu, uv, lahuta, õmblused, kõverad, kõveraobjektid, nurbs, bezier, skulptuur, uuesti võrgusta, retopoloogia, jaga, arvutus, kiirte jälgimine, webgpu, renderdamise tööruum, renderdamise järjekord, mp4, exr, müra eemaldamine, füüsikaline taevas, hdri, ies, väljasügavus, valguse segamine, udu, kaustika, reaalajavaade, reaalajas, hajutus, panoraam, tuur, vaataja, varjutus, sõlmed, sõlmematerjalid, materialx, kleebised, tekstuurimaalimine, küpsetamine, animeeri, graafiku redaktor, klipid, kujuvõtmed, draiverid, armatuur, luud, nahastamine, ik, piirangud, füüsika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D-tahkised, toed, seina paksus, õõnestamine, paranda, algaja, assistendid, sinu masin, ühikud, portugali
-from: fa562a09
+from: 16d52810
 ---
 
 Need on muudatused ModelCraft 0.7 versioonis võrreldes versiooniga 0.6. ModelCraft modelleerib nüüd võrke lisaks lükka/tõmba geomeetriale, renderdab graafikakaardil ja sellel on tööruum iga liiki tööks: vali see tööriistariba vasakul olevast loendist {{ui:Tööruum}}.

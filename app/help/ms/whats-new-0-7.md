@@ -2,7 +2,7 @@
 title: Perkara baharu dalam 0.7 (terdahulu)
 summary: Jejaring dengan pengubah, pahatan, UV dan objek lengkung, penjejakan laluan pada kad grafik dan ruang kerja Render, paparan langsung dengan taburan dan panorama, bahan nod, ruang kerja Animasi dengan tulang dan fizik, fail USD, FBX, STEP dan .3dm, serta alat cetakan dengan gaya Pemula.
 keywords: perkara baharu 0.7, keluaran terdahulu, nota keluaran, senarai perubahan, perubahan, 0.7, versi, ciri baharu, jejaring, meshes, ruang kerja jejaring, pengubah, modifiers, subdivisi, subdivision, lipatan, crease, uv, buka lipatan, unwrap, jahitan, seams, lengkung, objek lengkung, curves, nurbs, bezier, pahat, sculpt, remesh, retopologi, bahagi, pengiraan, penjejakan laluan, path tracing, webgpu, ruang kerja render, giliran render, mp4, exr, nyahbunyi, denoise, langit fizikal, hdri, ies, kedalaman medan, pencampuran cahaya, kabus, caustics, paparan langsung, masa nyata, berjalan, taburan, scatter, panorama, lawatan, penonton, viewer, pembayangan, shading, nod, bahan nod, pustaka bahan, materialx, decal, lukisan tekstur, bakar, animasi, editor graf, klip, kunci bentuk, pemacu, drivers, armatur, tulang, bones, skinning, ik, kekangan, constraints, fizik, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, pepejal 3D, sokongan, ketebalan dinding, berongga, baiki, pemula, pembantu, mesin anda, unit, portugis
-from: fa562a09
+from: 16d52810
 ---
 
 Ini ialah perubahan dalam ModelCraft 0.7, berbanding 0.6. ModelCraft kini memodelkan jejaring serta geometri tolak/tarik, merender pada kad grafik, dan mempunyai ruang kerja untuk setiap jenis kerja: pilihnya dalam senarai {{ui:Ruang kerja}} di sebelah kiri bar alat.

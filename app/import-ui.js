@@ -9,9 +9,35 @@ import { importDXF, importDWG, importDAE } from './io.js';
 import { Model } from './model.js';
 import { ident } from './vec.js';
 import { decodePartsAsync } from './textin.js';
+import * as i18n from './i18n.js';
 
 export function mountImport(ctx) {
   const { model, host, tools, print, dynamicNote, hideHint, afterHistory, ctxDef, zoomExtents, fileHost, bytesOf, ask } = ctx;
+
+  /**
+   * 0.11 PERF.7: a glTF or OBJ is read, welded and built into meshes in the page's worker pool (import-job.js), and only grafted
+   * into the model here: the page thread no longer holds for seconds on a big file. null = do it on the page as before (no
+   * workers, a Draco file, a job that failed for another reason than the file, or ?import=page, which tests use for "before").
+   */
+  async function importInWorker(kind, file, companions, name, label) {
+    if (/[?&]import=page(&|$)/.test(location.search) || typeof Worker !== 'function') return null;
+    let pool;
+    try { pool = await (await import('./compute/runtime.js')).pagePool({ sceneBytes: file.size || 0 }); } catch { return null; }
+    let meshoptUrl = null;
+    try { meshoptUrl = import.meta.resolve('meshopt-decoder'); } catch { /* no import map entry: meshopt files are refused, as on the page without one */ }
+    const bytes = (await bytesOf(file)).buffer;
+    const comp = [];
+    for (const f of companions) comp.push({ name: f.name, bytes: (await bytesOf(f)).buffer });
+    let pkg;
+    try {
+      pkg = await pool.run(new URL('./import-job.js', import.meta.url).href, 'importJob', { kind, bytes, companions: comp, name, lang: i18n.catalog(), meshoptUrl },
+        { priority: 5, transfer: [bytes, ...comp.map((c) => c.bytes)] });
+    } catch (e) { console.warn('import in the worker failed, importing on the page', e); return null; }
+    if (!pkg || pkg.pageOnly) return null;
+    if (pkg.fail) throw new Error(pkg.fail);
+    const { graftImport } = await import('./import-job.js');
+    return model.change(label, (m) => { const x = graftImport(m, pkg); m.place(m.context(host.path).def, x.def.id, ident()); return x; }, [model.context(host.path).def.id]);
+  }
 
   /** 0.8 EG.60 (round 3): Organize › Furnish a room… — the selected floor face furnished by the shared planner (furnish-mc.js over lib/furnish)
    *  with the starter library's furniture, one group on the Furniture tag, one undo step; what did not fit goes to Problems as notes. */
@@ -181,15 +207,18 @@ export function mountImport(ctx) {
         print(importMessage(file.name, r.report) + ctx.skipped(r.report));
       } else if (ext === 'obj' || ext === 'ply' || ext === 'stl' || ext === 'abc' || ext === 'fbx') {
         // 0.7 XF.3 (io/): OBJ + MTL with textures (found among the files dropped with it), PLY and STL with colour, Alembic caches
-        const bytes = await bytesOf(file);
+        const bytes = ext === 'obj' ? null : await bytesOf(file);   // an OBJ is read by the worker (PERF.7), or below when it cannot
         const ctxId = model.context(host.path).def.id;
         const into = (label, build) => model.change(label, (m) => { const x = build(m); m.place(m.context(host.path).def, x.def.id, ident()); return x; }, [ctxId]);
         if (ext === 'obj') {
-          const { readObj, importObj } = await import('./io/obj.js');
-          const byName = new Map(companions.map((f) => [f.name.toLowerCase(), f]));
-          const resolve = async (u) => { const f = byName.get(String(u).split(/[\\/]/).pop().toLowerCase()); return f ? bytesOf(f) : null; };
-          const obj = await readObj(bytes, { resolve });
-          r = into(ctx.t('app.undo.import_obj'), (m) => importObj(m, obj, name));
+          r = await importInWorker('obj', file, companions, name, ctx.t('app.undo.import_obj'));
+          if (!r) {
+            const { readObj, importObj } = await import('./io/obj.js');
+            const byName = new Map(companions.map((f) => [f.name.toLowerCase(), f]));
+            const resolve = async (u) => { const f = byName.get(String(u).split(/[\\/]/).pop().toLowerCase()); return f ? bytesOf(f) : null; };
+            const obj = await readObj(await bytesOf(file), { resolve });
+            r = into(ctx.t('app.undo.import_obj'), (m) => importObj(m, obj, name));
+          }
           print(ctx.t('io.import.obj', { file: file.name, faces: r.report.faces, n: r.report.objects }) + (r.report.textures ? ' ' + ctx.t('io.import.textures', { n: r.report.textures }) : '') + ctx.skipped(r.report));
         } else if (ext === 'ply') {
           const { readPly, importPly } = await import('./io/ply.js');
@@ -220,10 +249,13 @@ export function mountImport(ctx) {
       } else {
         // glTF 2.0 (0.7 XF.1, io/gltf.js): read with its decoders (Draco, meshopt) loaded only when the file uses them,
         // a .gltf's own .bin and textures taken from the files dropped or picked with it
-        const bytes = await bytesOf(file);
         const { readGltfFile, importGltfScene, importMessage } = await import('./io/gltf.js');
-        const scene = await readGltfFile(bytes, { companions });
-        r = model.change(ctx.t('app.undo.import_gltf'), (m) => { const x = importGltfScene(m, scene, name); m.place(m.context(host.path).def, x.def.id, ident()); return x; }, [model.context(host.path).def.id]);
+        r = await importInWorker('gltf', file, companions, name, ctx.t('app.undo.import_gltf'));
+        if (!r) {
+          const bytes = await bytesOf(file);
+          const scene = await readGltfFile(bytes, { companions });
+          r = model.change(ctx.t('app.undo.import_gltf'), (m) => { const x = importGltfScene(m, scene, name); m.place(m.context(host.path).def, x.def.id, ident()); return x; }, [model.context(host.path).def.id]);
+        }
         print(importMessage(file.name, r.report) + ctx.skipped(r.report));
       }
       const iid = [...ctxDef().insts.keys()].pop();

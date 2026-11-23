@@ -2,7 +2,7 @@
 title: Noutăți în versiunea 0.7 (anterioară)
 summary: Plase cu modificatori, sculptare, UV-uri și obiecte curbe, trasare de cale pe placa grafică și un spațiu de lucru Randare, o vedere live în timp real cu împrăștiere și panorame, materiale cu noduri, un spațiu de lucru Animație cu oase și fizică, fișiere USD, FBX, STEP și .3dm, și unelte de imprimare cu stilul Începător.
 keywords: noutăți 0.7, versiune anterioară, note de lansare, jurnal de modificări, modificări, 0.7, versiune, funcții noi, plasă, plase, spațiu de lucru plasă, modificatori, subdiviziune, crestare, uv, desfășurare, cusături, curbe, obiecte curbe, nurbs, bezier, sculptare, remeshare, retopologie, divizare, calcul, trasare de cale, webgpu, spațiu de lucru randare, coada de randare, mp4, exr, reducere zgomot, cer fizic, hdri, ies, adâncime de câmp, amestecare lumini, ceață, caustice, vedere live, timp real, plimbare, împrăștiere, panoramă, tur, vizualizator, umbrire, noduri, materiale cu noduri, bibliotecă de materiale, materialx, decale, pictare pe textură, coacere, animație, clipuri, chei de forme, drivere, armătură, oase, ik, constrângeri, fizică, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, solide 3D, suporturi, grosimea peretelui, golire, reparare, începător, asistenți, calculator, unități, portugheză
-from: fa562a09
+from: 16d52810
 ---
 
 Aceasta este lista modificărilor din ModelCraft 0.7, comparativ cu 0.6. ModelCraft modelează acum și plase, pe lângă geometria de tip împinge/trage, randează pe placa grafică și are un spațiu de lucru pentru fiecare tip de lucru: alegeți-l din lista {{ui:Spațiu de lucru}} din stânga barei de instrumente.

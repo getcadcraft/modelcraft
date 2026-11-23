@@ -2,7 +2,7 @@
 title: 0.7 တွင် အသစ်ဖြစ်သည် (ယခင်)
 summary: modifiers ပါသော mesh များ၊ sculpting၊ UV နှင့် curve objects၊ graphics card ပေါ်ရှိ path tracing နှင့် Render အလုပ်နေရာ၊ scatter နှင့် panorama ပါသော real-time live view၊ node materials၊ bones နှင့် physics ပါသော Animate အလုပ်နေရာ၊ USD၊ FBX၊ STEP နှင့် .3dm ဖိုင်များ၊ Beginner style ပါသော print tools။
 keywords: 0.7 အသစ်, ယခင် ဗားရှင်း, ဗားရှင်း မှတ်စု, ပြောင်းလဲမှုမှတ်တမ်, ပြောင်းလဲမှုများ, 0.7, ဗားရှင်း, အသစ်အင်္ဂါရပ်များ, mesh, meshes, mesh အလုပ်နေရာ, modifiers, subdivision, crease, uv, unwrap, ချုပ်ရိုး, မျဉ်းကွေးများ, curve objects, nurbs, bezier, ပုံသွင်း, remesh, retopology, ခွဲ, တွက်ချက်မှု, path tracing, webgpu, Render အလုပ်နေရာ, Render တန်းစီစာရင်း, mp4, exr, denoise, ရုပ်ပိုင်း ကောင်းကင်, hdri, ies, depth of field, အလင်းရောနှော, မှိုင်း, caustics, live view, real time, လမ်းလျှောက်, ဖြန့်ကျဲ, panorama, tour, viewer, အရိပ်အရောင်, nodes, node materials, ပစ္စည်း စာကြည့်တိုက်, materialx, decals, texture ဆေးခြယ်ခြင်း, baking, animate, graph editor, clips, shape keys, drivers, armature, အရိုးများ, skinning, ik, constraints, ရူပဗေဒ, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D solid များ, ထောက်ပံ့ချက်များ, နံရံထူ, အတွင်းဖောက်, ပြုပြင်, စတင်သူ, အကူအညီပေးသူများ, သင့်စက်, ယူနစ်များ, ပေါ်တူဂီ
-from: fa562a09
+from: 16d52810
 ---
 
 ဤသည်မှာ ModelCraft 0.7 တွင် 0.6 နှင့် နှိုင်းယှဉ်၍ ပြောင်းလဲသွားခဲ့သည်များ ဖြစ်သည်။ ModelCraft သည် ယခု push/pull ဂျီသြမေတြီအပြင် mesh များကိုလည်း မော်ဒယ်ပြုလုပ်ပြီး graphics card ပေါ်တွင် ရေးဆွဲပြီး အလုပ်အမျိုးအစားတိုင်းအတွက် အလုပ်နေရာ တစ်ခုစီ ရှိသည်: toolbar ၏ ဘယ်ဘက်ရှိ {{ui:အလုပ်နေရာ}} စာရင်းတွင် ရွေးပါ။

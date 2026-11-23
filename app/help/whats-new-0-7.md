@@ -2,7 +2,7 @@
 title: What's new in 0.7 (earlier)
 summary: Meshes with modifiers, sculpting, UVs and curve objects, path tracing on the graphics card and a Render workspace, a real-time live view with scatter and panoramas, node materials, an Animate workspace with bones and physics, USD, FBX, STEP and .3dm files, and print tools with a Beginner style.
 section: start
-order: 6
+order: 7
 keywords: whats new 0.7, earlier release, release notes, changelog, changes, 0.7, version, new features, mesh, meshes, mesh workspace, modifiers, subdivision, crease, uv, unwrap, seams, curves, curve objects, nurbs, bezier, sculpt, remesh, retopology, divide, calculation, path tracing, webgpu, render workspace, render queue, mp4, exr, denoise, physical sky, hdri, ies, depth of field, light mixing, fog, caustics, live view, real time, walk, scatter, panorama, tour, viewer, shading, nodes, node materials, material library, materialx, decals, texture painting, baking, animate, graph editor, clips, shape keys, drivers, armature, bones, skinning, ik, constraints, physics, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d solids, supports, wall thickness, hollow, repair, beginner, assistants, your machine, units, portuguese
 ---
 

@@ -2,7 +2,7 @@
 title: Jaunumi 0.7 versijā (agrāk)
 summary: Tīkli ar modifikatoriem, skulptēšana, UV un līkņu objekti, ceļa izsekošana grafikas kartē un Renderēšanas darba vide, reāllaika tiešraides skats ar izkliedi un panorāmām, mezglu materiāli, Animācijas darba vide ar kauliem un fiziku, USD, FBX, STEP un .3dm faili, kā arī drukas rīki ar iesācēju stilu.
 keywords: jaunumi 0.7, iepriekšējais izlaidums, izlaiduma piezīmes, izmaiņu žurnāls, izmaiņas, 0.7, versija, jaunas funkcijas, tīkls, tīkli, tīkla darba vide, modifikatori, sadalīšana, šķautne, uv, izvērst, šuves, līknes, līkņu objekti, nurbs, bezjē, skulptēt, pārveidot tīklu, retopoloģija, dalīt, aprēķins, ceļa izsekošana, webgpu, renderēšanas darba vide, renderēšanas rinda, mp4, exr, trokšņu samazināšana, fiziskās debesis, hdri, ies, lauka dziļums, gaismu sajaukšana, migla, kaustika, tiešraides skats, reāllaiks, staigāt, izkliede, panorāma, tūre, skatītājs, ēnojums, mezgli, mezglu materiāli, materiālu bibliotēka, materialx, uzlīmes, tekstūras krāsošana, cepšana, animēt, grafiku redaktors, griezumi, atslēgas kadri, draiveri, skelets, kauli, ādošana, ik, ierobežojumi, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D cietie ķermeņi, balsti, sienas biezums, iedobums, labošana, iesācējs, asistenti, jūsu dators, vienības, portugāļu
-from: fa562a09
+from: 16d52810
 ---
 
 Šeit ir izmaiņas ModelCraft 0.7 versijā salīdzinājumā ar 0.6. ModelCraft tagad modelē tīklus, kā arī ģeometriju, ko stumj un velk, renderē grafikas kartē un katram darba veidam ir sava darba vide: izvēlieties to sarakstā {{ui:Darba vide}} rīkjoslas kreisajā pusē.

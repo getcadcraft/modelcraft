@@ -2,7 +2,7 @@
 title: Nyheder i 0.7 (tidligere)
 summary: Net med modifikatorer, skulptering, UV'er og kurveobjekter, path tracing på grafikkortet og et Render-arbejdsområde, en levende visning i realtid med spredning og panoramaer, nodematerialer, et Animate-arbejdsområde med knogler og fysik, USD-, FBX-, STEP- og .3dm-filer, og printværktøjer med en Begynder-stil.
 keywords: nyheder 0.7, tidligere udgivelse, udgivelsesnoter, changelog, ændringer, 0.7, version, nye funktioner, net, net-arbejdsområde, modifikatorer, underinddeling, fold, uv, afvikl, søm, kurver, kurveobjekter, nurbs, bezier, skulptér, genopbyg net, retopologi, del, beregning, path tracing, webgpu, render-arbejdsområde, renderkø, mp4, exr, støjreduktion, fysisk himmel, hdri, ies, skarphedsdybde, lysblanding, tåge, kaustik, levende visning, realtid, gå, spredning, panorama, rundtur, viewer, shading, noder, nodematerialer, materialebibliotek, materialx, dekaler, teksturmaling, baking, animér, grafeditor, klip, formnøgler, drivere, armatur, knogler, skinning, ik, begrænsninger, fysik, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d-legemer, understøtninger, vægtykkelse, udhulning, reparation, begynder, assistenter, din maskine, enheder, portugisisk
-from: fa562a09
+from: 16d52810
 ---
 
 Dette er, hvad der er ændret i ModelCraft 0.7 sammenlignet med 0.6. ModelCraft modellerer nu net ligesom skub/træk-geometri, renderer på grafikkortet og har et arbejdsområde til hver type arbejde. Vælg det i listen {{ui:Arbejdsområde}} til venstre på værktøjslinjen.

@@ -2,7 +2,7 @@
 title: Có gì mới trong 0.7 (trước đó)
 summary: Lưới với bộ điều chỉnh, điêu khắc, UV và đối tượng đường cong, dò tia đường đi trên card đồ họa và không gian làm việc Kết xuất, xem trực tiếp theo thời gian thực với rải cây và toàn cảnh, vật liệu bằng nút, không gian làm việc Hoạt hình với xương và vật lý, các tệp USD, FBX, STEP và .3dm, cùng công cụ in với kiểu Người mới.
 keywords: có gì mới 0.7, phiên bản trước, ghi chú phát hành, nhật ký thay đổi, thay đổi, 0.7, phiên bản, tính năng mới, lưới, không gian làm việc lưới, bộ điều chỉnh, chia nhỏ, nếp gấp, uv, trải phẳng, đường nối, đường cong, đối tượng đường cong, nurbs, bezier, điêu khắc, tạo lại lưới, dựng lại topology, chia, phép tính, dò tia đường đi, webgpu, không gian làm việc kết xuất, hàng đợi kết xuất, mp4, exr, khử nhiễu, bầu trời vật lý, hdri, ies, độ sâu trường ảnh, trộn ánh sáng, sương mù, caustics, xem trực tiếp, thời gian thực, đi bộ, rải, toàn cảnh, trình xem, đổ bóng, bộ nút, vật liệu nút, thư viện vật liệu, materialx, decal, vẽ texture, nung, hoạt hình, biểu đồ đường cong, clip, khóa hình dạng, bộ điều khiển, khung xương, skinning, ik, ràng buộc, vật lý, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, khối đặc 3d, giá đỡ, độ dày thành, làm rỗng, sửa chữa, người mới, trợ lý, máy của bạn, đơn vị, tiếng Bồ Đào Nha
-from: fa562a09
+from: 16d52810
 ---
 
 Đây là những gì đã thay đổi trong ModelCraft 0.7, so với 0.6. ModelCraft giờ mô hình hóa cả lưới lẫn hình học đẩy/kéo, kết xuất trên card đồ họa, và có một không gian làm việc cho mỗi loại công việc: chọn trong danh sách {{ui:Không gian làm việc}} ở bên trái thanh công cụ.

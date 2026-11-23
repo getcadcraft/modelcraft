@@ -66,7 +66,7 @@ export function mountPrintTools(ctx) {
     return [
       el('div', { className: 'mc-guide-top' },
         el('p', { className: 'mc-guide-step' }, t('app.ptool.eyebrow')),
-        el('button', { type: 'button', className: 'mc-linkbtn', dataset: { ptoolClose: '' }, title: t('app.ptool.close'), 'aria-label': t('app.ptool.close'), onclick: () => close() }, el('i', { className: 'bi bi-x-lg', 'aria-hidden': 'true' }))),
+        el('button', { type: 'button', className: 'mc-linkbtn', dataset: { ptoolClose: '' }, title: t('app.ptool.close'), 'aria-label': t('app.ptool.close'), onclick: close }, el('i', { className: 'bi bi-x-lg', 'aria-hidden': 'true' }))),
       el('h2', { className: 'mc-guide-h', id: 'mc-ptool-h' }, t('app.ptool.' + name + '.h')),
     ];
   }
@@ -300,11 +300,11 @@ export function mountPrintTools(ctx) {
   }
 
   const TOOLS = { supports: { run: runSupports, draw: drawSupports }, walls: { run: runWalls, draw: drawWalls }, hollow: { run: runHollow, draw: drawHollow }, repair: { run: runRepair, draw: drawRepair } };
-  TOOLS.split = splitTool({ ctx, card, overlay, el, t, number, radio, soon: () => soon(), close: () => close(), toM, active: () => tool === 'split' });   // 0.8 SU.929 sx-split
+  TOOLS.split = splitTool({ ctx, card, overlay, el, t, number, radio, soon, close, toM, active: () => tool === 'split' });   // 0.8 SU.929 sx-split
 
   // a field's change redraws the card after the event (removing the field inside its own change/blur event throws)
   let soonT = 0;
-  const soon = () => { clearTimeout(soonT); soonT = setTimeout(() => refresh(true), 0); };
+  function soon() { clearTimeout(soonT); soonT = setTimeout(() => refresh(true), 0); }
   function refresh(force) {
     if (!tool) return;
     const now = choiceSig();

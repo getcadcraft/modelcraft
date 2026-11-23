@@ -2,7 +2,7 @@
 title: Waxa cusub ee 0.7 (hore)
 summary: Meshes oo leh modifiers, sculpting, UV-yo iyo curve objects, path tracing kaarka garaafka iyo goobta Rendarka, live view oo wakhti dhab ah oo leh scatter iyo panoramas, node materials, goobta Animate oo leh bones iyo physics, USD, FBX, STEP iyo faylal .3dm, iyo qalabka daabacaadda oo leh style-ka Bilowga.
 keywords: waxa cusub 0.7, nooca hore, release notes, changelog, isbeddel, 0.7, nooca, astaamo cusub, mesh, meshes, goobta mesh, beddelayaal, subdivision, crease, uv, unwrap, xagallo, curves, curve objects, nurbs, bezier, sculpt, remesh, retopology, qaybi, xisaab, path tracing, webgpu, goobta rendarka, safka rendarka, mp4, exr, denoise, physical sky, hdri, ies, depth of field, light mixing, fog, caustics, live view, wakhti dhab ah, socod, scatter, panorama, tour, viewer, shading, nodes, node materials, maktabadda agabka, materialx, decals, texture painting, baking, animate, tafatiraha grafka, clips, shape keys, drivers, armature, bones, skinning, ik, constraints, physics, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d solids, supports, ballaca darbiga, dhex-madhan, hagaaji, bilowga, kaaliyayaasha, kombiyuutarkaaga, units, boortaqiis
-from: fa562a09
+from: 16d52810
 ---
 
 Tanu waa waxa isbeddelay ModelCraft 0.7, marka la barbardhigo 0.6. ModelCraft hadda wuxuu moodeelaa meshes sida uu moodeelayo geometry-ga push/pull, wuxuu rendarka ku sameeyaa kaarka garaafka, wuxuuna leeyahay goob shaqo kasta oo shaqo ah: dooro gudaha liiska {{ui:Goobta shaqada}} ee dhinaca bidix ee toolbar-ka.

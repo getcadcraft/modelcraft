@@ -2,7 +2,7 @@
 title: Kas naujo 0.7 versijoje (ankstesnė)
 summary: Tinkleliai su modifikatoriais, skulptūra, UV ir kreivių objektai, kelio sekimas grafikos plokštėje ir Atvaizdavimo darbo sritis, realaus laiko gyvasis vaizdas su išbarstymu ir panoramomis, mazgų medžiagos, Animacijos darbo sritis su kaulais ir fizika, USD, FBX, STEP ir .3dm failai bei spausdinimo įrankiai su Pradedančiojo stiliumi.
 keywords: kas naujo 0.7, ankstesnė versija, išleidimo pastabos, pakeitimai, pokyčiai, 0.7, versija, naujos funkcijos, tinklelis, tinkleliai, tinklelio darbo sritis, modifikatoriai, paviršiaus skaidymas, raukšlė, uv, išskleisti, siūlės, kreivės, kreivių objektai, nurbs, bezjė, skulptūra, perkurti tinklą, retopologija, padalyti, skaičiavimas, kelio sekimas, webgpu, atvaizdavimo darbo sritis, atvaizdavimo eilė, mp4, exr, triukšmo šalinimas, fizinis dangus, hdri, ies, lauko gylis, šviesų maišymas, rūkas, kaustikai, gyvasis vaizdas, realus laikas, vaikščiojimas, išbarstymas, panorama, turas, peržiūros programa, šešėliavimas, mazgai, mazgų medžiagos, medžiagų biblioteka, materialx, lipdukai, tekstūros dažymas, išdeginimas, animacija, grafikų redaktorius, klipai, formų raktai, tvarkyklės, karkasas, kaulai, odos apvalkalas, ik, apribojimai, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D kietieji kūnai, atramos, sienelės storis, ištuštinimas, taisymas, pradedantysis, asistentai, jūsų kompiuteris, vienetai, portugalų
-from: fa562a09
+from: 16d52810
 ---
 
 Tai, kas pasikeitė ModelCraft 0.7 versijoje, lyginant su 0.6. ModelCraft dabar modeliuoja tinklelius ir taip pat stumimo/traukimo geometriją, atvaizduoja grafikos plokštėje ir turi darbo sritį kiekvienam darbo tipui: pasirinkite ją sąraše {{ui:Darbo sritis}} įrankių juostos kairėje.

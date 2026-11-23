@@ -28,6 +28,7 @@ import { sniffImage } from './gltf-read.js';
 import { tgaToPng } from './tga.js';
 import { t } from '../i18n.js';
 import { decodeParts, linesOf, isParts, lengthOf } from '../textin.js';   // 0.10 PERF.20: the text is read a line at a time, never as one string
+import { TextChunks } from '../chunks.js';   // 0.11 PERF.26: the export is written in ~1 MB parts (lib/textout), never one array of lines + one join
 
 const MAX = 2000000;
 const MAX_TEXT = 64 * 1048576;
@@ -277,8 +278,29 @@ const zy = (p) => [p[0], p[2], -p[1]];
 const extOf = (mime) => ({ 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' }[mime] || 'png');
 const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 60) || 'texture';
 
+/** Does any face exportObj writes carry a paint (its own or its placement's)? With none it writes no .mtl, no mtllib and no usemtl. */
+function anyPainted(model) {
+  let found = false;
+  const cs = [];
+  model.walk((d, wm, path, pc) => {
+    if (found) return;
+    if (d.mesh) {
+      const M = d.mesh;
+      for (let f = 0; f < M.nf && !found; f++) { if (M.fFl[f] & 1) continue; cs.length = 0; M.faceCorners(f, cs); if (cs.length >= 3 && (M.facePaint(f) || pc)) found = true; }
+    } else for (const f of d.faces.values()) if ((f.color || pc) && len(faceNormal(d, f))) { found = true; break; }
+  });
+  return found;
+}
+
+/**
+ * The OBJ text; 0.11 PERF.26: `obj` is out.output() of a TextChunks: the same string as before up to 300 M characters, a Blob
+ * past that (the host's download takes either). The lines are exactly those of 0.10's join (tools/modelcraft-test/test-writers-11.mjs).
+ */
 export function exportObj(model, { base = 'model' } = {}) {
-  const lines = ['# ModelCraft OBJ export — meters, Y up (converted from the model\'s Z up)', 'mtllib ' + safe(base) + '.mtl'];   // i18n-ignore: written into the file
+  const painted = anyPainted(model);
+  const lines = new TextChunks('\n');
+  lines.add('# ModelCraft OBJ export — meters, Y up (converted from the model\'s Z up)');   // i18n-ignore: written into the file
+  if (painted) lines.add('mtllib ' + safe(base) + '.mtl');
   const report = { objects: 0, faces: 0, textures: 0 };
   const matNames = new Map();
   const images = [];
@@ -363,7 +385,7 @@ export function exportObj(model, { base = 'model' } = {}) {
     for (const k of ts) lines.push('vt ' + k);
     for (const k of ns) lines.push('vn ' + k);
     for (const f of fl) {
-      if (f.mat !== curMat) { lines.push('usemtl ' + f.mat); curMat = f.mat; }
+      if (f.mat !== curMat) { if (painted) lines.push('usemtl ' + f.mat); curMat = f.mat; }
       lines.push(f.text);
     }
     vBase += vs.length; tBase += ts.length; nBase += ns.length;
@@ -378,8 +400,8 @@ export function exportObj(model, { base = 'model' } = {}) {
     if (paint && isImagePaint(paint) && imageFile.has(imageId(paint))) mtl.push('map_Kd ' + imageFile.get(imageId(paint)));
   }
   // nothing painted: no materials file at all (as io.js did)
-  if ([...matNames.keys()].every((k) => k === '')) return { obj: lines.filter((l) => !/^(mtllib|usemtl) /.test(l)).join('\n') + '\n', mtl: null, mtlName: null, images, report };
-  return { obj: lines.join('\n') + '\n', mtl: mtl.join('\n') + '\n', mtlName: safe(base) + '.mtl', images, report };
+  if (!painted) return { obj: lines.finish(true).output('text/plain'), mtl: null, mtlName: null, images, report };
+  return { obj: lines.finish(true).output('text/plain'), mtl: mtl.join('\n') + '\n', mtlName: safe(base) + '.mtl', images, report };
 }
 
 function unb64(s) {

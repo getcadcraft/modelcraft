@@ -2,7 +2,7 @@
 title: 0.7 හි නව දේ (පෙර)
 summary: දැලරාමු සහ modifiers, sculpting, UV සහ වක්‍ර වස්තු, ග්‍රැෆික්ස් කාඩ්පතෙන් path tracing සහ Render වැඩ ඉඩ, scatter සහ panorama සහිත තත්‍ය-කාලීන සජීවී දසුන, node ද්‍රව්‍ය, bones සහ physics සහිත Animate වැඩ ඉඩ, USD, FBX, STEP සහ .3dm ගොනු, සහ Beginner ශෛලිය සහිත මුද්‍රණ මෙවලම්.
 keywords: whats new 0.7, පෙර නිකුතුව, නිකුත් සටහන්, changelog, වෙනස්කම්, 0.7, අනුවාදය, නව විශේෂාංග, mesh, දැලරාමු, mesh වැඩ ඉඩ, modifiers, subdivision, crease, uv, unwrap, මැලවුම්, වක්‍ර, වක්‍ර වස්තු, nurbs, bezier, sculpt, remesh, retopology, divide, ගණනය කිරීම, path tracing, webgpu, render වැඩ ඉඩ, render queue, mp4, exr, denoise, physical sky, hdri, ies, depth of field, light mixing, fog, caustics, live view, තත්‍ය කාලය, walk, scatter, panorama, tour, viewer, shading, nodes, node ද්‍රව්‍ය, ද්‍රව්‍ය පුස්තකාලය, materialx, decals, texture painting, baking, animate, graph editor, clips, shape keys, drivers, armature, bones, skinning, ik, constraints, physics, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D ඝන වස්තු, supports, බිත්තියේ ඝනකම, hollow, repair, beginner, සහායකයින්, ඔබේ යන්ත්‍රය, ඒකක, පෘතුගීසි
-from: fa562a09
+from: 16d52810
 ---
 
 මෙය ModelCraft 0.7 හි, 0.6 හා සසඳන විට, වෙනස් වූ දේයි. ModelCraft දැන් තල්ලු/අදින්න ජ්‍යාමිතිය මෙන්ම දැලරාමු ද මොඩල කරයි, ග්‍රැෆික්ස් කාඩ්පත මත රෙන්ඩර් කරයි, සහ සෑම වර්ගයකම වැඩ සඳහා වැඩ ඉඩක් ඇත: ටූල්බාරයේ වම් පස ඇති {{ui:වැඩ ඉඩ}} ලැයිස්තුවෙන් එක තෝරන්න.

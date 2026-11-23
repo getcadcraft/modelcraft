@@ -2,7 +2,7 @@
 title: 0.7 ގައި އާ ކަންތައް (ކުރީގެ)
 summary: ޢަމަލުތައް އާ މޮޑިފަޔާތަކާއެކު މެޝްތައް، ސްކަލްޕްޓިންގ، UVs އަދި ވަޅު އޮބްޖެކްޓްތައް، ގްރާފިކްސް ކާޑުގައި ޕާތް ޓްރޭސިންގ އަދި ރެންޑަރ ވޯކްސްޕޭސް، ސްކޭޓަރ އާއި ޕެނޯރަމާ ހުންނަ ރިއަލް ޓައިމް ލައިވް ވިއު، ނޯޑް މެޓީރިއަލްތައް، Animate ވޯކްސްޕޭސް ބޯންސާއި ފިޒިކްސާއެކު، USD، FBX، STEP އަދި .3dm ފައިލްތައް، އަދި ޕްރިންޓް ޓޫލްސް ބިގިނާ ސްޓައިލްއާއެކު.
 keywords: 0.7 ގައި އާ ކަންތައް، ކުރީގެ ރިލީޒް، ރިލީޒް ނޯޓްސް، ޗޭންޖްލޮގް، ބަދަލުތައް، 0.7، ވާރޝަން، އާ ފީޗަރތައް، މެޝް، މެޝްތައް، މެޝް ވޯކްސްޕޭސް، މޮޑިފަޔާތައް، ސަބްޑިވިޝަން، ކްރީޒް، uv، އަންރެޕް، ސީމްސް، ވަޅުތައް، curve objects، nurbs، bezier، sculpt، remesh، retopology، divide، calculation، path tracing، webgpu، render workspace، render queue، mp4، exr، denoise، physical sky، hdri، ies، depth of field، light mixing، fog، caustics، live view، real time، walk، scatter، panorama، tour، viewer، shading، nodes، node materials، material library، materialx، decals، texture painting، baking، animate، graph editor، clips، shape keys، drivers، armature، bones، skinning، ik، constraints، physics، usd، usdz، gltf، fbx، step، 3dm، alembic، ply، acis، 3d solids، supports، wall thickness، hollow، repair، beginner، assistants، your machine، units، portuguese
-from: fa562a09
+from: 16d52810
 ---
 
 ModelCraft 0.7 ގައި ބަދަލުވި ކަންތައް، 0.6 އާ ބެހޭގޮތުން. މިހާރު ModelCraft މެޝްތައް ފުށުގައި ސައިޒްތަކަށް ފިޔަވަނީ ފުރާ ފުރަތަމަ ޖިއޮމެޓްރީ ފަދައިން، ރެންޑަރ ކުރަނީ ގްރާފިކްސް ކާޑުގައި، އަދި ކޮންމެ ވާހަކައަކަށް ވޯކްސްޕޭސް ވެއެވެ: ނެވިގޭޝަން ޓޫލްބާރުގެ ކަނާތު ފަރާތުގައި {{ui:ވޯކްސްޕޭސް}} ލިސްޓުން ނަގާ.

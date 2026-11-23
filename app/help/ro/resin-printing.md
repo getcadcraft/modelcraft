@@ -1,42 +1,51 @@
 ---
 title: Feliere pentru o imprimantă cu rășină
-summary: Felierea platformei de imprimare pentru o imprimantă cu rășină, golirea și susținerea piesei, verificarea straturilor, salvarea fișierului imprimantei și aflarea expunerii cu testul de expunere.
-keywords: rășină, imprimare cu rășină, sla, msla, dlp, feliere, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, gol, orificiu de ventilare, suport de bază, suporturi, test de expunere, scară de expunere, calibrare, straturi, supliment
-from: 83c394e1
+summary: Felierea platformei de imprimare pentru o imprimantă cu rășină, golirea și susținerea piesei, parcurgerea straturilor, salvarea fișierului imprimantei și găsirea expunerii potrivite cu testul de expunere.
+keywords: rășină, sugerare înclinare, ventuză, forță de desprindere, contravântuire, imprimare cu rășină, sla, msla, dlp, slicer, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, golire, orificiu de aerisire, plută, suporturi, test de expunere, scară de expunere, calibrare, straturi, supliment
+from: 8cc12858
 ---
 
-Suplimentele pentru rășină taie ce se află pe platforma de imprimare în imagini de strat pentru ecranul imprimantei și salvează fișierul pe care îl citește imprimanta. Sunt gratuite, fără funcții blocate, și rămân oprite până când sunt activate.
+Suplimentele pentru rășină feliază ce se află pe platforma de imprimare în imagini de strat pentru ecranul imprimantei și salvează fișierul pe care îl citește imprimanta. Sunt gratuite, fără nimic blocat, și rămân dezactivate până la activare.
 
 :::note
 Niciun fișier nu a fost încă încărcat pe o imprimantă reală. Fișierele au fost citite doar de cititoarele proprii ale CadCraft, iar suporturile sunt noi. Verificați straturile și rulați prima imprimare manual.
 :::
 
-## Ce veți face
+## Ce urmează să faceți
 
-Tăiați o piesă pentru rășină, verificați straturile, salvați fișierul și copiați-l pe imprimantă.
+Feliați o piesă pentru rășină, verificați straturile, salvați fișierul și copiați-l pe imprimantă.
 
 ## Pași
 
-1. Deschideți {{ui:Settings}} › {{ui:Add-ons}} și activați suplimentul de feliere pentru rășină și suplimentul pentru formatul de fișier al imprimantei (Elegoo GOO, SL1, Chitubox sau Anycubic). Puteți apăsa și {{ui:Add resin printing}} de pe cardul etapei de imprimare.
-2. Puneți piesa pe platforma de imprimare, ca în [Așezarea lucrurilor pe platforma de imprimare](topic:print-stage), apoi alegeți {{ui:Resin}} lângă **Imprimare cu**.
-3. Sub **Setări de imprimare cu rășină**, alegeți **Imprimantă** și **Rășină**. Cardul arată dimensiunea ecranului în pixeli. Acestea sunt dimensiunile publicate de producător, de verificat pentru imprimanta folosită; le puteți edita sub Personalizat.
-4. Setați **Înălțimea stratului (mm)**, **Expunere (s)** și **Expunere inferioară (s)**. Valorile pentru fiecare rășină sunt doar un punct de plecare.
-5. Bifați **Goală, cu orificiu de ventilare** dacă doriți o piesă goală și setați **Perete (mm)** și **Lățimea orificiului (mm)**.
-6. Bifați **Suporturi și bază** și alegeți **Densitatea suporturilor**: Ușoară, Medie sau Mare.
-7. Alegeți **Format de fișier**. Dacă cardul spune că niciun format nu este adăugat încă, apăsați butonul care scrie Adăugare și numele formatului.
-8. Apăsați {{ui:Preview layers}} și mutați cursorul **Strat**. Piesele flotante sunt încercuite. Rândul de sub el dă straturile, timpul și rășina în mL, grame și cost.
-9. Apăsați {{ui:Save the print file}}, verificați rezumatul și apăsați {{ui:Save}}. Copiați fișierul pe imprimantă.
+1. Deschideți {{ui:Setări}} › {{ui:Suplimente}} și activați suplimentul de feliere pentru rășină și suplimentul pentru formatul de fișier al imprimantei (Elegoo GOO, SL1, Chitubox sau Anycubic). Puteți apăsa și pe {{ui:Adăugare imprimare cu rășină}} de pe cardul etapei de imprimare.
+2. Puneți piesa pe platformă, ca în [Plasarea obiectelor pe platforma de imprimare](topic:print-stage), apoi alegeți {{ui:Rășină}} lângă **Imprimare cu**.
+3. Sub **Setări de imprimare cu rășină**, alegeți **Imprimanta** și **Rășina**. Cardul arată dimensiunea ecranului în pixeli. Acestea sunt dimensiunile publicate de producător, așa că verificați-le pe cele ale imprimantei; le puteți modifica la Personalizat.
+4. Setați **Înălțimea stratului (mm)**, **Expunerea (s)** și **Expunerea de bază (s)**. Valorile pentru fiecare rășină sunt doar un punct de plecare.
+5. Bifați **Golire, cu orificiu de aerisire** dacă doriți o piesă golită și setați **Peretele (mm)** și **Lățimea orificiului (mm)**.
+6. Bifați **Suporturi și plută** și alegeți **Densitatea suporturilor**: Ușoară, Medie sau Mare.
+7. Alegeți **Formatul fișierului**. Dacă cardul spune că niciun format nu este adăugat încă, apăsați butonul care scrie Adăugare și numele formatului.
+8. Apăsați {{ui:Previzualizare straturi}} și mutați cursorul **Strat**. Piesele plutitoare sunt încercuite. Linia de sub acesta indică numărul de straturi, timpul și rășina, în mL, grame și cost.
+9. Apăsați {{ui:Salvare fișier de imprimare}}, verificați sumarul și apăsați {{ui:Salvare}}. Copiați fișierul pe imprimantă.
 
-## Aflați expunerea
+## Înclinare, ventuze, contravântuiri și valoarea forței de desprindere
 
-1. Activați suplimentul de test de expunere din {{ui:Settings}} › {{ui:Add-ons}}.
-2. Apăsați {{ui:Put the test part on the bed}}.
-3. Apăsați {{ui:Save the exposure ladder}}. Obțineți câte un fișier pentru fiecare expunere, într-o arhivă zip.
-4. Imprimați fiecare fișier cu aceeași rășină și păstrați expunerea la care stâlpișorii subțiri și orificiile deschise sunt cei mai clari.
+Aceste patru elemente sunt estimări după forma piesei. Niciunul nu a fost încercat pe o imprimantă reală, așa că tratați fiecare ca pe o indicație și verificați straturile.
+
+1. Apăsați {{ui:Sugerare înclinare}} sub **Înclinare (grade)**. CadCraft încearcă înclinări de la 0 la 60 de grade și alege înclinarea cu cel mai mare strat cel mai mic, cea mai mică suprafață în consolă și fără ventuză. Setează **Înclinare (grade)** și spune ce a găsit. Ponderile de punctaj sunt ale noastre, nu ale unui producător de imprimante.
+2. După {{ui:Previzualizare straturi}}, un avertisment indică cavitățile care se deschid doar spre peliculă. O astfel de cavitate poate reține aer sub vacuum atunci când un strat se desprinde. Înclinați piesa sau adăugați un orificiu. Buzunarele mai înguste decât dimensiunea celulei din avertisment nu sunt detectate.
+3. Cu **Suporturi și plută** activate, bifați **Contravântuiți suporturile înalte** pentru a adăuga contravântuiri transversale între stâlpii înalți și subțiri.
+4. Linia de sub previzualizare indică cel mai mare strat, în cm2. Afișează o forță doar dacă introduceți o **Tensiune de desprindere măsurată** la **Straturi de bază, ridicare și viteze**. Fără o valoare proprie măsurată, afișează doar aria.
+
+## Găsiți expunerea potrivită
+
+1. Activați suplimentul pentru testul de expunere din {{ui:Setări}} › {{ui:Suplimente}}.
+2. Apăsați {{ui:Plasare piesă de test pe platformă}}.
+3. Apăsați {{ui:Salvare scară de expunere}}. Primiți câte un fișier pentru fiecare expunere, într-o arhivă zip.
+4. Imprimați fiecare fișier cu aceeași rășină și păstrați expunerea la care stâlpii subțiri sunt cei mai clari și orificiile deschise cele mai curate.
 
 ## Note
 
-- Felierea rulează în fundal, astfel că pagina rămâne utilizabilă pe o platformă mare.
+- Felierea rulează în fundal, astfel încât pagina rămâne utilizabilă pe o placă mare.
 - Piesele care nu sunt solide închise sunt lăsate deoparte, iar cardul o spune.
 - Dacă imprimanta refuză un fișier, cardul formatului are opțiuni pentru ce lasă formatul deschis. Schimbați una, salvați din nou și spuneți-ne care a funcționat.
 - Versiunile Anycubic 517 și 518 nu sunt scrise.

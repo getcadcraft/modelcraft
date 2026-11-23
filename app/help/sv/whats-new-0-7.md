@@ -2,7 +2,7 @@
 title: Nyheter i 0.7 (tidigare)
 summary: Nät med modifierare, skulptering, UV och kurvobjekt, sökvägsspårning (path tracing) på grafikkortet och en renderingsarbetsyta, en levande vy i realtid med spridning och panoramor, nodmaterial, en animationsarbetsyta med ben och fysik, USD-, FBX-, STEP- och .3dm-filer, samt utskriftsverktyg med en nybörjarstil.
 keywords: nyheter 0.7, tidigare version, versionsanteckningar, ändringslogg, ändringar, 0.7, version, nya funktioner, nät, arbetsytan nät, modifierare, underdelning, veck, uv, unwrap, sömmar, kurvor, kurvobjekt, nurbs, bezier, skulptera, remesh, retopologi, dela, beräkning, path tracing, webgpu, renderingsarbetsyta, renderingskö, mp4, exr, brusreducering, fysisk himmel, hdri, ies, skärpedjup, ljusblandning, dimma, kaustik, levande vy, realtid, gå, spridning, panorama, rundtur, visare, skuggning, noder, nodmaterial, materialbibliotek, materialx, dekaler, texturmålning, baka, animera, grafeditor, klipp, formnycklar, drivare, armatur, ben, skinning, ik, villkor, fysik, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d-solider, stöd, väggtjocklek, urholka, reparera, nybörjare, assistenter, din dator, enheter, portugisiska
-from: fa562a09
+from: 16d52810
 ---
 
 Det här är vad som ändrades i ModelCraft 0.7, jämfört med 0.6. ModelCraft modellerar nu nät såväl som push/pull-geometri, renderar på grafikkortet och har en arbetsyta för varje slags arbete: välj den i listan {{ui:Workspace}} till vänster i verktygsfältet.

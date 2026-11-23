@@ -2,7 +2,7 @@
 title: Kaj je novega v 0.7 (prej)
 summary: Mreže z modifikatorji, kiparjenje, UV in krivuljni predmeti, sledenje poti na grafični kartici in delovno okolje Upodobi, živi pogled v realnem času s stresanjem in panoramami, materiali z vozlišči, delovno okolje Animiraj s kostmi in fiziko, USD, FBX, STEP in datoteke .3dm ter orodja za tiskanje s slogom Začetnik.
 keywords: kaj je novega 0.7, prejšnja izdaja, opombe ob izdaji, dnevnik sprememb, spremembe, 0.7, različica, nove funkcije, mreža, mreže, delovno okolje mreže, modifikatorji, podrazdelitev, zareza, uv, razvij, šivi, krivulje, krivuljni predmeti, nurbs, bezier, kiparjenje, ponovna mreža, retopologija, razdelitev, izračun, sledenje poti, webgpu, delovno okolje upodobi, vrsta upodobitev, mp4, exr, odšumljanje, fizično nebo, hdri, ies, globina ostrine, mešanje luči, megla, kavstika, živi pogled, realni čas, hoja, raztresenje, panorama, ogled, senčenje, vozlišča, vozliščni materiali, knjižnica materialov, materialx, nalepke, slikanje tekstur, pečenje, animiraj, urejevalnik grafov, posnetki, oblike ključev, gonilniki, skelet, kosti, vezanje, ik, omejitve, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d telesa, podpore, debelina sten, izdolbi, popravilo, začetnik, pomočniki, vaš računalnik, enote, portugalščina
-from: fa562a09
+from: 16d52810
 ---
 
 To so spremembe v ModelCraft 0.7 v primerjavi z 0.6. ModelCraft zdaj modelira mreže in tudi geometrijo, narejeno s potisni/povleci, upodablja na grafični kartici in ima delovno okolje za vsako vrsto dela: izberete ga v seznamu {{ui:Delovno okolje}} na levi strani orodne vrstice.

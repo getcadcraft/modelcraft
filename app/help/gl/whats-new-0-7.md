@@ -2,7 +2,7 @@
 title: Novidades da 0.7 (anterior)
 summary: Mallas con modificadores, esculpido, UV e obxectos de curva, trazado de camiños na tarxeta gráfica e un espazo de traballo Renderizar, vista en directo en tempo real con dispersión e panorámicas, materiais con nodos, un espazo de traballo Animar con ósos e física, ficheiros USD, FBX, STEP e .3dm, e ferramentas de impresión cun estilo Principiante.
 keywords: novidades 0.7, versión anterior, notas de versión, rexistro de cambios, cambios, 0.7, versión, novas funcións, malla, mallas, espazo de traballo malla, modificadores, subdivisión, pregar, uv, desdobrar, costuras, curvas, obxectos de curva, nurbs, bezier, esculpir, remallar, retopoloxía, dividir, cálculo, trazado de camiños, webgpu, espazo de traballo renderizar, cola de render, mp4, exr, eliminación de ruído, ceo físico, hdri, ies, profundidade de campo, mestura de luces, néboa, cáusticas, vista en directo, tempo real, percorrer, dispersión, panorama, percorrido, visor, sombreado, nodos, materiais con nodos, biblioteca de materiais, materialx, calcomanías, pintura de texturas, cocer, animar, editor de curvas, clips, chaves de forma, controladores, esqueleto, ósos, deformación, restricións, física, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, sólidos 3D, soportes, grosor de muro, ocar, reparar, principiante, asistentes, o seu ordenador, unidades, portugués
-from: fa562a09
+from: 16d52810
 ---
 
 Esta é a lista do que cambiou na ModelCraft 0.7, en comparación coa 0.6. ModelCraft agora modela mallas ademais de xeometría de empurrar/tirar, renderiza na tarxeta gráfica, e ten un espazo de traballo para cada tipo de traballo: escóllao na lista {{ui:Espazo de traballo}} á esquerda da barra de ferramentas.

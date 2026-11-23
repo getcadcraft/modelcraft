@@ -11,6 +11,7 @@
  *                                    1 to 1.5 s and most of the import's memory at 500k faces)
  *   meshShells(mesh)               → the same from a Mesh: pieces joined through shared edges (half-edge twins), closed when
  *                                    no edge of the piece is open; kept per mesh state, so the card's polling costs nothing
+ *   keepShells(mesh, shells)       → meshShells' answer handed in (import-job.js: the worker worked it out on the same slots)
  *   guideFacts(model, {ready})     → {face, solid, group, print}: booleans. face = a face anywhere shown; solid = a closed
  *                                    piece with volume; group = a shown group or component holding one; print = `ready`
  *                                    (the caller's last check of this model version said "Ready to print")
@@ -89,6 +90,8 @@ export function meshShells(mesh) {
   meshFacts.set(mesh, { v: mesh.v, shells: out });
   return out;
 }
+/** 0.11 PERF.7: shells worked out elsewhere for this mesh as it is now (an import's worker, on the same slots): kept as meshShells' own. */
+export function keepShells(mesh, list) { meshFacts.set(mesh, { v: mesh.v, shells: list }); }
 
 const hasSolid = (def) => shells(def).some((s) => s.closed && Math.abs(s.volume) > VOL_EPS);
 const hasFace = (def) => (def.mesh ? def.shown.faceCount > 0 : def.faces.size > 0);

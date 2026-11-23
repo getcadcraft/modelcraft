@@ -8,6 +8,7 @@
  *
  *   prettyJson(obj) → text            one property per line (indent 1), lists of plain numbers on one line (0.8 DC.27 H1)
  *   encodeRaw(obj) → obj              every { [RAW_B64]: typed array } (Mesh.toJSON raw) replaced by its base64, in place
+ *   fileTextChecked({ j }) → { text, slots }   job: the same text + each mesh's slotHash as the text reads back (PERF.24)
  *   fileText({ j }) → text            job: what modelText() writes, from the same object with raw meshes: the same characters
  *   exportFile({ j, kind, name, lang }) → { bytes | text, extra }   job: glb (io/gltf-write.js exportGltf), obj (io/obj.js
  *                                     exportObj: { obj, mtl, mtlName, images }), dae (io.js exportDAE) of the model `j`
@@ -33,6 +34,20 @@ export function encodeRaw(v) {
 
 export function fileText({ j }) {
   return prettyJson(encodeRaw(j));
+}
+
+/**
+ * 0.11 PERF.24: fileText for the autosave's first copy, plus, for each mesh definition, Mesh.slotHash() of the mesh that text
+ * reads back as (Mesh.fromJSON, as a recovery does): { text, slots: {defId: hash} }. The page compares them with its live meshes'
+ * own; where they agree the autosave writes that mesh's later edits instead of the whole mesh.
+ */
+export async function fileTextChecked({ j }) {
+  const { Mesh } = await import('./mesh.js');
+  const slots = {};
+  for (const d of Array.isArray(j.defs) ? j.defs : []) {
+    if (d && d.kind === 'mesh' && d.mesh && typeof d.id === 'string') { try { slots[d.id] = Mesh.fromJSON(d.mesh).slotHash(); } catch { /* not read back: written whole later */ } }
+  }
+  return { text: prettyJson(encodeRaw(j)), slots };
 }
 
 let langKey = '';

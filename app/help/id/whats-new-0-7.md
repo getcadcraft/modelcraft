@@ -2,7 +2,7 @@
 title: Yang baru di 0.7 (sebelumnya)
 summary: Mesh dengan modifier, pahat, UV dan objek kurva, path tracing di kartu grafis dan ruang kerja Render, tampilan langsung real-time dengan sebar dan panorama, material node, ruang kerja Animate dengan tulang dan fisika, USD, FBX, STEP, dan berkas .3dm, serta alat cetak dengan gaya Pemula.
 keywords: yang baru 0.7, rilis sebelumnya, catatan rilis, changelog, perubahan, 0.7, versi, fitur baru, mesh, mesh, ruang kerja mesh, modifier, subdivisi, lipatan, uv, unwrap, jahitan, kurva, objek kurva, nurbs, bezier, pahat, remesh, retopologi, bagi, perhitungan, path tracing, webgpu, ruang kerja render, antrean render, mp4, exr, denoise, langit fisik, hdri, ies, kedalaman bidang, pencampuran cahaya, kabut, caustics, tampilan langsung, real time, jalan, sebar, panorama, tur, viewer, shading, node, material node, pustaka material, materialx, decal, lukis tekstur, bake, animate, graph editor, klip, shape key, driver, armature, tulang, skinning, ik, constraint, fisika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, solid 3d, penyangga, tebal dinding, lubangi, perbaiki, pemula, asisten, mesin Anda, satuan, portugis
-from: fa562a09
+from: 16d52810
 ---
 
 Inilah yang berubah di ModelCraft 0.7, dibandingkan dengan 0.6. ModelCraft kini memodelkan mesh serta geometri dorong/tarik, merender di kartu grafis, dan memiliki ruang kerja untuk setiap jenis pekerjaan: pilih di daftar {{ui:Ruang kerja}} di sebelah kiri bilah alat.

@@ -1,42 +1,51 @@
 ---
-title: Hlukanisa ngomshini wokuphrinta we-resin
-summary: Hlukanisa ibhedi lokuphrinta lesiteji ngomshini wokuphrinta we-resin, gqoka futhi ulekelele ingxenye, bheka ngezendlalelo, londoloza ifayela lomshini, bese uthola ukuvezwa kwakho ngovivinyo lokuvezwa.
-keywords: i-resin, ukuphrinta nge-resin, sla, msla, dlp, isihlukanisi, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, ukugoqa, umgodi wokuphefumula, irafu, izisekelo zokusekela, ovivinyo lokuvezwa, indlela yokuvezwa, izendlalelo, i-add-on
-from: 83c394e1
+title: Ukusika ngomshini wokuprinta ngeresini
+summary: Sika ibhedi lesigaba sokuprinta ngomshini wokuprinta ngeresini, ugobe futhi usekele ingxenye, bheka izingqimba, londoloza ifayela lomshini, bese uthola ukuveza kwakho ngesivivinyo sokuveza.
+keywords: iresini, phakamisa ukuthambeka, inkomishi yokumunca, amandla okukhipha, ukubopha, ukuprinta nge-resin, sla, msla, dlp, isilayisi, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, ukugoba, imbobo yokuphefumula, uhlaka, izisekelo, isivivinyo sokuveza, uhlaka lokuveza, ukulinganisa, izingqimba, okwengeziwe
+from: 8cc12858
 ---
 
-Ama-add-on e-resin ahlukanisa okusebhedini lokuphrinta abe izithombe zezendlalelo zesikrini somshini wakho, bese elondoloza ifayela umshini wakho ulifundayo. Ahhala, awakho okuvalekile, futhi avalwe kuze kuvulwe.
+Okwengeziwe kwe-resin kusika okusebhedini lokuprinta kube yizithombe zezingqimba zesikrini somshini wakho, bese kulondoloza ifayela ofundwa yimshini wakho. Ziyamahhala, akukho okukhiyiwe, futhi zivaliwe kuze kube yilapho uzivula.
 
 :::note
-Akukakayiswa ifayela kumshini wangempela wokuphrinta. Amafayela afundwe yizifundi zabafundi bakwa-CadCraft kuphela, nezisekelo zintsha. Hlola izendlalelo, bese wenza ukuphrinta kokuqala ngesandla.
+Akukakaze kulayishwe ifayela emshinini wangempela wokuprinta. Amafayela afundwe emuva yizifundi zeCadCraft zodwa, futhi izisekelo zintsha. Hlola izingqimba, bese wenza ukuprinta kokuqala ngesandla.
 :::
 
 ## Okuzokwenza
 
-Hlukanisa ingxenye ye-resin, hlola izendlalelo, londoloza ifayela bese uliphehlela emshinini wakho.
+Sika ingxenye ngeresini, hlola izingqimba, londoloza ifayela bese uyikopisha emshinini wakho.
 
 ## Izinyathelo
 
-1. Vula {{ui:Izilungiselelo}} › {{ui:Okwengeziwe}} bese uvula i-add-on yesihlukanisi se-resin ne-add-on yefomethi yefayela lomshini wakho (Elegoo GOO, SL1, Chitubox, noma Anycubic). Ungacindezela futhi {{ui:Engeza ukuphrinta nge-resin}} ekhadini lesiteji sokuphrinta.
-2. Beka ingxenye yakho ebhedini njengoba kuchazwe ku-[Beka izinto ebhedini lokuphrinta](topic:print-stage), bese ukhetha {{ui:I-resin}} eduze kwe-**Ukuphrinta nge**.
-3. Ngaphansi kwe-**Resin print settings**, khetha i-**Printer** yakho ne-**Resin** yakho. Ikhadi libonisa usayizi wesikrini ngamaphikseli. Lawa ngosayizi abashicileli ababhalile, ngakho ahlole ngokwakho; ungawahlela ngaphansi kwe-Custom.
-4. Setha **Layer height (mm)**, **Exposure (s)** and **Bottom exposure (s)**. Izinombolo zento ngayinye ye-resin zisuke nje kuqala.
-5. Tika **Hollow it, with a vent hole** uma ufuna ingxenye eyimbobo, bese usetha **Wall (mm)** ne-**Hole width (mm)**.
-6. Tika **Supports and a raft**, bese ukhetha **Support density**: Light, Medium noma Heavy.
-7. Khetha **File format**. Uma ikhadi lisho ukuthi akukakhiwa lutho, cindezela inkinobho ethi Add negama lefomethi.
-8. Cindezela {{ui:Bonisa izendlalelo}} bese uhambisa isilayidi se-**Layer**. Izinto ezintantayo zibhalwe ngomjikelezo. Umugqa ongaphansi kwayo unikeza izendlalelo, isikhathi, ne-resin ngo-mL, amagremu nezindleko.
-9. Cindezela {{ui:Londoloza ifayela lokuphrinta}}, hlola isifinyezo bese ucindezela {{ui:Londoloza}}. Kopisha ifayela emshinini wakho.
+1. Vula {{ui:Izilungiselelo}} › {{ui:Okwengeziwe}} bese uvula okwengeziwe kwesilayisi seresini kanye nokwengeziwe kwefomethi yefayela lomshini wakho (Elegoo GOO, SL1, Chitubox, noma Anycubic). Ungacindezela futhi {{ui:Engeza ukuprinta nge-resin}} ekhadini lesigaba sokuprinta.
+2. Beka ingxenye yakho ebhedini njengoba kuchazwe ku-[Beka izinto ebhedini lokuprinta](topic:print-stage), bese ukhetha {{ui:Iresini}} eduze kwe-**Ukuprinta nge**.
+3. Ngaphansi kwe-**Izilungiselelo zokuprinta nge-resin**, khetha i-**Umshini wokuprinta** yakho ne-**Iresini** yakho. Ikhadi likhombisa usayizi wesikrini ngamapikseli. Lezi yizinkulumo ezishicilelwe zomkhiqizi, ngakho hlola eyakho; ungazihlela ngaphansi kwe-**Okwezifiso**.
+4. Setha **Ukuphakama kongqimba (mm)**, **Ukuveza (s)** kanye **Ukuveza kwaphansi (s)**. Izinombolo zalo mkhiqizo wonke ziyisiqalo nje.
+5. Thikha **Gobela, ngembobo yokuphefumula** uma ufuna ingxenye egobile, bese usetha **Udonga (mm)** kanye **Ububanzi bembobo (mm)**.
+6. Thikha **Izisekelo nohlaka**, bese ukhetha i-**Ukuminyana kwezisekelo**: Ukukhanya, Phakathi noma Ukusindu.
+7. Khetha i-**Ifomethi yefayela**. Uma ikhadi lithi akukakho okwengeziwe, cindezela inkinobho ethi Engeza kanye negama lefomethi.
+8. Cindezela {{ui:Buka izingqimba}} bese uhambisa isilayidi se-**Ungqimba**. Izingxenye ezintantayo zibhalwe ngomjikelezo. Umugqa ongaphansi kwawo unikeza izingqimba, isikhathi nerezini nge-mL, nge-g nezindleko.
+9. Cindezela {{ui:Londoloza ifayela lokuprinta}}, hlola isifinyezo bese ucindezela {{ui:Londoloza}}. Kopisha ifayela emshinini wakho.
 
-## Thola ukuvezwa kwakho
+## Ukuthambeka, izinkomishi zokumunca, izibopho nesibalo sokukhuphuka
 
-1. Vula i-add-on yovivinyo lokuvezwa ku-{{ui:Izilungiselelo}} › {{ui:Okwengeziwe}}.
-2. Cindezela {{ui:Beka ingxenye yovivinyo ebhedini}}.
-3. Cindezela {{ui:Londoloza indlela yokuvezwa}}. Uthola ifayela elilodwa ngokuvezwa ngakunye, ku-zip.
-4. Phrinta ngalinye lamafayela nge-resin efanayo, bese ugcina ukuvezwa okucacile kakhulu ngezinsika ezincane nezimbobo ezivulekile.
+Lezi zinto ezine ziyizilinganiso ezivela esimweni sengxenye. Azikaze zivivinywe emshinini wangempela wokuprinta, ngakho zibheke njengamazwibela futhi bheka izingqimba.
+
+1. Cindezela {{ui:Phakamisa ukuthambeka}} ngaphansi kwe-**Ukuthambeka (amadigri)**. I-CadCraft izama ukuthambeka kusukela ku-0 kuya ku-60 amadigri bese ikhetha okuncane kakhulu kongqimba olukhulu kunazo zonke, ukungcwabeka okuncane kwendawo, futhi ingabikho inkomishi yokumunca. Isetha i-**Ukuthambeka (amadigri)** futhi ichaze okutholwe yona. Izisindo zokuhlola ngezethu, hhayi ezomkhiqizi womshini wokuprinta.
+2. Ngemva kokucindezela {{ui:Buka izingqimba}}, isexwayiso sichaza izimbobo ezivulela kuphela ngasefilimini. Imbobo enjalo ingabamba ukumunca uma ungqimba lukhuphuka. Phendula ingxenye noma wengeze imbobo. Izikhala ezincane kunosayizi weseli ezisexwayisweni azibonakali.
+3. Uma i-**Izisekelo nohlaka** ivuliwe, thikha **Bopha izisekelo ezinde** ukuze wengeze izibopho ezinqamulelayo phakathi kwezinsika ezinde ezincane.
+4. Umugqa ongaphansi kwesibuki unikeza ungqimba olukhulu kunazo zonke ngo-cm2. Ukhombisa amandla kuphela uma ufaka **Ukucindezeleka kokukhuphuka okulinganiswe** ngaphansi kwe-**Izingqimba eziphansi, ukuphakamisa nezivinini**. Ngaphandle kwenombolo yakho elinganisiwe ukhombisa indawo kuphela.
+
+## Thola ukuveza kwakho
+
+1. Vula okwengeziwe kwesivivinyo sokuveza ku-{{ui:Izilungiselelo}} › {{ui:Okwengeziwe}}.
+2. Cindezela {{ui:Beka ingxenye yesivivinyo ebhedini}}.
+3. Cindezela {{ui:Londoloza uhlaka lokuveza}}. Uthola ifayela elilodwa ngokuveza ngakunye, ku-zip.
+4. Printa ngayinye yamafayela ngeresini efanayo, bese ugcina ukuveza okunezinsika ezincane ezibukhali nezimbobo ezivulekile.
 
 ## Amanothi
 
-- Ukuhlukanisa kusebenza ngemuva, ngakho ikhasi liyasebenza ngisho nasebhedini elikhulu.
-- Izingxenye ezingewona amavolumu avaliwe ziyasuswa, futhi ikhadi liyasho lokho.
-- Uma umshini wakho ungamukeli ifayela, ikhadi lefomethi linezinketho zalokho lefomethi eyishiyile ivulekile. Shintsha okukodwa, londoloza futhi, bese usitshela ukuthi yiphi eyasebenza.
-- Izinguqulo ze-Anycubic 517 nezi-518 aziloghwa.
+- Ukusika kusebenza ngemuva, ngakho ikhasi lisasebenziseka ephleti enkulu.
+- Izingxenye ezingasizo amasolidi avaliwe ziyashiywa, futhi ikhadi liyasho lokho.
+- Uma umshini wakho wenqaba ifayela, ikhadi lefomethi linezinketho zalokho okushiywa yifomethi. Shintsha enye, londoloza futhi, bese usitshela ukuthi iyiphi eyasebenza.
+- Izinguqulo ze-Anycubic 517 no-518 abizibhalwa.

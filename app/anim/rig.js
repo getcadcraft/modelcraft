@@ -19,11 +19,8 @@
  *   bonePoints(rig, world Map) → [{id, head, tail}] posed, mesh coordinates (drawing bones)
  */
 import { eulerToQuat, compose, decompose } from '../render/anim.js';
+import { cross3 as cross, dot3 as dot, sub3 as sub, unit3 as norm } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
 /** Column-major 4×4 product a × b. */
 export function mul(a, b) {
   const o = new Array(16);

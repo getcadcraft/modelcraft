@@ -2,7 +2,7 @@
 title: 0.7-də yeniliklər (əvvəlki)
 summary: Modifikatorlu mesh-lər, heykəltəraşlıq, UV-lər və əyri obyektlər, qrafik kartında yol izləmə və Render iş sahəsi, səpələnmə və panoramalı real vaxt canlı görünüşü, node materialları, skeletlər və fizika ilə Animate iş sahəsi, USD, FBX, STEP və .3dm faylları, və Başlanğıc üslubu ilə çap alətləri.
 keywords: 0.7-də yeniliklər, əvvəlki buraxılış, buraxılış qeydləri, dəyişikliklər jurnalı, dəyişikliklər, 0.7, versiya, yeni xüsusiyyətlər, mesh, mesh-lər, mesh iş sahəsi, modifikatorlar, bölünmə, qırış, uv, açmaq, tikişlər, əyrilər, əyri obyektləri, nurbs, bezier, heykəltəraşlıq, remesh, retopologiya, bölmək, hesablama, yol izləmə, webgpu, render iş sahəsi, render növbəsi, mp4, exr, səs-küy azaltma, fiziki səma, hdri, ies, sahə dərinliyi, işıqların qarışdırılması, duman, kaustika, canlı görünüş, real vaxt, gəzmək, səpələnmə, panorama, tur, baxış proqramı, kölgələndirmə, node-lar, node materialları, material kitabxanası, materialx, dekal, tekstur boyama, bişirmə, animasiya, qrafik redaktor, kliplər, forma açarları, sürücülər, skelet, sümüklər, skinninq, ik, məhdudiyyətlər, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D cisimlər, dayaqlar, divar qalınlığı, oyma, təmir, başlanğıc, köməkçilər, sizin kompüteriniz, vahidlər, portuqal dili
-from: fa562a09
+from: 16d52810
 ---
 
 Bu, ModelCraft 0.7-də 0.6-ya nisbətən nəyin dəyişdiyidir. ModelCraft indi həm itələ/çək həndəsəsini, həm də meshləri modelləşdirir, qrafik kartında render edir və hər iş növü üçün iş sahəsi var: onu alətlər panelinin solundakı {{ui:İş sahəsi}} siyahısında seçin.

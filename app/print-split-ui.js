@@ -24,6 +24,7 @@ import { apply } from './vec.js';
 import { SPLIT_DEFAULTS, CONNECTORS, gridForBed, splitForPrint, splitFiles, assemblySheet } from './print-split.js';
 import { zipStored } from './print3d.js';
 import { placePieces } from './print-split-mc.js';
+import { cross3 as cr } from './geom-vec.js';   // shared helpers (0.11 PERF.74)
 
 const MM = 1000;
 /** The normal of a cut across `axis`, slanted `deg` degrees by turning it about the axis `about` (0 = straight across). */
@@ -94,7 +95,6 @@ export function splitTool(h) {
       const mid = [0, 1, 2].map((i) => (lo[i] + hi[i]) / 2), off = p.n[0] * mid[0] + p.n[1] * mid[1] + p.n[2] * mid[2] - p.d;
       const c0 = mid.map((v, i) => v - p.n[i] * off), r = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2 + pad;
       const ref = Math.abs(p.n[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
-      const cr = (x, y) => [x[1] * y[2] - x[2] * y[1], x[2] * y[0] - x[0] * y[2], x[0] * y[1] - x[1] * y[0]];
       let u = cr(p.n, ref); const ul = Math.hypot(...u); u = u.map((v) => v / ul); const w = cr(p.n, u);
       const q = (su, sw) => c0.map((v, i) => v + (u[i] * su + w[i] * sw) * r);
       const A = q(-1, -1), B = q(1, -1), C = q(1, 1), D = q(-1, 1);

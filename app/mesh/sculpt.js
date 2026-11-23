@@ -16,6 +16,7 @@
  * positions under the brush (as sculpting programs commonly do; no code from any was read).
  */
 import { BoxTree } from '../bvh.js';
+import { dot3 as dot, lerp3 as lerp, scale3 as mul, sub3 as sub } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 export const BRUSHES = ['draw', 'clay', 'smooth', 'grab', 'inflate', 'crease', 'pinch', 'flatten', 'mask'];
 export const falloff = (x) => (x >= 1 ? 0 : x <= 0 ? 1 : 1 - 3 * x * x + 2 * x * x * x);
@@ -237,11 +238,7 @@ export function splitEdge(m, h) {
 }
 
 // ---- small vector helpers ----
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const addS = (a, d, k) => [a[0] + d[0] * k, a[1] + d[1] * k, a[2] + d[2] * k];
-const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 /** Does the ray pass within s of the box [lo, hi]? (slab test on the box grown by s) */
 function rayBox(o, d, lo, hi, s) {
   let t0 = 0, t1 = Infinity;

@@ -2,7 +2,7 @@
 title: Okusha ku-0.7 (kwangaphambili)
 summary: Ama-mesh anezinguquli, ukubumba, ama-UV namajika, ukulandelela indlela ku-graphics card nendawo yokurenda, ukubuka okuphilayo kwesikhathi sangempela nama-panorama, izinto zama-node, indawo ye-Animate enamathambo nefiziksi, amafayela e-USD, FBX, STEP nele-.3dm, namathuluzi okuprinta anesitayela sabaqalayo.
 keywords: okusha 0.7, inguqulo yangaphambili, amanothi okukhishwa, izinguquko, changelog, 0.7, inguqulo, izici ezintsha, mesh, ama-mesh, indawo ye-mesh, izinguquli, indawo yokuhlukaniswa, ugoqo, uv, vula isikhumba, imiphetho, amajika, izinto zamajika, nurbs, bezier, ukubumba, remesh, retopology, hlukanisa, isibalo, ukulandelela indlela, webgpu, indawo yokurenda, uhlu lokurenda, mp4, exr, ukuhlanza isithombe, isibhakabhaka sefiziksi, hdri, ies, ukujula kwenkundla, ukuxuba izibani, umsi, caustics, ukubuka okuphilayo, isikhathi sangempela, hamba, ama-panorama, ukuthengisa, ukushadisa, ama-node, izinto ze-node, ithala lezinto, materialx, ama-decal, ukupeyinta ukuthungwa, ukubhaka, animate, graph editor, clips, izikhiye zesimo, ama-driver, ama-armature, amathambo, skinning, ik, ama-constraint, fiziksi, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, amasolidi 3d, ama-supports, ukujula kodonga, gobhoza, lungisa, oqalayo, abasizi, umshini wakho, amayunithi, isiPutukezi
-from: fa562a09
+from: 16d52810
 ---
 
 Lokhu kuguquke ku-ModelCraft 0.7, uma kuqhathaniswa no-0.6. Manje i-ModelCraft imodela ama-mesh kanye nejiyomethri ngokusunduza/ukuhudula, irenda ku-graphics card, futhi inendawo yomsebenzi ngayinye: yikhethe ohlwini lwe-{{ui:Indawo yokusebenza}} ngakwesobunxele kwe-toolbar.

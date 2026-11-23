@@ -3,7 +3,7 @@
  * usd-modelcraft.js — ModelCraft ↔ OpenUSD (0.7 XF.9 + XF.2, session `usd`; conventions docs/USD-CONVENTIONS.md § 9).
  * DOM-free. The library is cc-usd (./usd/, a copy of lib/usd written by tools/usd/sync.mjs).
  *
- *   saveUsd(file, model, { format: 'usda' | 'usdc' | 'usdz', name, appVersion }) → { data: string | Uint8Array, report }
+ *   saveUsd(file, model, { format: 'usda' | 'usdc' | 'usdz', name, appVersion }) → { data: string | Uint8Array (| Blob: a .usda past 300 M characters), report }
  *        `file` = the .modelcraft file's JSON (what Save writes: model.toJSON() + view, images, render, anim, issues)
  *   openUsd(bytes, { name, read }) → { file, report }          the .modelcraft JSON again: open it as a .modelcraft is opened
  *   importUsd(model, bytes, name, { read }) → { def, report }    any USD scene into the open model (call inside change())
@@ -23,12 +23,14 @@
  * **Any other USD file** opens (or imports) as groups, MD.1 meshes (UVs, normals, colours, per-face materials as paints),
  * shared prototypes as components, lamps and cameras — in metres, Z up, whatever the file's units and up axis.
  */
-import { UsdBuilder, openStage, sceneOf, sniffUsd, hexToLinear, linearToHex, mul, invert, valueAt, localMatrix, UsdError } from './usd/index.js';
+import { UsdBuilder, openStage, sceneOf, sniffUsd, hexToLinear, linearToHex, mul, invert, valueAt, localMatrix, UsdError, writeUsdaTo } from './usd/index.js';
+import { TextChunks } from './chunks.js';   // 0.11 PERF.26 (lib/textout)
 import { writeM3d } from './usd/m3d.js';
 import { Model, faceTris, edgeFaces, cleanScene, isColor, isMaterialPaint, isImagePaint } from './model.js';
 import { Mesh } from './mesh.js';
 import { material as libMaterial } from './render/materials.js';
 import { t } from './i18n.js';
+import { unit3 as norm3 } from './geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 const IDENT = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 const fromB64 = (s) => { const bin = atob(s); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
@@ -96,7 +98,8 @@ export function saveUsd(file, model, { format = 'usda', name = '', appVersion = 
     const cp = b.group(b.root, 'Cameras', { type: 'Scope' });
     file.scenes.forEach((s, k) => S(b.camera(cp, s.name || 'Scene', s.cam), 'cadcraft:id', 's' + k));
   }
-  const data = format === 'usdz' ? b.usdz(textures) : b.write(format);
+  // 0.11 PERF.26: .usda written a prim at a time into a TextChunks: the same string as b.write('usda') up to 300 M characters, a Blob past it
+  const data = format === 'usdz' ? b.usdz(textures) : format === 'usda' ? writeUsdaTo(b.layer, new TextChunks('\n')).finish().output('model/vnd.usda') : b.write(format);
   return { data, report };
 }
 
@@ -325,7 +328,6 @@ export function importScene(model, scene, name) {
 }
 
 const clean = (s) => String(s || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 120);   // eslint-disable-line no-control-regex
-const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
 
 /** A scene mesh → an MD.1 Mesh in metres, Z up, with its layers and per-face paints. */
 function buildMesh(src, F, paintOfPath) {

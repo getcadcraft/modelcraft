@@ -2,7 +2,7 @@
 title: Što je novo u 0.7 (ranije)
 summary: Mreže s modifikatorima, kiparenje, UV-ovi i objekti krivulja, praćenje putanja na grafičkoj kartici i radni prostor Renderiraj, prikaz uživo u stvarnom vremenu s raspršivanjem i panoramama, čvorni materijali, radni prostor Animacija s kostima i fizikom, USD, FBX, STEP i .3dm datoteke te alati za 3D ispis s početničkim stilom.
 keywords: što je novo 0.7, ranije izdanje, bilješke o izdanju, popis promjena, promjene, 0.7, verzija, nove značajke, mreža, mreže, radni prostor mreža, modifikatori, podjela, žlijeb, uv, razmotavanje, šavovi, krivulje, objekti krivulja, nurbs, bezier, kiparenje, remesh, retopologija, podjela brida, izračun, praćenje putanja, webgpu, radni prostor render, red renderiranja, mp4, exr, uklanjanje šuma, fizikalno nebo, hdri, ies, dubina polja, miješanje svjetla, magla, kaustika, prikaz uživo, stvarno vrijeme, hodaj, raspršivanje, panorama, obilazak, preglednik, sjenčanje, čvorovi, čvorni materijali, knjižnica materijala, materialx, naljepnice, bojanje teksture, pečenje, animacija, uređivač grafa, isječci, ključevi oblika, pokretači, armatura, kosti, skinning, ik, ograničenja, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D tijela, potpore, debljina stijenke, izdubi, popravak, početnik, pomoćnici, vaše računalo, jedinice, portugalski
-from: fa562a09
+from: 16d52810
 ---
 
 Ovo je što se promijenilo u ModelCraftu 0.7 u odnosu na 0.6. ModelCraft sada modelira mreže uz geometriju potisni/povuci, renderira na grafičkoj kartici i ima radni prostor za svaku vrstu posla: odaberite ga na popisu {{ui:Radni prostor}} s lijeve strane alatne trake.

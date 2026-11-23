@@ -2,7 +2,7 @@
 title: 0.7-এ নতুন কী (আগের)
 summary: মডিফায়ারসহ মেশ, স্কাল্পটিং, UV ও কার্ভ অবজেক্ট, গ্রাফিক্স কার্ডে পাথ ট্রেসিং ও একটি রেন্ডার ওয়ার্কস্পেস, স্ক্যাটার ও প্যানোরামাসহ রিয়েল-টাইম লাইভ ভিউ, নোড ম্যাটেরিয়াল, বোন ও ফিজিক্সসহ একটি Animate ওয়ার্কস্পেস, USD, FBX, STEP ও .3dm ফাইল, এবং Beginner স্টাইলসহ প্রিন্ট টুল।
 keywords: whats new 0.7, আগের রিলিজ, রিলিজ নোট, পরিবর্তনের লগ, পরিবর্তন, 0.7, সংস্করণ, নতুন বৈশিষ্ট্য, মেশ, মেশ, মেশ ওয়ার্কস্পেস, মডিফায়ার, subdivision, crease, uv, unwrap, সিম, কার্ভ, কার্ভ অবজেক্ট, nurbs, bezier, স্কাল্পট, remesh, retopology, divide, হিসাব, পাথ ট্রেসিং, webgpu, রেন্ডার ওয়ার্কস্পেস, render queue, mp4, exr, denoise, physical sky, hdri, ies, depth of field, light mixing, fog, caustics, লাইভ ভিউ, রিয়েল টাইম, walk, scatter, panorama, tour, viewer, শেডিং, nodes, নোড ম্যাটেরিয়াল, ম্যাটেরিয়াল লাইব্রেরি, materialx, decals, টেক্সচার পেইন্টিং, baking, animate, graph editor, clips, shape keys, drivers, armature, বোন, skinning, ik, constraints, ফিজিক্স, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D সলিড, সাপোর্ট, দেয়ালের পুরুত্ব, ফাঁপা করুন, মেরামত, beginner, সহকারী, আপনার মেশিন, এককসমূহ, পর্তুগিজ
-from: fa562a09
+from: 16d52810
 ---
 
 এটি ModelCraft 0.7-এ কী বদলেছে, 0.6-এর তুলনায়। ModelCraft এখন মেশ এবং push/pull জ্যামিতি উভয়ই মডেল করে, গ্রাফিক্স কার্ডে রেন্ডার করে, এবং প্রতিটি ধরনের কাজের জন্য একটি ওয়ার্কস্পেস আছে: টুলবারের বাঁদিকে {{ui:ওয়ার্কস্পেস}} তালিকা থেকে বেছে নিন।

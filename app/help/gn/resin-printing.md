@@ -1,42 +1,51 @@
 ---
-title: Resina impresora-pe rebanar
-summary: Rebanar impresión escenario cama resina impresora-pe, ahueco ha sostené pieza, layer-kuéra ojehechakuaa, impresora archivo oñeguarda, ha exposición prueba rupi exposición ojejuhu.
-keywords: resin, resin printing, sla, msla, dlp, slicer, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, hollow, vent hole, raft, supports, exposure test, exposure ladder, calibration, layers, add-on
-from: 83c394e1
+title: Laminar para peteĩ impresora de resina
+summary: Laminá la base de impresión de la etapa de impresión para peteĩ impresora de resina, ahuecá y sostené la pieza, revisá las capas, guardá el archivo de la impresora y hallá tu exposición con la prueba de exposición.
+keywords: resina, sugerir inclinación, ventosa, fuerza de despegue, refuerzo, impresión en resina, sla, msla, dlp, laminador, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, hueco, orificio de ventilación, balsa, soportes, prueba de exposición, escalera de exposición, calibración, capas, complemento
+from: 8cc12858
 ---
 
-Resina complemento-kuéra cama-pe impresión escenario oĩva rebanar capa imagen-kuéra impresora pantalla-pe ha oguardaba archivo impresora oipuru. Ndoiméi pago, opavave oikóva liberado, ha oñepyrũ mboyve jeýpe ndojapóiva.
+Ko'ã complemento de resina oñemboja lo oĩva ibasepe de impresión peteĩ imagen de capa rehe, pantalla de tu impresora-pe, ha oñemboguejy archivo tu impresora ohendúva. Ndaipóri pago, ndaipóri mba'e oñemboty, ha oĩ apagado peve oñemoaktiva.
 
 :::note
-Ndaipóri archivo ojeipe'áva impresora verdadera-pe todavía. Archivo-kuéra CadCraft lector-kuéra rupi ojeporu, sostén-kuéra pyahu. Capa-kuéra ehechakuaa, ha primera impresión eĩ eme'ẽ.
+Ndaipóri ojekarga archivo peteĩ impresora real rehe ko'ẽrõ. Oñemoĩ lector propio CadCraft-pe añoite, ha soporte kuéra ha'e pyahu. Eheka capas kuéra, ha eimprimi peteĩ jey eterã eme'ẽvo.
 :::
 
-## Eikotevẽva
+## Mba'épa rejapóta
 
-Pieza resina-pe rebanar, capa-kuéra ehechakuaa, archivo oñeguarda ha impresora-pe emoñe'ẽ.
+Laminá peteĩ pieza para resina, eheka capas kuéra, guardá archivo ha emoĩ peteĩ kopia tu impresora-pe.
 
 ## Pasos
 
-1. Ekliká {{ui:Configuración}} › {{ui:Complementos}} ha eñeporavo resina rebanar complemento ha impresora archivo formato complemento (Elegoo GOO, SL1, Chitubox térã Anycubic). Ikatu avei ekliká {{ui:Agregar resin printing}} Impresión escenario tarjeta-pe.
-2. Emoĩ pieza cama-pe [Impresión cama-pe ojeguerohory](topic:print-stage) ichaʼeme, upéi eiporavo {{ui:Resina}} **Impresión ndive** rapykuéri.
-3. **Resina impresión configuración** rapykuéri, eiporavo nde **Impresora** ha nde **Resina**. Tarjeta pantalla tamaño píxel rehe ohechauka. Ko'ã fabricante pantalla tamaño ojehechakuaa ojehai, nde ojehecha; Personalizado rupi ojejapo ikatu.
-4. Emoĩ **Altura de capa (mm)**, **Exposición (s)** ha **Exposición inferior (s)**. Ko'ã valor resina peteĩteĩ rehe ha'e ñepyrũ ndéve.
-5. Ejeporu **Ahuecarlo, con un orificio de ventilación** pieza ahueco ojeikotevẽramo, ha emoĩ **Pared (mm)** ha **Ancho del orificio (mm)**.
-6. Ejeporu **Soportes y base** ha eiporavo **Densidad de soportes**: Ligera, Media térã Pesada.
-7. Eiporavo **Formato de archivo**. Tarjeta he'íramo ndaipóri oñemoĩ, ekliká Agregar botón ha formato nombre.
-8. Ekliká {{ui:Vista previa de capas}} ha embyaty **Capa** deslizador. Flotante pieza-kuéra círculo-pe oñemoĩ. Línea oúva capa-kuéra, tiempo, ha resina mL, gramo ha costo rehe.
-9. Ekliká {{ui:Guardar el archivo de impresión}}, ehechakuaa resumen ha ekliká {{ui:Guardar}}. Archivo impresora-pe emboguata.
+1. Eñeno {{ui:Configuración}} › {{ui:Complementos}} ha emoaktiva complemento laminador de resina ha complemento de formato de archivo tu impresora-pe (Elegoo GOO, SL1, Chitubox térã Anycubic). Eikotevẽ avei apreta {{ui:Agregar impresión en resina}} tarjeta Impresión-pe.
+2. Emoĩ tu pieza ibasepe-pe, ojehechahaguépe [Put things on the print bed](topic:print-stage), upéi eiporavo {{ui:Resina}} **Impresión con** rapykue.
+3. Ryepýpe **Configuración de impresión en resina**, eiporavo **Impresora** ha **Resina** nde. Tarjeta omosẽ pantalla tamaño píxeles-pe. Ko'ã tamaño kuéra oñemoĩva fabricante rehe, eheka tuichave; oikotevẽ ojeporu **Personalizado** rupi ojeporrẽ hag̃ua.
+4. Emoĩ **Altura de capa (mm)**, **Exposición (s)** ha **Exposición inferior (s)**. Peteĩ resina ndive oĩ número kuéra ha'e peteĩ punto de partida añoite.
+5. Eiporavo **Ahuecarla, con orificio de ventilación** temimbo pieza ahueca va'ekue, ha emoĩ **Pared (mm)** ha **Ancho del orificio (mm)**.
+6. Eiporavo **Soportes y balsa**, ha eiporavo **Densidad de soportes**: Liviana, Media térã Alta.
+7. Eiporavo **Formato de archivo**. Tarjeta he'ise ndaipóri ojeagrega, apreta botón **Agregar** ha formato rérape.
+8. Apreta {{ui:Vista previa de capas}} ha emboguejy **Capa** deslizador. Oñemarka sy'ũ mba'e kuéra. Línea ipopyte ome'ẽ capas, tiempo ha resina mL, gramos ha costo.
+9. Apreta {{ui:Guardar el archivo de impresión}}, eheka resumen ha apreta {{ui:Guardar}}. Emoĩ archivo tu impresora-pe.
 
-## Exposición ojejuhu
+## Inclinación, ventosas, refuerzos y figura de despegue
 
-1. Ejeporu exposición prueba complemento {{ui:Configuración}} › {{ui:Complementos}} rupi.
-2. Ekliká {{ui:Poner la pieza de prueba en la cama}}.
-3. Ekliká {{ui:Guardar la escalera de exposición}}. Peteĩteĩ exposición rehe peteĩ archivo oguereko, zip-pe.
-4. Peteĩteĩ archivo resina mbojoaju ndive impresión ejapo, ha exposición ohechakuaa ohechaukáva ayvu fino ha abierto agujero porã oguereko ojekuaa.
+Ko'ã cuatro ha'e estimación oñemboja pieza forma rehe. Ndaipóri peteĩ jey ojeporu peteĩ impresora real-pe, upévare pensá cada peteĩ ra'anga ha eheka capas kuéra.
 
-## Mba'e ojekuaa
+1. Apreta {{ui:Sugerir una inclinación}} **Inclinación (grados)** rapykue. CadCraft oñeha inclinación 0 guive 60 grado peve ha oiporavo peteĩ oĩva capa tuichavéva menor, superficie menos colgante ha ndaipóri ventosa. Oñemoĩ **Inclinación (grados)** ha omombe'u mba'e ojuhúva. Puntaje peso ha'e ñande, ndaha fabricante de impresora rehe.
+2. Ojeporu {{ui:Vista previa de capas}} rire, peteĩ aviso omombe'u cavidad oipysyryva ha'e película rehe. Peteĩ cavidad upéicha ikatu oguarda succión peteĩ capa oúgui vez. Emboguejy pieza térã emoĩ peteĩ orificio. Aviso-pe ojehechaha tamaño celda guive estrecho pozo ndojehecháiva.
+3. Ojeporu **Soportes y balsa** ha eiporavo **Reforzar soportes altos** ojuhu hag̃ua travesaño entre pilar aky'ỹva.
+4. Vista previa ipopyte ome'ẽ capa tuichavéva cm2-pe. Fuerza omoñe'ẽ añoite tuichaite **Tensión de despegue medida** **Capas inferiores, elevación y velocidades** rupi. Ndaipóri peteĩ número ndéva medido, tenonde ome'ẽ superficie añoite.
 
-- Rebanar mboyve oñemboguata, upévare placa guasu jave página oñeporu iporã.
-- Sólido cerrado ndoguerekóiva pieza-kuéra ojeho pe'a, tarjeta he'i.
-- Impresora archivo ndojapóiva, formato tarjeta opción-kuéra oguereko ndojejapóiva formato mbytépe. Peteĩ cambia, oñeguarda jey, ha ndéve he'i mbaʼépa ojapo porã.
-- Anycubic 517 ha 518 versión ndojapói.
+## Eheka tu exposición
+
+1. Emoaktiva complemento de prueba de exposición {{ui:Configuración}} › {{ui:Complementos}}-pe.
+2. Apreta {{ui:Colocar la pieza de prueba en la base}}.
+3. Apreta {{ui:Guardar la escalera de exposición}}. Oguerekóta peteĩ archivo cada exposición-pe, peteĩ zip-pe.
+4. Emboguejy cada archivo ndive resina peteĩha, ha eñongatu exposición oĩva tembe'y aky'ỹva ha agujero abierto kuéra porã.
+
+## Ñemombe'u
+
+- Laminado oñemoĩ segundo plano-pe, upévare página oñemoĩ ojeporu hag̃ua plato tuichave-pe.
+- Pieza ndaha sólido cerrado kuéra oñemboyke, ha tarjeta omombe'u upéva.
+- Tu impresora ndaiprovechái archivo, formato tarjeta-pe oĩ opciones mba'e formato ndoĩmo'ãi. Emoambue peteĩ, guardá jey ha emombe'u ndéve mbaʼéichapa oiporavo.
+- Anycubic versión 517 ha 518 ndojehai.

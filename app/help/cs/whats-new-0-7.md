@@ -2,7 +2,7 @@
 title: Co je nového ve verzi 0.7 (dřívější)
 summary: Sítě s modifikátory, tvarování, UV souřadnice a křivkové objekty, sledování paprsků na grafické kartě a pracovní prostor Vykreslení, živý pohled v reálném čase s rozptylem a panoramaty, uzlové materiály, pracovní prostor Animace s kostrami a fyzikou, soubory USD, FBX, STEP a .3dm a nástroje pro tisk se stylem Začátečník.
 keywords: co je nového 0.7, dřívější vydání, poznámky k vydání, changelog, změny, 0.7, verze, nové funkce, síť, sítě, pracovní prostor sítě, modifikátory, rozdělení, rýha, uv, rozbalit, švy, křivky, křivkové objekty, nurbs, bezier, tvarování, přesíťování, retopologie, rozdělit, výpočet, sledování paprsků, webgpu, pracovní prostor vykreslení, fronta vykreslování, mp4, exr, odšumění, fyzikální obloha, hdri, ies, hloubka ostrosti, míchání světel, mlha, kaustiky, živý pohled, reálný čas, procházka, rozptyl, panorama, prohlídka, prohlížeč, stínování, uzly, uzlové materiály, knihovna materiálů, materialx, dekaly, malování textur, zapékání, animace, editor grafu, klipy, klíče tvarů, ovladače, kostra, kosti, navazování kůže, ik, omezení, fyzika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3D tělesa, podpěry, tloušťka stěn, vyduta, oprava, začátečník, asistenti, váš počítač, jednotky, portugalština
-from: fa562a09
+from: 16d52810
 ---
 
 Toto se změnilo v ModelCraftu 0.7 oproti 0.6. ModelCraft nyní modeluje sítě i geometrii tlač/tah, vykresluje na grafické kartě a má pracovní prostor pro každý druh práce: vyberte jej v seznamu {{ui:Pracovní prostor}} vlevo na panelu nástrojů.

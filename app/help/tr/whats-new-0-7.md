@@ -2,7 +2,7 @@
 title: 0.7'deki yenilikler (daha önce)
 summary: Modifikatörlü örgüler, heykel, UV'ler ve eğri nesneleri, grafik kartında yol izleme ve bir Render çalışma alanı, dağılım ve panoramalarla gerçek zamanlı canlı görünüm, düğüm malzemeleri, kemikler ve fizikli bir Animasyon çalışma alanı, USD, FBX, STEP ve .3dm dosyaları ile Başlangıç stilli baskı araçları.
 keywords: 0.7'de yenilikler, önceki sürüm, sürüm notları, değişiklik günlüğü, değişiklikler, 0.7, sürüm, yeni özellikler, örgü, örgüler, örgü çalışma alanı, değiştiriciler, alt bölme, keskin çizgi, uv, açma, dikişler, eğriler, eğri nesneleri, nurbs, bezier, heykel, yeniden örgüleme, yeniden topoloji, bölme, hesaplama, yol izleme, webgpu, render çalışma alanı, render kuyruğu, mp4, exr, gürültü giderme, fiziksel gökyüzü, hdri, ies, alan derinliği, ışık karıştırma, sis, kostik, canlı görünüm, gerçek zamanlı, yürü, dağılım, panorama, tur, görüntüleyici, gölgelendirme, düğümler, düğüm malzemeleri, malzeme kütüphanesi, materialx, çıkartmalar, doku boyama, pişirme, animasyon, grafik editörü, klipler, şekil anahtarları, sürücüler, iskelet, kemik, kaplama, fizik, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3B katılar, destekler, duvar kalınlığı, içini boşalt, onar, başlangıç, asistanlar, makineniz, birimler, portekizce
-from: fa562a09
+from: 16d52810
 ---
 
 Bu, ModelCraft 0.6'ya göre 0.7 sürümünde neyin değiştiğidir. ModelCraft artık push/pull geometrisinin yanında örgüleri de modelliyor, render işini grafik kartında yapıyor ve her iş türü için bir çalışma alanına sahip: bunu araç çubuğunun solundaki {{ui:Çalışma alanı}} listesinden seçin.

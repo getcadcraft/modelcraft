@@ -13,17 +13,11 @@
  * made from another.
  */
 import { MeshError, FL_SHARP } from '../mesh.js';
+import { add3 as add, cross3 as cross, dot3 as dot, len3 as len, lerp3 as lerp, scale3 as mul, sub3 as sub } from '../geom-vec.js';   // shared helpers (0.11 PERF.74; tools/perf/util-copies.mjs)
 
 // ---- small vector helpers (Float64 positions in the mesh's P) ----
 const P3 = (m, v) => [m.P[v * 3], m.P[v * 3 + 1], m.P[v * 3 + 2]];
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const len = (a) => Math.hypot(a[0], a[1], a[2]);
 const norm = (a) => { const l = len(a); return l > 0 ? [a[0] / l, a[1] / l, a[2] / l] : [0, 0, 0]; };
-const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 export const vecs = { P3, sub, add, mul, dot, cross, len, norm, lerp };
 
 /** A new vertex at p, with the vertex layers of `from` (or zeros). */
@@ -139,7 +133,8 @@ export function insetFaces(m, faces, { thickness = 0.1, depth = 0, individual = 
       vs.forEach((v, i) => { const w = vs[(i + 1) % n]; adds.push({ verts: [v, w, map.get(w), map.get(v)], mat: m.fMat[f], from: f, corners: [corners[i], corners[(i + 1) % n], corners[(i + 1) % n], corners[i]] }); });
     }
     const r = m.replaceFaces(R, adds);
-    return { faces: inner.map((i) => r.faces[i]), band: r.faces.filter((_, i) => !inner.includes(i)) };
+    const innerSet = new Set(inner);   // 0.11 PERF.76: a Set, not includes() per face
+    return { faces: inner.map((i) => r.faces[i]), band: r.faces.filter((_, i) => !innerSet.has(i)) };
   }
   // region: only border vertices move in; each border vertex's new place from its two border edges (in their faces' planes)
   const inR = new Set(R), border = [];
@@ -334,9 +329,9 @@ export function fill(m, { verts = [], edges = [] }) {
   if (!open.length) throw new MeshError('need_border');
   const from = new Map(open.map((h) => [m.hV[h], h]));
   // follow the border from the first open edge; if it closes, the new face is that loop run the other way
-  const loop = [];
+  const loop = [], inLoop = new Set();   // 0.11 PERF.76: inLoop answers "already in the loop" in one step
   let h = open[0];
-  for (let g = 0; g < 1e6; g++) { loop.push(h); const nx = from.get(m.head(h)); if (nx === undefined || nx === open[0] || loop.includes(nx)) { if (nx === open[0]) loop.closed = true; break; } h = nx; }
+  for (let g = 0; g < 1e6; g++) { loop.push(h); inLoop.add(h); const nx = from.get(m.head(h)); if (nx === undefined || nx === open[0] || inLoop.has(nx)) { if (nx === open[0]) loop.closed = true; break; } h = nx; }
   if (loop.closed && loop.length >= 3) {
     const rev = loop.slice().reverse();   // a_k+1 → a_k against each open half-edge a_k → a_k+1
     const verts = rev.map((x) => m.head(x)), corners = rev.map((x) => m.hNx[x]);
@@ -383,8 +378,8 @@ export function subdivide(m, { edges = [], faces = [] }, cuts = 1) {
   const C = cutEdges(m, [...es], cuts);
   const touched = new Set();
   for (const h of es) { touched.add(m.hF[h]); const t = m.hTw[h]; if (t >= 0) touched.add(m.hF[t]); }
-  const adds = [], made = [], gridFaces = new Set();   // indices into adds of the faces made from subdivided faces
-  for (const v of C.values()) made.push(...v.map((x) => x.v));
+  const adds = [], made = [], madeSet = new Set(), gridFaces = new Set();   // indices into adds of the faces made from subdivided faces
+  for (const v of C.values()) for (const x of v) { made.push(x.v); madeSet.add(x.v); }
   for (const f of touched) {
     if (m.faceDead(f)) continue;
     const cs = m.faceCorners(f, []), n = cs.length;
@@ -418,7 +413,7 @@ export function subdivide(m, { edges = [], faces = [] }, cuts = 1) {
         const pick = (ii, jj) => corners[ii * 2 >= N ? (jj * 2 >= N ? 2 : 1) : jj * 2 >= N ? 3 : 0];
         adds.push({ verts: [grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]], mat: m.fMat[f], from: f, corners: [pick(i, j), pick(i + 1, j), pick(i + 1, j + 1), pick(i, j + 1)] });
       }
-      for (const row of grid) for (const v of row) if (!made.includes(v) && v >= 0 && !cs.some((h) => m.hV[h] === v)) made.push(v);
+      for (const row of grid) for (const v of row) if (v >= 0 && !madeSet.has(v) && !cs.some((h) => m.hV[h] === v)) { made.push(v); madeSet.add(v); }
       for (let k = first; k < adds.length; k++) gridFaces.add(k);
       continue;
     }
@@ -468,7 +463,8 @@ export function loopCut(m, h, { cuts = 1, slide = 0 } = {}) {
   m.replaceFaces([...touched], adds);
   const verts = [];
   for (const l of C.values()) verts.push(...l.map((x) => x.v));
-  for (const v of verts) for (const x of m.outgoing(v)) { const w = m.head(x); if (verts.includes(w)) newEdges.push(m.edgeOf(x)); }
+  const vertSet = new Set(verts);
+  for (const v of verts) for (const x of m.outgoing(v)) { const w = m.head(x); if (vertSet.has(w)) newEdges.push(m.edgeOf(x)); }
   return { verts, edges: [...new Set(newEdges)] };
 }
 /** The edge ring through h for a loop cut: {edges (canonical), faces (the quads crossed)}. */
@@ -761,7 +757,7 @@ export function bisect(m, faces, plane) {
 function splitByPoints(m, split, cut, onCut) {
   const touched = new Set(split);
   for (const k of cut.keys()) { touched.add(m.hF[k]); const t = m.hTw[k]; if (t >= 0) touched.add(m.hF[t]); }
-  const inSplit = new Set(split), adds = [], newEdges = [];
+  const inSplit = new Set(split), adds = [], newEdges = [], cutVerts = new Set(cut.values());   // 0.11 PERF.76: the cut's vertices once, not [...cut.values()] per corner
   for (const f of touched) {
     const vs = [], cc = [];
     for (const h of m.faceCorners(f, [])) {
@@ -769,7 +765,7 @@ function splitByPoints(m, split, cut, onCut) {
       const k = m.edgeOf(h);
       if (cut.has(k)) { vs.push(cut.get(k)); cc.push(h); }
     }
-    const on = vs.map((v, i) => (cut.size && [...cut.values()].includes(v)) || (inSplit.has(f) && onCut(v)) ? i : -1).filter((i) => i >= 0);
+    const on = vs.map((v, i) => (cut.size && cutVerts.has(v)) || (inSplit.has(f) && onCut(v)) ? i : -1).filter((i) => i >= 0);
     if (inSplit.has(f) && on.length === 2 && Math.abs(on[0] - on[1]) !== 1 && Math.abs(on[0] - on[1]) !== vs.length - 1) {
       const [p1, p2] = splitPoly(vs, on[0], on[1]), [c1, c2] = splitPoly(cc, on[0], on[1]);
       adds.push({ verts: p1, mat: m.fMat[f], from: f, corners: c1 }, { verts: p2, mat: m.fMat[f], from: f, corners: c2 });
@@ -863,9 +859,9 @@ export function gridFill(m, { edges = [], verts = [] }, { span = 0, offset = 0 }
   const open = [];
   for (let h = 0; h < m.nh; h++) if (!m.heDead(h) && m.hTw[h] < 0 && vs.has(m.hV[h]) && vs.has(m.head(h))) open.push(h);
   const from = new Map(open.map((h) => [m.hV[h], h]));
-  const loop = [];
+  const loop = [], inLoop = new Set();
   let h = open[0];
-  for (let g = 0; h !== undefined && g < 1e6; g++) { loop.push(h); const nx = from.get(m.head(h)); if (nx === open[0]) break; if (nx === undefined || loop.includes(nx)) { loop.length = 0; break; } h = nx; }
+  for (let g = 0; h !== undefined && g < 1e6; g++) { loop.push(h); inLoop.add(h); const nx = from.get(m.head(h)); if (nx === open[0]) break; if (nx === undefined || inLoop.has(nx)) { loop.length = 0; break; } h = nx; }
   const n = loop.length;
   if (n < 4 || n % 2) throw new MeshError('need_even_loop');
   // the fill runs against the border: its order is the loop reversed
@@ -909,10 +905,11 @@ export function gridFill(m, { edges = [], verts = [] }, { span = 0, offset = 0 }
  */
 export function slideRails(m, verts) {
   const set = new Set(verts), out = new Map();
-  let ref = null;
+  let ref = null, openIn = null;
   for (const v of set) {
     const others = m.outgoing(v).map((h) => m.head(h)).filter((w) => !set.has(w));
-    for (let h = 0; h < m.nh; h++) if (!m.heDead(h) && m.hTw[h] < 0 && m.head(h) === v && !set.has(m.hV[h]) && !others.includes(m.hV[h])) others.push(m.hV[h]);
+    if (!openIn) { openIn = new Map(); for (let h = 0; h < m.nh; h++) if (!m.heDead(h) && m.hTw[h] < 0) { const t = m.head(h); (openIn.get(t) || openIn.set(t, []).get(t)).push(m.hV[h]); } }   // 0.11 PERF.76: the open half-edges by head, once (was a scan of every half-edge per vertex)
+    for (const w of openIn.get(v) || []) if (!set.has(w) && !others.includes(w)) others.push(w);
     if (!others.length) continue;
     const dirs = others.map((w) => ({ w, d: norm(sub(P3(m, w), P3(m, v))) }));
     if (!ref) ref = dirs[0].d;

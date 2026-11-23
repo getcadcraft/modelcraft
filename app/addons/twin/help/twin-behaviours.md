@@ -37,6 +37,20 @@ The solver carries a load about 3 % faster than the belt, so times can come out 
 
 If you import an edited version of the part, press {{ui:Check against the part again}}. A job finds its face again when the same plane or axis is in the same place. It says whether the face was found as it was, found under a new number, or found with a different size. If no face fits, or two fit equally well, the job stays in the file, does nothing, and says why. Pick the face again to repair it. Nothing is guessed.
 
+## Let Material flow read the job
+
+Each job in the list has a {{ui:Material flow item}} choice. Pick an item of the Material flow layout and its numbers come from the job:
+
+- A conveyor job gives a belt (or incline) its length, as long as the face is along the belt, and its speed. The items after it move along, so the layout still joins up.
+- A joint gives a station or transfer its time: one swing out to the far limit and back, twice the travel divided by the rate.
+- A sensor gives a photo-eye its place on the belt it is on, where its beam meets that belt. The belt must be a conveyor job too.
+
+Under the job the panel says what Material flow read, or why it could not (switched off, item missing, wrong kind of item, face not found). The flow layout itself is not changed: the link is kept with the job. Run again after you change a link.
+
+## Joints in the view
+
+When a run is playing, a joint that is linked to a flow item moves while a load is on that item. It leaves its start toward the farther limit at its rate and comes back at its rate after the load has gone. You see a copy of the part in that position; the part in the model stays where it is, so the copy hides again when the joint is home. The joint does not carry other parts.
+
 ## What this does not do
 
-Joints are tested on their own; they do not yet move the part in the view or carry other parts. Jobs are not yet read by the Material flow run: they run in the physics check on the part itself. Round faces that were cut into uneven pieces on import read as plain "other" faces and cannot be a joint axis. This is not a safety validation.
+A joint does not carry other parts, and the part in the model itself does not move: a copy is drawn. Jobs not linked to a Material flow item only run in the physics check on the part itself. Round faces that were cut into uneven pieces on import read as plain "other" faces and cannot be a joint axis. This is not a safety validation.

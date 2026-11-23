@@ -2,7 +2,7 @@
 title: Ano ang bago sa 0.7 (mas maaga)
 summary: Mga mesh na may modifier, sculpting, UV at curve object, path tracing sa graphics card at Render workspace, real-time live view na may scatter at panorama, node materials, Animate workspace na may bones at physics, USD, FBX, STEP at .3dm na file, at print tools na may Beginner style.
 keywords: whats new 0.7, naunang release, release notes, changelog, mga pagbabago, 0.7, bersyon, mga bagong feature, mesh, meshes, mesh workspace, modifiers, subdivision, crease, uv, unwrap, seam, curves, curve objects, nurbs, bezier, sculpt, remesh, retopology, divide, kalkulasyon, path tracing, webgpu, render workspace, render queue, mp4, exr, denoise, physical sky, hdri, ies, depth of field, light mixing, fog, caustics, live view, real time, lakad, scatter, panorama, tour, viewer, shading, nodes, node materials, library ng materyal, materialx, decal, pagpipinta ng texture, baking, animate, graph editor, clips, shape keys, drivers, armature, bones, skinning, ik, constraints, physics, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d solids, supports, wall thickness, hollow, repair, beginner, assistants, ang iyong makina, units, portuguese
-from: fa562a09
+from: 16d52810
 ---
 
 Ito ang nagbago sa ModelCraft 0.7, kumpara sa 0.6. Nagmo-model na ngayon ang ModelCraft ng mga mesh gayundin ng push/pull na geometry, nagre-render sa graphics card, at may workspace para sa bawat uri ng trabaho: piliin ito sa listahan ng {{ui:Workspace}} sa kaliwa ng toolbar.

@@ -2,7 +2,7 @@
 title: Uutta versiossa 0.7 (aiemmin)
 summary: Verkot muokkaimilla, veistäminen, UV-koordinaatit ja käyräkohteet, polunjäljitys näytönohjaimella ja Renderöinti-työtila, reaaliaikainen live-näkymä sirottelulla ja panoraamoilla, solmumateriaalit, Animoi-työtila luilla ja fysiikalla, USD-, FBX-, STEP- ja .3dm-tiedostot sekä tulostustyökalut Aloittelija-tyylillä.
 keywords: mitä uutta 0.7, aiempi julkaisu, julkaisutiedot, muutosloki, muutokset, 0.7, versio, uudet ominaisuudet, verkko, verkot, verkkotyötila, muokkaimet, alijako, laskos, uv, avaa tasoksi, saumat, käyrät, käyräkohteet, nurbs, bezier, veistäminen, uudelleenverkotus, jako, laskenta, polunjäljitys, webgpu, renderöintityötila, renderöintijono, mp4, exr, kohinanpoisto, fysikaalinen taivas, hdri, ies, syvyysterävyys, valojen sekoitus, sumu, kaustiikka, live-näkymä, reaaliaika, kävely, sirottelu, panoraama, kierros, katselin, varjostus, solmut, solmumateriaalit, materiaalikirjasto, materialx, tarrat, tekstuurimaalaus, paistaminen, animointi, käyräeditori, leikkeet, muotoavaimet, ohjaimet, luustot, ihotus, ik, rajoitteet, fysiikka, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d-kiintokappaleet, tukien, seinämän paksuus, ontoksi, korjaus, aloittelija, avustajat, oma kone, yksiköt, portugali
-from: fa562a09
+from: 16d52810
 ---
 
 Tämä on muuttunut ModelCraftissa versiosta 0.6 versioon 0.7. ModelCraft mallintaa nyt verkkoja työnnä/vedä-geometrian lisäksi, renderöi näytönohjaimella ja sillä on työtila jokaiselle työlajille: valitse se työkalurivin vasemmalla puolella olevasta {{ui:Työtila}}-luettelosta.

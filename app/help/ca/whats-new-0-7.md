@@ -2,7 +2,7 @@
 title: Novetats a la versió 0.7 (anterior)
 summary: Malles amb modificadors, escultura, UV i objectes de corba, traçat de camins a la targeta gràfica i un espai de treball Renderitza, una vista en directe en temps real amb dispersió i panoràmiques, materials de nodes, un espai de treball Anima amb ossos i física, USD, FBX, STEP i fitxers .3dm, i eines d'impressió amb un estil Principiant.
 keywords: novetats 0.7, versió anterior, notes de la versió, registre de canvis, canvis, 0.7, versió, funcions noves, malla, malles, espai de treball malla, modificadors, subdivisió, plec, uv, desplega, costures, corbes, objectes de corba, nurbs, bezier, escultura, remalla, retopologia, divideix, càlcul, traçat de camins, webgpu, espai de treball renderitza, cua de renderització, mp4, exr, reducció de soroll, cel físic, hdri, ies, profunditat de camp, barreja de llums, boira, càustics, vista en directe, temps real, camina, dispersió, panoràmica, recorregut, visor, ombrejat, nodes, materials de nodes, biblioteca de materials, materialx, decals, pintura de textura, bake, animació, espai de treball anima, línia de temps, claus de forma, controladors, armadures, ossos, ik, restriccions, física, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, sòlids 3D, suports, gruix de paret, buida, repara, principiant, assistents, el teu ordinador, unitats, portuguès
-from: fa562a09
+from: 16d52810
 ---
 
 Això és el que ha canviat a ModelCraft 0.7, en comparació amb la 0.6. ModelCraft ara modela malles a més de la geometria de prem/estira, renderitza a la targeta gràfica i té un espai de treball per a cada tipus de feina: trieu-lo a la llista {{ui:Espai de treball}} a l'esquerra de la barra d'eines.

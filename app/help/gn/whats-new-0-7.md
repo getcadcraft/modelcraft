@@ -2,7 +2,7 @@
 title: Mba'épa pyahu 0.7 (anterior)
 summary: Mallas modificadores rupi, sculpting, UVs ha objetos curva, path tracing tarjeta gráfica-pe ha Render workspace, vista en vivo tiempo real ha scatter ha panorámica, materiales nodo rupi, Animate workspace huesos ha física rupi, USD, FBX, STEP ha .3dm archivo, ha impresión herramienta Principiante estilo ndive.
 keywords: pyahu 0.7, versión anterior, notas de versión, registro de cambios, cambios, 0.7, versión, nuevas funciones, malla, mallas, mesh workspace, modificadores, subdivisión, pliegue, uv, desenvolver, costuras, curvas, objetos curva, nurbs, bezier, sculpt, remesh, retopología, dividir, cálculo, path tracing, webgpu, render workspace, cola de renderizado, mp4, exr, denoise, cielo físico, hdri, ies, profundidad de campo, mezcla de luces, niebla, caústicas, vista en vivo, tiempo real, recorrer, scatter, panorámica, tour, visor, sombreado, nodos, materiales de nodo, biblioteca de materiales, materialx, decals, pintura de textura, horneado, animar, editor de gráficos, clips, shape keys, drivers, armadura, huesos, skinning, ik, restricciones, física, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, sólidos 3D, soportes, grosor de pared, ahuecar, reparar, principiante, asistentes, tu máquina, unidades, portugués
-from: fa562a09
+from: 16d52810
 ---
 
 Ko'ã ojeporavo ModelCraft 0.7, 0.6 rehe. ModelCraft ko'ágã malla ha empuje/tirón geometría ojapo, tarjeta gráfica-pe renderiza, ha peteĩ workspace opa mba'e ndive: ejeporavo {{ui:Workspace}} lista pe izquierda toolbar-pe.

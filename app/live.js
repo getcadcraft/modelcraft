@@ -25,6 +25,7 @@ import { pack, unpack } from './live-client.js';
 import { t } from './i18n.js';
 import { attachPresence } from './live-presence.js';
 import { mmul as mmul4 } from './vec.js';
+import { dot3 as dot, sub3 as sub } from './geom-vec.js';   // shared helpers (0.11 PERF.74)
 
 export const SCHEMA = 1;
 export const ID_BLOCK = 1e6;
@@ -401,7 +402,6 @@ export function createLiveAdapter({ host } = {}) {
  */
 export function presenceView(app) {
   const cam = () => app.cam;
-  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   return {
     // 0.9 ED.1: follow a view — ModelCraft's own camera (camera.js: eye, target, fov, persp)
     snap() { const c = cam(); if (!c || !c.eye) return null; return c.persp === false ? { k: '3d', e: c.eye, t: c.target, o: 1, z: c.height } : { k: '3d', e: c.eye, t: c.target, f: c.fov }; },

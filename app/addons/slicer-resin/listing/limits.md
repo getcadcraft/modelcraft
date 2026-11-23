@@ -1,1 +1,3 @@
 New in 0.9 and not yet tried on a printer: the files are checked by reading them back, not by printing. Printer sizes are the makers' published numbers; check yours. Supports are new: look at the layers before you print. Large plates on a 12K screen take minutes, because slicing runs in the page. Formats from Chitu (CTB, CBDDLP, PWMX) are not included yet.
+
+The tilt suggestion, the suction-cup warning, the braces and the largest-layer figure are estimates from the shape of the part (the weights of the tilt score and the slenderness of a brace are ours, not a maker's). A force appears only if you enter a peel stress you measured on your own printer and resin. Cavities narrower than the cells named in the warning are not seen. None of this has met a real printer.

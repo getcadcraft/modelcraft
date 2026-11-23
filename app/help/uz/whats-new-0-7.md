@@ -2,7 +2,7 @@
 title: 0.7 da nimalar yangi (oldingi)
 summary: Modifikatorli meshlar, haykaltaroshlik, UV va egri chiziq obyektlari, grafik kartada nurni kuzatish (path tracing) va Render ish maydoni, scatter va panoramali jonli koʻrinish, tugun materiallari, skelet va fizikali Animate ish maydoni, USD, FBX, STEP va .3dm fayllari, hamda Boshlovchi uslubidagi chop etish vositalari.
 keywords: 0.7 yangiliklari, oldingi nashr, relizlar eslatmalari, oʻzgarishlar jurnali, oʻzgarishlar, 0.7, versiya, yangi imkoniyatlar, mesh, meshlar, mesh ish maydoni, modifikatorlar, subdivision, burma, uv, yoyish, choklar, egri chiziqlar, egri chiziq obyektlari, nurbs, bezier, haykaltaroshlik, qayta mesh, retopologiya, boʻlish, hisob-kitob, path tracing, webgpu, render ish maydoni, render navbati, mp4, exr, shovqinni kamaytirish, fizik osmon, hdri, ies, maydon chuqurligi, yorugʻlikni aralashtirish, tuman, kaustika, jonli koʻrinish, real vaqt, yurish, sochish, panorama, tur, koʻruvchi, soyalash, tugunlar, tugun materiallari, material kutubxonasi, materialx, dekal, tekstura boʻyash, pishirish, animatsiya, grafik muharriri, kliplar, shakl kalitlari, drayverlar, skelet, suyaklar, skinning, ik, cheklovlar, fizika, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, 3d jismlar, tayanchlar, devor qalinligi, boʻshatish, tuzatish, boshlovchi, yordamchilar, sizning kompyuteringiz, birliklar, portugal tili
-from: fa562a09
+from: 16d52810
 ---
 
 Bu ModelCraft 0.7 da 0.6 bilan solishtirganda nimalar oʻzgarganini koʻrsatadi. Endi ModelCraft push/pull geometriyasi bilan birga meshlarni ham modellaydi, grafik kartada render qiladi va har bir ish turi uchun ish maydoniga ega: uni asboblar panelining chap tomonidagi {{ui:Ish maydoni}} roʻyxatidan tanlang.

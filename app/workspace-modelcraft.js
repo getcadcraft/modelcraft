@@ -23,7 +23,7 @@ import { getWorkspace, listWorkspaces } from './workspaces.js';
 // the well-known actions a layout names (title bar, File, options bar, view bar) → ModelCraft's registry commands
 const MAP = { open: 'file.open', save: 'file.save', undo: 'edit.undo', redo: 'edit.redo', select: 'modify.select', clear: 'edit.select-none', fit: 'camera.extents' };
 
-export async function mountModelcraftLayouts({ root, t, mc }) {
+export async function mountModelcraftLayouts({ root, t, mc, frame = null }) {
   // fromInput sits beside the engine (an edition may serve the shell from another folder)
   const { fromInput } = await import(new URL('./app-workspace-input.js', import.meta.resolve('cc-workspace')).href);
   const $ = (s) => root.querySelector(s);
@@ -87,6 +87,9 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
     if (mc.model.scenes[i]) mc.goScene(i);
   }
 
+  // 0.11 UI.25: what ccState says a selected thing is (host.sel entries are { t, id }: i = an instance, f = a face, e = an edge)
+  const SEL_KIND = { i: 'instance', f: 'face', e: 'edge' };
+  function pickInstances(ids) { const r = (window.ccState?.refs(ids) || []).filter((x) => !x.kind || x.kind === 'instance' || x.kind === 'i'); return r.length ? !!window.ccPickers?.modelcraft?.apply(r) : false; }
   const adapter = {
     ...base,
     hide: ['[data-scenebar]'],   // the view tabs are the scenes' tabs in a layout
@@ -96,8 +99,14 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
       const tl = mc.tools, name = tl.name || 'select';
       const b = root.querySelector('.mc-tools [data-tool="' + CSS.escape(name) + '"]');
       return { document: true, name: mc.fileName, dirty: !!mc.model.dirty, busy: !!tl.tool?.busy, selection: mc.host.sel || [], other: false,
-        tool: name, toolLabel: name === 'select' ? '' : spanText(b) || wsName(wsNow()) };
+        tool: name, toolLabel: name === 'select' ? '' : spanText(b) || wsName(wsNow()),
+        kinds: (mc.host.sel || []).map((x) => SEL_KIND[x?.t] || x?.t), mode: '3d' };   // 0.11 UI.25: into ccState
     },
+    // 0.11 UI.25: ccState.select / reveal / highlight: component and group instances of the open context (the same pick SuperCad's panels use);
+    // refs { kind: 'instance', id } or a bare instance id. reveal also frames the selection (the right-click menu's Zoom to selection)
+    select: pickInstances,
+    reveal: (ids) => { if (!pickInstances(ids)) return false; try { frame?.(); } catch (e) { /* a camera that cannot frame keeps its place */ } return true; },
+    highlight: pickInstances,
     endTool() { if ((mc.tools.name || 'select') !== 'select') root.querySelector('.mc-tools [data-tool="select"]')?.click(); },
     ribbon: () => [...(base.ribbon ? base.ribbon() : []).filter((tb) => !onlyWsTools(tb)), wsTab(), ...contextTabs()],
     contextTab: () => (wsNow() !== 'model' ? 'ws-' + wsNow() : null),
@@ -155,7 +164,7 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
     views: {
       list: views, token: () => mc.fileName, initial: () => '3d',
       current: () => lastView,
-      go: (id) => go(id),
+      go,
       empty: (c) => { const b = c.el('button', { type: 'button', className: 'btn-line btn-sm-cc' }, t('app.lay.empty.open')); b.addEventListener('click', () => c.open('3d')); return b; },
     },
     // 0.9 RH.1: the Rhino layout asks for four views (Top, Perspective, Front, Right); leaving a layout gives the single view back
@@ -188,7 +197,7 @@ export async function mountModelcraftLayouts({ root, t, mc }) {
     try { ctx.open('scene:' + i); } finally { fromApp = false; }
   }
 
-  engine = mountWorkspaces(adapter);
+  engine = mountWorkspaces(window.ccState?.adapt ? window.ccState.adapt(adapter) : adapter);   // 0.11 UI.25: kinds, mode, view, problems into ccState
   window.modelcraftLayouts = Object.freeze({ engine, inspect: () => ({ layout: engine.layout, view: lastView, blocks: engine.inspect().blocks }) });   // tests and the console
   return { engine, refresh: () => engine.refresh(), scene: (i) => { seenScene = i; scene(i); } };
 }

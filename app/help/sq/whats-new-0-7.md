@@ -2,7 +2,7 @@
 title: Çfarë ka të re në 0.7 (më herët)
 summary: Rrjeta me modifikues, skulptim, UV-të dhe objekte kurbë, gjurmim shtegu në kartën grafike dhe një punëtori renderimi, pamje live në kohë reale me shpërndarje dhe panorama, materiale me nyje, një punëtori animacioni me kocka dhe fizikë, skedarë USD, FBX, STEP dhe .3dm, dhe mjete printimi me një stil Fillestar.
 keywords: çfarë ka të re 0.7, version më i hershëm, shënime lëshimi, ndryshime, 0.7, version, veçori të reja, rrjetë, rrjeta, punëtoria e rrjetës, modifikues, nënndarje, mprehje, uv, shpalos, qepje, qepje, kurba, objekte kurbë, nurbs, bezier, skulpto, ri-mesh, ri-topologji, ndaj, llogaritje, gjurmim shtegu, webgpu, punëtoria e renderimit, radha e renderimit, mp4, exr, pastrim zhurmash, qiell fizik, hdri, ies, thellësi fushe, përzierje drite, mjegull, kaustikë, pamja live, kohë reale, ec, shpërndarje, panoramë, tur, shfaqës, hijëzim, nyje, materiale nyjesh, bibliotekë materialesh, materialx, dekale, pikturim teksture, pjekje, animo, redaktori i grafikut, klipe, çelësa formash, drejtues, skelet, kocka, skinning, ik, kufizime, fizikë, usd, usdz, gltf, fbx, step, 3dm, alembic, ply, acis, trupa 3D, mbështetëse, trashësi muri, zbrazje, riparim, fillestar, asistentë, kompjuteri juaj, njësi, portugalisht
-from: fa562a09
+from: 16d52810
 ---
 
 Kjo është ajo që ndryshoi në ModelCraft 0.7, krahasuar me 0.6. ModelCraft tani modelon edhe rrjeta përveç gjeometrisë shtyj/tërhiq, renderon në kartën grafike, dhe ka një punëtori për çdo lloj pune: zgjidhe në listën {{ui:Hapësirë pune}} në të majtë të shiritit të veglave.

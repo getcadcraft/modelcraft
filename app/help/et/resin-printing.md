@@ -1,42 +1,51 @@
 ---
-title: Lõika detail vaikprinteri jaoks
-summary: Lõika printimislava trükialus vaikprinteri jaoks, tühjenda ja toeta detail, vaata kihte läbi, salvesta printeri fail ja leia oma valgustusaeg valgustustestiga.
-keywords: vaik, vaikprintimine, sla, msla, dlp, lõikur, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, õõnes, ventilatsiooniava, alus, toed, valgustustest, valgustusredel, kalibreerimine, kihid, lisandmoodul
-from: 83c394e1
+title: Viilutamine vaikprinteri jaoks
+summary: Viiluta printimisetapi alus vaikprinteri jaoks, õõnestage ja toetage detaili, vaadake kihte läbi, salvestage printeri fail ning leidke oma valotus valotuskatsega.
+keywords: vaik, kalde soovitus, vaakumkapsel, koorumisjõud, tugevdamine, vaikprintimine, sla, msla, dlp, viilutaja, goo, sl1, ctb, cbddlp, chitubox, anycubic, pwmx, pws, elegoo, õõnestamine, ventilatsiooniava, alusplaat, toed, valotuskatse, valotusredel, kalibreerimine, kihid, lisandmoodul
+from: 8cc12858
 ---
 
-Vaiguprintimise lisandmoodulid lõikavad printimislaual oleva kihtideks pildiks printeri ekraanile ja salvestavad faili, mida printer loeb. Need on tasuta, midagi ei ole lukus, ja need on välja lülitatud, kuni sa need sisse lülitad.
+Vaikprinteri lisandmoodulid viilutavad printimisalusel oleva sisu kihtideks pildiks printeri ekraani jaoks ning salvestavad faili, mida printer loeb. Need on tasuta, ilma lukustatud funktsioonideta, ja on välja lülitatud, kuni te need sisse lülitate.
 
 :::note
-Ühtegi faili ei ole veel päris printeril laaditud. Failid on loetud tagasi ainult CadCraft'i enda lugejatega ja toed on uued. Kontrolli kihte ja käivita esimene printimine käsitsi.
+Päris printeriga pole veel ühtegi faili laaditud. Failid loeti tagasi ainult CadCraft'i enda lugejatega ning toed on uued. Kontrollige kihte ja tehke esimene printimine käsitsi.
 :::
 
-## Mida sa teed
+## Mida teete
 
-Lõika detail vaigu jaoks, kontrolli kihte, salvesta fail ja kopeeri see oma printerisse.
+Viilutate detaili vaikprintimiseks, kontrollite kihte, salvestate faili ja kopeerite selle printerisse.
 
 ## Sammud
 
-1. Ava {{ui:Sätted}} › {{ui:Lisandmoodulid}} ja lülita sisse vaigulõikuri lisandmoodul ning lisandmoodul sinu printeri failivormingu jaoks (Elegoo GOO, SL1, Chitubox või Anycubic). Võid vajutada ka nuppu {{ui:Lisa vaikprintimine}} printimisetapi kaardil.
-2. Aseta detail trükialusele nagu jaotises [Aseta asjad trükialusele](topic:print-stage), seejärel vali **Printimisega** kõrval {{ui:Vaik}}.
-3. Jaotises **Vaigu printimise sätted** vali oma **Printer** ja oma **Vaik**. Kaart näitab ekraani suurust pikslites. Need on tootja avaldatud suurused, kontrolli oma; saad neid muuta jaotises Kohandatud.
-4. Sea **Kihi kõrgus (mm)**, **Valgustusaeg (s)** ja **Põhja valgustusaeg (s)**. Arvud iga vaigu jaoks on ainult lähtepunkt.
-5. Märgi **Tühjenda see, ventilatsiooniavaga**, kui tahad õõnset detaili, ja sea **Sein (mm)** ning **Ava laius (mm)**.
-6. Märgi **Toed ja alus** ja vali **Toe tihedus**: Kerge, Keskmine või Raske.
-7. Vali **Failivorming**. Kui kaardil on öeldud, et ühtegi pole veel lisatud, vajuta nuppu, millel on kirjas „Lisa“ ja vormingu nimi.
-8. Vajuta {{ui:Eelvaata kihte}} ja liiguta **Kiht** liugurit. Ujuvad tükid on ümber ringitud. Rida selle all annab kihid, aja ning vaigu milliliitrites, grammides ja hinna.
-9. Vajuta {{ui:Salvesta printimisfail}}, kontrolli kokkuvõtet ja vajuta {{ui:Salvesta}}. Kopeeri fail oma printerisse.
+1. Avage {{ui:Sätted}} › {{ui:Lisandmoodulid}} ja lülitage sisse vaikviilutaja lisandmoodul ning lisandmoodul oma printeri failivormingu jaoks (Elegoo GOO, SL1, Chitubox või Anycubic). Võite vajutada ka nuppu {{ui:Lisa vaikprintimine}} printimisetapi kaardil.
+2. Asetage detail alusele, nagu juhendis [Aseta asjad printimisalusele](topic:print-stage), ning valige **Printimise viis** kõrval {{ui:Vaik}}.
+3. Jaotises **Vaikprintimise sätted** valige oma **Printer** ja **Vaik**. Kaart näitab ekraani suurust pikslites. Need on tootjate avaldatud suurused, seega kontrollige oma printerit; saate neid muuta jaotises Kohandatud.
+4. Määrake **Kihi kõrgus (mm)**, **Valotus (s)** ja **Põhja valotus (s)**. Iga vaigu arvud on ainult lähtepunkt.
+5. Märgistage **Õõnesta, ventilatsiooniavaga**, kui soovite õõnset detaili, ning määrake **Sein (mm)** ja **Ava laius (mm)**.
+6. Märgistage **Toed ja alusplaat** ning valige **Toete tihedus**: Kerge, Keskmine või Raske.
+7. Valige **Faili vorming**. Kui kaart ütleb, et ühtegi pole veel lisatud, vajutage nuppu, millel on sõna Lisa ja vormingu nimi.
+8. Vajutage {{ui:Kihtide eelvaade}} ja liigutage liugurit **Kiht**. Ujuvad tükid on ümbritsetud rõngaga. Selle all olev rida näitab kihtide arvu, aega ning vaigu kogust milliliitrites ja grammides ning maksumust.
+9. Vajutage {{ui:Salvesta printimisfail}}, kontrollige kokkuvõtet ja vajutage {{ui:Salvesta}}. Kopeerige fail printerisse.
 
-## Leia oma valgustusaeg
+## Kalle, vaakumkapslid, tugevdused ja koorumisnäitaja
 
-1. Lülita sisse valgustustesti lisandmoodul jaotises {{ui:Sätted}} › {{ui:Lisandmoodulid}}.
-2. Vajuta {{ui:Pane testdetail trükialusele}}.
-3. Vajuta {{ui:Salvesta valgustusredel}}. Saad iga valgustusaja kohta ühe faili zip-failis.
-4. Prindi iga fail sama vaiguga ja hoia alles see valgustusaeg, mille juures on kõige teravamad õhukesed sambad ja avatud augud.
+Need neli on hinnangud detaili kuju järgi. Ühtegi neist pole päris printeril proovitud, seega käsitlege iga ühte vihjena ja vaadake kihte.
+
+1. Vajutage jaotises **Kalle (kraadides)** nuppu {{ui:Paku kallet}}. CadCraft proovib kaldeid 0 kuni 60 kraadi ja valib selle, millel on väikseim suurim kiht, kõige vähem üle ulatuv pind ja ilma vaakumkapslita. See määrab **Kalle (kraadides)** ja ütleb, mida leidis. Hindamise kaalud on meie omad, mitte printeritootja omad.
+2. Pärast {{ui:Kihtide eelvaade}} nimetab hoiatus õõnsused, mis avanevad ainult kile suunas. Selline õõnsus võib kihi koorumisel hoida vaakumit. Kallutage detaili või lisage ava. Hoiatuses nimetatud lahtrisuurusest kitsamaid taskuid ei nähta.
+3. Kui **Toed ja alusplaat** on sisse lülitatud, märgistage **Ühenda kõrged toed**, et lisada kõrgete õhukeste sammaste vahele ristsidemed.
+4. Eelvaate all olev rida näitab suurimat kihti cm2-des. See näitab jõudu ainult siis, kui sisestate jaotises **Põhjakihid, tõste ja kiirused** **Mõõdetud koorumispinge**. Ilma oma mõõdetud arvuta näitab see ainult pindala.
+
+## Leidke oma valotus
+
+1. Lülitage {{ui:Sätted}} › {{ui:Lisandmoodulid}} all sisse valotuskatse lisandmoodul.
+2. Vajutage {{ui:Aseta katseosa alusele}}.
+3. Vajutage {{ui:Salvesta valotusredel}}. Saate ZIP-failis ühe faili iga valotuse kohta.
+4. Printige iga fail sama vaiguga ja jätke alles valotus, mille õhukesed sambad ja avatud augud on kõige teravamad.
 
 ## Märkused
 
-- Lõikamine toimub taustal, nii et leht jääb suurel plaadil kasutatavaks.
-- Tükid, mis ei ole suletud tahkised, jäetakse välja ja kaart ütleb seda.
-- Kui printer keeldub failist, on vormingu kaardil valikud selle kohta, mida vorming jätab lahtiseks. Muuda üht, salvesta uuesti ja anna meile teada, mis töötas.
+- Viilutamine toimub taustal, nii et leht jääb suure plaadi puhul kasutatavaks.
+- Tükid, mis pole suletud tahkised, jäetakse välja ja kaart ütleb seda.
+- Kui printer faili ei võta, on vormingukaardil valikud selle kohta, mida vorming jätab lahtiseks. Muutke ühte, salvestage uuesti ja andke meile teada, mis töötas.
 - Anycubicu versioone 517 ja 518 ei kirjutata.
